@@ -8,6 +8,10 @@ Os serviços públicos portugueses, numa só pergunta. O **Zé** responde com ba
 em páginas oficiais e diz-te por onde começar — telefones, horários e links
 verificados incluídos.
 
+O visual é a burocracia como objeto físico — senhas de atendimento, carimbos,
+formulários e um painel LED de chamada. O Zé é o funcionário do balcão, em
+SVG inline, com expressões para cada estado do chat.
+
 Projeto independente — não é um site do Estado.
 
 ![Screenshot](docs/screenshot-home.png)
@@ -57,7 +61,8 @@ LLM_MODEL_FALLBACK=openai/gpt-oss-20b   # opcional
 app/                  páginas (/, /chat, /fontes, /privacidade, /termos)
 app/api/responder/    POST { pergunta } -> resposta do motor
 app/opengraph-image   cartão de partilha gerado automaticamente
-components/           Header, Footer, Chat, ZeFace, ZeMark...
+components/           Header, Footer, Chat, ZePersonagem, SenhaTema,
+                      FontesArquivo (arquivo expansível de /fontes)...
 lib/data/temas.ts     base de conhecimento curada (temas, perguntas, fontes)
 lib/data/fontes.ts    entidades oficiais + contactos (telefone, horário, email)
 lib/engine.ts         motores de resposta (keyword + LLM com fallback)
