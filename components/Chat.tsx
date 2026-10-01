@@ -29,11 +29,12 @@ type Mensagem =
   | { papel: "utilizador"; texto: string }
   | {
       papel: "ze";
-      tipo: "resposta" | "sugestoes" | "erro";
+      tipo: "resposta" | "sugestoes" | "erro" | "limite";
       pergunta?: Pergunta;
       tema?: Tema;
       sugestoes: Sugestao[];
       via?: "keyword" | "llm";
+      retryAte?: number;
     };
 
 export default function Chat() {
@@ -44,6 +45,7 @@ export default function Chat() {
   const [fraseIdx, setFraseIdx] = useState(0);
   const [batendo, setBatendo] = useState(false);
   const [movel, setMovel] = useState(false);
+  const [tick, setTick] = useState(0);
   const ultimaPergunta = useRef("");
   const senhaN = useRef(0);
   const fim = useRef<HTMLDivElement>(null);
@@ -78,6 +80,16 @@ export default function Chat() {
     fim.current?.scrollIntoView({ behavior: suave ? "smooth" : "auto" });
   }, [mensagens, aCarregar]);
 
+  // Countdown do 429 — só corre enquanto houver uma mensagem "limite" ativa
+  useEffect(() => {
+    const ativa = mensagens.some(
+      (m) => m.papel === "ze" && m.tipo === "limite" && (m.retryAte ?? 0) > Date.now()
+    );
+    if (!ativa) return;
+    const t = setInterval(() => setTick((n) => n + 1), 1000);
+    return () => clearInterval(t);
+  }, [mensagens, tick]);
+
   async function perguntar(texto: string) {
     const q = texto.trim();
     if (!q || aCarregar) return;
@@ -92,6 +104,18 @@ export default function Chat() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ pergunta: q }),
       });
+      if (res.status === 429) {
+        const data = await res.json().catch(() => ({}));
+        const seg = Math.min(Math.max(Number(data.retryAfter) || 60, 5), 900);
+        setMensagens((m) => [
+          ...m,
+          { papel: "ze", tipo: "limite", retryAte: Date.now() + seg * 1000, sugestoes: [] },
+        ]);
+        anuncio.current &&
+          (anuncio.current.textContent = "Limite de pedidos. Tenta de novo mais tarde.");
+        return;
+      }
+      if (!res.ok) throw new Error(`resposta ${res.status}`);
       const data = await res.json();
       setMensagens((m) => [
         ...m,
@@ -222,6 +246,29 @@ export default function Chat() {
                     <button
                       onClick={() => ultimaPergunta.current && perguntar(ultimaPergunta.current)}
                       className="btn-outline mt-3 px-4 py-2 text-sm"
+                    >
+                      Tentar de novo
+                    </button>
+                  </>
+                ) : m.tipo === "limite" ? (
+                  <>
+                    <p className="text-base">
+                      Demasiados pedidos seguidos desta ligação — o balcão
+                      precisa de respirar.{" "}
+                      {(() => {
+                        const s = Math.max(
+                          0,
+                          Math.ceil(((m.retryAte ?? 0) - Date.now()) / 1000)
+                        );
+                        return s >= 90
+                          ? `Tenta de novo daqui a ~${Math.ceil(s / 60)} min.`
+                          : `Tenta de novo daqui a ${s}s.`;
+                      })()}
+                    </p>
+                    <button
+                      onClick={() => ultimaPergunta.current && perguntar(ultimaPergunta.current)}
+                      disabled={(m.retryAte ?? 0) > Date.now()}
+                      className="btn-outline mt-3 px-4 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       Tentar de novo
                     </button>

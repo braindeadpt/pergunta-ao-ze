@@ -110,6 +110,12 @@ export default function PrivacidadePage() {
           pedidos (endereço IP, data, página pedida) por razões de segurança e
           operação.
         </p>
+        <p>
+          Para limitar o abuso do chat, contamos pedidos por endereço IP
+          usando apenas uma <em>hash</em> (resumo criptográfico) do endereço,
+          guardada em memória durante ~10 minutos e depois apagada. Nunca
+          guardamos o IP em claro nem o associamos às perguntas.
+        </p>
         <h2
           id="regra"
           className="pt-2 font-display text-lg uppercase tracking-tight"
