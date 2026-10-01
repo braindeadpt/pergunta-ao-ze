@@ -332,7 +332,7 @@ export default function Home() {
             },
             {
               q: "Onde vai parar a minha pergunta?",
-              a: "A pergunta é comparada com um conjunto curado de respostas sobre serviços públicos — nesta versão não há inteligência artificial nem envio para terceiros. As conversas não são guardadas.",
+              a: "Pode ser processada por um modelo de IA (Groq, tier gratuito) que só recebe a pergunta e excertos das respostas curadas — nunca dados pessoais. Se a IA falhar, responde a pesquisa local. As conversas não são guardadas.",
             },
             {
               q: "Que serviços conhece?",

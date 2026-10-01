@@ -19,12 +19,20 @@ export default function PrivacidadePage() {
           O que acontece à tua pergunta
         </h2>
         <p>
-          Quando escreves uma pergunta, ela é enviada ao nosso servidor para ser
-          comparada com um conjunto curado de respostas sobre serviços
-          públicos. Nesta versão não há inteligência artificial nem envio para
-          terceiros. Se no futuro as respostas passarem a usar um modelo de IA,
-          a pergunta poderá ser enviada ao fornecedor desse modelo — e esta
-          página dirá qual.
+          Quando escreves uma pergunta, ela é enviada ao nosso servidor e pode
+          ser processada por um modelo de inteligência artificial alojado na{" "}
+          <a
+            href="https://groq.com/privacy-policy/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-azulejo underline decoration-azulejo/30 underline-offset-2 hover:decoration-azulejo"
+          >
+            Groq
+          </a>{" "}
+          (fornecedor externo, tier gratuito). O modelo só recebe a tua
+          pergunta mais excertos das nossas respostas curadas — nunca te pede
+          nem deve receber dados pessoais. Se a IA falhar, a resposta vem do
+          motor de pesquisa local, sem envio a terceiros.
         </p>
         <h2 className="pt-2 font-serif text-xl font-semibold">
           O que não guardamos
@@ -34,6 +42,10 @@ export default function PrivacidadePage() {
           <li>Não pedimos conta, email, NIF ou números de documentos.</li>
           <li>Não usamos cookies de rastreamento nem publicidade.</li>
         </ul>
+        <p>
+          Usamos Vercel Analytics — métricas de visitas agregadas e anónimas,
+          sem cookies nem identificação pessoal.
+        </p>
         <h2 className="pt-2 font-serif text-xl font-semibold">
           Dados técnicos
         </h2>

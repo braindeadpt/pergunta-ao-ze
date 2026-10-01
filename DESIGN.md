@@ -244,8 +244,11 @@ reversível. Não avançar sem checkpoint.
   subtítulo → caixa, 120ms entre cada); cartões de tema com seta subtil
   (cinza → verde + deslocamento no hover) em vez de círculos verdes
   repetidos
-- [ ] **F5 — Páginas secundárias**: `/fontes`, `/privacidade`, `/termos`,
-  404 — consistência de títulos, espaçamento, tom
+- [x] **F5 — Páginas secundárias**: correção de facto em `/privacidade`
+  e na FAQ — o texto dizia "sem IA nem envio a terceiros" mas o LLM já
+  estava ativo; agora nomeia a Groq, explica o que é enviado e menciona
+  o Vercel Analytics. Cartões de `/fontes` com o raio do sistema
+  (`1.75rem`)
 - [ ] **F6 — Motion**: entrada das mensagens no chat (stagger suave),
   typing dots, reduced-motion verificado
 - [ ] **F7 — Revisão final**: acessibilidade (foco, contraste, labels),

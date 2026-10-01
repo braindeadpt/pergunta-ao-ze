@@ -27,7 +27,7 @@ export default function FontesPage() {
         {grupos.map((g) => (
           <section
             key={g.entidade.dominio}
-            className="rounded-2xl border border-stone-200 bg-white p-5"
+            className="rounded-[1.75rem] border border-stone-200 bg-white p-6"
           >
             <div className="flex items-baseline justify-between gap-4">
               <h2 className="font-semibold">{g.entidade.nome}</h2>
