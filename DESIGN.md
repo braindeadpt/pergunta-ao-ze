@@ -226,6 +226,7 @@ Regras de composição:
 | 2026-10 | **Direção v2: burocracia como objeto físico** (neo-brutalismo pop) | Direção escolhida pelo autor; a sátira vive nos objetos |
 | 2026-10 | Resposta do chat sempre sóbria | Quem lê passos oficiais precisa de clareza |
 | 2026-10 | **Objetos = estrutura, não decoração** | A v1 aplicou só uma "pele" sobre a mesma grelha — rejeitado. Senhas, formulários, livro e LED passam a ser o layout (home: hero assimétrico, senhas picotadas, stats em LED, FAQ = livro de reclamações) |
+| 2026-10 | **Chat: a moldura é a piada, a resposta é séria** | Regras do /chat: mensagem do utilizador = senha Z-00x; resposta = ficha sóbria com FONTES OFICIAIS ≥14px; carimbo DEFERIDO só no canto, nunca sobre texto; sem resultado sempre com saída útil (link/sugestão); erro de rede sem piada, com retry; em mobile a ficha ocupa a largura toda (o Zé não reserva coluna) |
 
 ## 12. Referências
 
@@ -246,14 +247,15 @@ Regras de composição:
 Regra: **apresentar antes de aplicar**. A home foi aprovada como piloto.
 
 - [x] **R0 — Documento v2**: esta direção
-- [ ] **R1 — Piloto home** (estrutura, não pele): hero assimétrico com
+- [x] **R1 — Piloto home** (estrutura, não pele): hero assimétrico com
   ZePersonagem, temas = senhas picotadas, stats = painel LED, faz/não faz
-  = formulário Z-02, FAQ = Livro de Reclamações — **aguarda aprovação**
-- [ ] **R2 — Sistema**: `.senha`, `.carimbo`, `.led-bar`, `.folha-linhas`
+  = formulário Z-02, FAQ = Livro de Reclamações — **aprovada**
+- [x] **R2 — Sistema**: `.senha`, `.carimbo`, `.led-bar`, `.folha-linhas`
   consolidados em `globals.css`
-- [ ] **R3 — Chat**: bolhas ink + sombra; input = campo de formulário;
-  loading = Zé pensar + frases de balcão; resposta entra com carimbo
-  "DEFERIDO"; sem resultados = Zé panico. Resposta sempre sóbria
-- [ ] **R4 — Secundárias**: `/fontes` (diretório "repartições"), legais
-  (impresso simples), 404 (senha "a sua vez é daqui a 3 anos")
+- [x] **R3 — Chat**: bolhas ink + sombra; input = formulário Z-01 com
+  carimbo ENVIAR; loading = Zé pensar + frases de balcão; resposta entra
+  com carimbo "DEFERIDO"; sem resultados = Zé panico + saída útil;
+  erro de rede sóbrio com "Tentar de novo". Resposta sempre sóbria
+- [ ] **R4 — Secundárias**: `/fontes` (arquivo com fichas de pasta),
+  legais (impresso sóbrio), 404 (senha A-404 "a sua vez é daqui a 3 anos")
 - [ ] **R5 — Revisão**: mobile, reduced-motion, contraste AA, consola

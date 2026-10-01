@@ -1,24 +1,71 @@
 import type { Metadata } from "next";
+import ZePersonagem from "@/components/ZePersonagem";
 
 export const metadata: Metadata = {
   title: "Privacidade",
 };
 
+const SECCOES = [
+  { id: "pergunta", t: "O que acontece à tua pergunta" },
+  { id: "nao-guardamos", t: "O que não guardamos" },
+  { id: "tecnicos", t: "Dados técnicos" },
+  { id: "regra", t: "Uma regra simples" },
+];
+
 export default function PrivacidadePage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-14">
-      <p className="font-mono text-xs font-bold uppercase tracking-[0.25em] text-stone-400">
-        Impresso Z-03 · versão cidadão
-      </p>
-      <h1 className="mt-2 font-display text-4xl uppercase tracking-tight">
-        Privacidade
-      </h1>
-      <div className="mt-6 space-y-5 border-2 border-ink bg-white p-7 text-[15px] leading-relaxed text-stone-700 shadow-[6px_6px_0_#1b1d22]">
+      <div className="flex items-start justify-between gap-6">
+        <div>
+          <p className="font-mono text-sm font-bold uppercase tracking-[0.25em] text-carimbo-tinta">
+            ▸ Impresso Z-03 · versão cidadão
+          </p>
+          <h1 className="mt-2 font-display text-4xl uppercase tracking-tight sm:text-5xl">
+            Privacidade
+          </h1>
+        </div>
+        <div className="relative hidden shrink-0 sm:block">
+          <ZePersonagem estado="pensar" className="w-28" />
+          <span
+            aria-hidden
+            className="carimbo absolute -left-8 top-16 rotate-[-8deg] bg-white text-xs"
+          >
+            Leia atentamente
+          </span>
+        </div>
+      </div>
+
+      {/* Índice — formulário de leitura */}
+      <nav
+        aria-label="Índice da página"
+        className="mt-8 border-2 border-ink bg-form-amarelo/30 px-5 py-4 shadow-[4px_4px_0_#1b1d22]"
+      >
+        <p aria-hidden className="font-mono text-xs font-bold uppercase tracking-[0.25em] text-stone-600">
+          Índice · preencher por esta ordem
+        </p>
+        <ol className="mt-2 space-y-1">
+          {SECCOES.map((s, i) => (
+            <li key={s.id}>
+              <a
+                href={`#${s.id}`}
+                className="font-mono text-sm font-medium text-azulejo underline decoration-azulejo/30 underline-offset-2 hover:decoration-azulejo"
+              >
+                {String(i + 1).padStart(2, "0")} — {s.t}
+              </a>
+            </li>
+          ))}
+        </ol>
+      </nav>
+
+      <div className="mt-8 space-y-5 border-2 border-ink bg-white p-7 text-base leading-relaxed text-stone-700 shadow-[6px_6px_0_#1b1d22]">
         <p>
           O Pergunta ao Zé foi desenhado para precisar do mínimo de informação
           possível.
         </p>
-        <h2 className="pt-2 font-display text-lg uppercase tracking-tight">
+        <h2
+          id="pergunta"
+          className="pt-2 font-display text-lg uppercase tracking-tight"
+        >
           O que acontece à tua pergunta
         </h2>
         <p>
@@ -37,7 +84,10 @@ export default function PrivacidadePage() {
           nem deve receber dados pessoais. Se a IA falhar, a resposta vem do
           motor de pesquisa local, sem envio a terceiros.
         </p>
-        <h2 className="pt-2 font-display text-lg uppercase tracking-tight">
+        <h2
+          id="nao-guardamos"
+          className="pt-2 font-display text-lg uppercase tracking-tight"
+        >
           O que não guardamos
         </h2>
         <ul className="list-disc space-y-1.5 pl-6">
@@ -49,7 +99,10 @@ export default function PrivacidadePage() {
           Usamos Vercel Analytics — métricas de visitas agregadas e anónimas,
           sem cookies nem identificação pessoal.
         </p>
-        <h2 className="pt-2 font-display text-lg uppercase tracking-tight">
+        <h2
+          id="tecnicos"
+          className="pt-2 font-display text-lg uppercase tracking-tight"
+        >
           Dados técnicos
         </h2>
         <p>
@@ -57,7 +110,10 @@ export default function PrivacidadePage() {
           pedidos (endereço IP, data, página pedida) por razões de segurança e
           operação.
         </p>
-        <h2 className="pt-2 font-display text-lg uppercase tracking-tight">
+        <h2
+          id="regra"
+          className="pt-2 font-display text-lg uppercase tracking-tight"
+        >
           Uma regra simples
         </h2>
         <p>

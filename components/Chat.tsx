@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import Link from "next/link";
 import type { Pergunta, Tema } from "@/lib/types";
 import type { Sugestao } from "@/lib/engine";
 import { getContactoPorDominio } from "@/lib/data/fontes";
@@ -44,11 +43,25 @@ export default function Chat() {
   const [aCarregar, setACarregar] = useState(false);
   const [fraseIdx, setFraseIdx] = useState(0);
   const [batendo, setBatendo] = useState(false);
+  const [movel, setMovel] = useState(false);
   const ultimaPergunta = useRef("");
   const senhaN = useRef(0);
   const fim = useRef<HTMLDivElement>(null);
+  const barra = useRef<HTMLDivElement>(null);
+  const [padBaixo, setPadBaixo] = useState(176);
   const enviado = useRef(false);
   const anuncio = useRef<HTMLParagraphElement>(null);
+
+  // Padding inferior = altura real da barra + 16px (a última senha nunca fica tapada)
+  useEffect(() => {
+    const el = barra.current;
+    if (!el) return;
+    const mede = () => setPadBaixo(el.offsetHeight + 16);
+    mede();
+    const ro = new ResizeObserver(mede);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   // Frases de balcão a rodar durante o loading
   useEffect(() => {
@@ -104,6 +117,15 @@ export default function Chat() {
     }, 220);
   };
 
+  // Placeholder curto em ecrãs pequenos
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 639px)");
+    const atualiza = () => setMovel(mq.matches);
+    atualiza();
+    mq.addEventListener("change", atualiza);
+    return () => mq.removeEventListener("change", atualiza);
+  }, []);
+
   useEffect(() => {
     const q = params.get("q");
     if (q && !enviado.current) {
@@ -120,7 +142,10 @@ export default function Chat() {
       {/* Região de anúncio para leitores de ecrã — resposta recebida / erro */}
       <p ref={anuncio} aria-live="polite" className="sr-only" />
 
-      <div className="flex-1 space-y-6 py-8">
+      <div
+        className="flex-1 space-y-6 pt-8"
+        style={{ paddingBottom: padBaixo }}
+      >
         {mensagens.length === 0 && (
           <div className="pt-4 sm:pt-8">
             <div className="text-center">
@@ -178,9 +203,9 @@ export default function Chat() {
                 estado={
                   m.tipo === "resposta" ? "carimbar" : m.tipo === "sugestoes" ? "panico" : "normal"
                 }
-                className="mt-1 w-20 shrink-0"
+                className="mt-1 hidden w-28 shrink-0 self-start lg:block"
               />
-              <div className="relative max-w-[85%] flex-1 rounded-lg rounded-tl-sm border-2 border-ink bg-white px-5 py-4 shadow-[3px_3px_0_#1b1d22]">
+              <div className="relative min-w-0 flex-1 rounded-lg rounded-tl-sm border-2 border-ink bg-white px-5 py-4 shadow-[3px_3px_0_#1b1d22] lg:max-w-[85%]">
                 {m.tipo === "resposta" && (
                   <span
                     aria-hidden
@@ -345,7 +370,7 @@ export default function Chat() {
       </div>
 
       {/* FORMULÁRIO Z-01 — a mesma família visual da home */}
-      <div className="sticky bottom-0 border-t-2 border-ink bg-paper py-4">
+      <div ref={barra} className="sticky bottom-0 border-t-2 border-ink bg-paper py-4">
         <div className="rounded-lg border-2 border-ink bg-white shadow-[4px_4px_0_#1b1d22] focus-within:shadow-[5px_5px_0_#1b1d22]">
           <div aria-hidden className="flex items-center justify-between border-b-2 border-dashed border-ink/20 px-4 py-1.5 font-mono text-xs font-bold uppercase tracking-widest text-stone-600">
             <span>Formulário Z-01</span>
@@ -354,7 +379,11 @@ export default function Chat() {
           <div className="flex items-end gap-2 p-2">
             <textarea
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              onChange={(e) => {
+                setInput(e.target.value);
+                e.target.style.height = "auto";
+                e.target.style.height = Math.min(e.target.scrollHeight, 128) + "px";
+              }}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
@@ -362,20 +391,21 @@ export default function Chat() {
                 }
               }}
               rows={1}
-              placeholder="A tua pergunta para o Zé"
+              placeholder={movel ? "Pergunta ao Zé…" : "A tua pergunta para o Zé"}
               aria-label="A tua pergunta para o Zé"
-              className="max-h-32 flex-1 resize-none bg-transparent px-3 py-2 text-base outline-none placeholder:text-stone-400"
+              className="max-h-32 flex-1 resize-none overflow-auto bg-transparent px-3 py-2 text-base outline-none placeholder:text-stone-400"
             />
             {/* O botão de envio É um carimbo — bate ao submeter */}
             <button
               onClick={carimbar}
               disabled={!input.trim() || aCarregar}
-              className={`carimbo shrink-0 px-4 py-2 text-sm ${
+              aria-label="Enviar pergunta"
+              className={`carimbo shrink-0 px-3 py-2 text-sm ${
                 batendo ? "stamp-batendo" : ""
-              } bg-white disabled:opacity-30`}
+              } bg-white disabled:cursor-not-allowed disabled:border-stone-500 disabled:text-stone-600 disabled:bg-stone-100`}
               style={{ transform: "rotate(-7deg)" }}
             >
-              Enviar →
+              <span className="hidden sm:inline">Enviar </span>→
             </button>
           </div>
         </div>
