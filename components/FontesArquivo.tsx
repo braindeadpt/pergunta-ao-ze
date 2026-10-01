@@ -103,7 +103,7 @@ export default function FontesArquivo({ grupos }: { grupos: GrupoArquivo[] }) {
               </span>
               <span className="text-carimbo-tinta">— {g.rotulo}</span>
             </p>
-            <div className="mt-3 grid gap-x-5 gap-y-3 sm:grid-cols-2 sm:gap-y-4">
+            <div className="mt-3 grid items-start gap-x-5 gap-y-3 sm:grid-cols-2 sm:gap-y-4">
               {g.fichas.map((f, i) => {
                 const sep = SEPARADORES[(gi + i) % SEPARADORES.length];
                 const aberta = abertas.has(f.dominio);
@@ -122,23 +122,25 @@ export default function FontesArquivo({ grupos }: { grupos: GrupoArquivo[] }) {
                         onClick={() => alternar(f.dominio)}
                         aria-expanded={aberta}
                         aria-controls={`ficha-${f.dominio}`}
-                        className="flex w-full flex-wrap items-center gap-x-3 gap-y-1 px-4 py-2 text-left outline-band-verde outline-offset-2 focus-visible:outline-2 sm:py-2.5"
+                        className="flex w-full items-start gap-x-3 px-4 py-2 text-left outline-band-verde outline-offset-2 focus-visible:outline-2 sm:py-2.5"
                       >
                         <span
                           aria-hidden
-                          className={`font-mono text-sm transition-transform ${aberta ? "rotate-90" : ""}`}
+                          className={`mt-0.5 font-mono text-sm transition-transform ${aberta ? "rotate-90" : ""}`}
                         >
                           ▸
                         </span>
-                        <span className="font-display text-base uppercase tracking-tight">
-                          {f.nome}
-                        </span>
-                        <span className="ml-auto flex shrink-0 items-center gap-2">
-                          <span className="font-mono text-sm text-stone-600 sm:hidden">
-                            {f.dominio}
+                        <span className="flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-1">
+                          <span className="font-display text-base uppercase tracking-tight">
+                            {f.nome}
                           </span>
-                          <span className="rounded-md border-2 border-ink/40 px-2 py-0.5 font-mono text-sm font-bold uppercase tracking-widest text-stone-600">
-                            {f.ambito}
+                          <span className="ml-auto flex shrink-0 items-center gap-2">
+                            <span className="font-mono text-sm text-stone-600 sm:hidden">
+                              {f.dominio}
+                            </span>
+                            <span className="rounded-md border-2 border-ink/40 px-2 py-0.5 font-mono text-sm font-bold uppercase tracking-widest text-stone-600">
+                              {f.ambito}
+                            </span>
                           </span>
                         </span>
                       </button>
@@ -185,8 +187,8 @@ export default function FontesArquivo({ grupos }: { grupos: GrupoArquivo[] }) {
                           </div>
                         )}
                         <ul className="space-y-1.5">
-                          {f.fontes.map((fo) => (
-                            <li key={fo.url}>
+                          {f.fontes.map((fo, fi) => (
+                            <li key={`${fo.url}-${fi}`}>
                               <a
                                 href={fo.url}
                                 target="_blank"
