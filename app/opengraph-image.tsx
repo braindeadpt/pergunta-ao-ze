@@ -176,50 +176,42 @@ export default async function OgImage() {
             </div>
           </div>
 
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "flex-start",
-              gap: 16,
-            }}
-          >
-            {/* Carimbo */}
-            <div
-              style={{
-                display: "flex",
-                border: "4px solid #d5232f",
-                borderRadius: 8,
-                padding: "8px 18px",
-                color: "#a31522",
-                fontSize: 22,
-                fontWeight: 700,
-                letterSpacing: 3,
-                textTransform: "uppercase",
-                transform: "rotate(-4deg)",
-                background: "rgba(255,255,255,0.35)",
-                whiteSpace: "nowrap",
-              }}
-            >
-              Grátis. Sem registo.
-            </div>
-            <span style={{ fontSize: 26, color: "#3d3a34" }}>
-              perguntaaoze.vercel.app
-            </span>
-          </div>
+          <span style={{ fontSize: 26, color: "#3d3a34" }}>
+            perguntaaoze.vercel.app
+          </span>
         </div>
 
-        {/* O Zé ao balcão */}
+        {/* O Zé ao balcão + carimbo por baixo */}
         <div
           style={{
             display: "flex",
-            alignItems: "flex-end",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "flex-end",
             paddingRight: 16,
-            paddingBottom: 8,
           }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={zeUri} width={400} height={353} alt="" />
+          <div
+            style={{
+              display: "flex",
+              border: "4px solid #d5232f",
+              borderRadius: 8,
+              padding: "6px 16px",
+              color: "#a31522",
+              fontSize: 22,
+              fontWeight: 700,
+              letterSpacing: 3,
+              textTransform: "uppercase",
+              transform: "rotate(-4deg)",
+              background: "rgba(255,255,255,0.4)",
+              whiteSpace: "nowrap",
+              marginTop: -14,
+            }}
+          >
+            Grátis. Sem registo.
+          </div>
         </div>
       </div>
     ),
