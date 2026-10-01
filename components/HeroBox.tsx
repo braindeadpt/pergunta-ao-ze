@@ -80,13 +80,13 @@ export default function HeroBox() {
       {/* FORMULÁRIO Z-01 — a caixa de pergunta */}
       <div className="relative z-10 rounded-lg border-2 border-ink bg-white text-left shadow-[8px_8px_0_#1b1d22] transition-shadow focus-within:shadow-[10px_10px_0_#1b1d22]">
         <div className="flex items-center justify-between border-b-2 border-dashed border-ink/20 px-5 py-2.5">
-          <p className="font-mono text-[11px] font-bold uppercase tracking-widest text-stone-700">
+          <p aria-hidden className="font-mono text-xs font-bold uppercase tracking-widest text-stone-700">
             Formulário Z-01 · via única
           </p>
-          <span className="carimbo -my-1">Sem fila</span>
+          <span aria-hidden="true" className="carimbo -my-1">Sem fila</span>
         </div>
         <div className="relative">
-          <p className="px-6 pt-4 font-mono text-[11px] uppercase tracking-[0.25em] text-stone-700">
+          <p className="px-6 pt-4 font-mono text-sm uppercase tracking-[0.25em] text-stone-700">
             Assunto
           </p>
           <textarea
@@ -113,7 +113,7 @@ export default function HeroBox() {
           )}
         </div>
         <div className="flex flex-col gap-3 border-t-2 border-dashed border-ink/20 px-5 py-3.5 sm:flex-row sm:items-center sm:justify-between">
-          <p className="font-mono text-[11px] uppercase tracking-wide text-stone-600">
+          <p className="font-mono text-xs uppercase tracking-wide text-stone-600 sm:text-sm">
             NIF ou nºs de documento: não são precisos
           </p>
           {/* O botão de submeter É um carimbo — bate antes de navegar */}
@@ -138,7 +138,7 @@ export default function HeroBox() {
           style={{ "--fundo": "#faf6ec" } as CSSProperties}
         >
           <div className="px-5 pt-6 pb-4">
-            <div className="flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.25em] text-stone-600">
+            <div aria-hidden className="flex items-center justify-between font-mono text-xs uppercase tracking-[0.25em] text-stone-600">
               <span>Senha Z-{String(idx + 1).padStart(3, "0")}</span>
               <span>{exemplo.entidade}</span>
             </div>

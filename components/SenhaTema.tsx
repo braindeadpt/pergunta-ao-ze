@@ -42,7 +42,7 @@ export default function SenhaTema({
       style={{ "--fundo": fundo, transform } as CSSProperties}
     >
       {destaque && (
-        <span className="carimbo absolute -right-3 -top-3 z-10 rotate-6 bg-white text-[13px]">
+        <span aria-hidden="true" className="carimbo absolute -right-3 -top-3 z-10 rotate-6 bg-white text-[13px]">
           Mais pedida
         </span>
       )}
@@ -57,7 +57,7 @@ export default function SenhaTema({
         <p className={`mt-1 font-mono font-bold tracking-tight ${destaque ? "text-6xl" : "text-4xl"}`}>
           {num}
         </p>
-        <div className="mt-1.5 flex items-center justify-between font-mono text-xs uppercase tracking-widest text-stone-700">
+        <div className="mt-1.5 flex items-center justify-between font-mono text-sm uppercase tracking-widest text-stone-700">
           <span>{balcao ?? `Balcão ${(i % 6) + 1}`} · {tema.entidade}</span>
         </div>
         <p aria-hidden className="mt-0.5 font-mono text-[11px] uppercase tracking-widest text-stone-600">

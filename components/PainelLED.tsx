@@ -67,14 +67,14 @@ export default function PainelLED({
       ref={ref}
       className={`led-bar rounded-xl border-2 border-ink p-6 shadow-[8px_8px_0_#1b1d22] md:p-8 ${className}`}
     >
-      <div className="flex items-center justify-between border-b-2 border-dashed border-[#ffb020]/30 pb-3 text-[11px] font-bold uppercase">
+      <div aria-hidden className="flex items-center justify-between border-b-2 border-dashed border-[#ffb020]/30 pb-3 text-xs font-bold uppercase">
         <span>Painel de atendimento</span>
         <span className="animate-pulse">● LIVE</span>
       </div>
       <dl className="mt-4 space-y-4">
         {linhas.map(([label, n]) => (
           <div key={label} className="flex items-end justify-between gap-4">
-            <dt className="pb-1.5 font-mono text-[11px] uppercase tracking-[0.2em] opacity-80">
+            <dt className="pb-1.5 font-mono text-sm uppercase tracking-[0.15em] opacity-80">
               {label}
             </dt>
             <dd>
@@ -83,7 +83,7 @@ export default function PainelLED({
           </div>
         ))}
       </dl>
-      <div className="mt-5 border-t-2 border-dashed border-[#ffb020]/30 pt-3 text-center font-mono text-[13px] font-bold uppercase tracking-[0.2em]">
+      <div className="mt-5 border-t-2 border-dashed border-[#ffb020]/30 pt-3 text-center font-mono text-sm font-bold uppercase tracking-[0.2em]">
         A chamar → Senha Z-001
       </div>
     </div>

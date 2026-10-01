@@ -4,7 +4,7 @@ import ZeMark from "@/components/ZeMark";
 export default function Header() {
   return (
     <header className="sticky top-0 z-40 border-b-2 border-ink bg-paper/95 backdrop-blur">
-      <div className="led-bar px-4 py-1.5 text-center text-[11px] font-bold uppercase md:text-xs">
+      <div className="led-bar px-4 py-2 text-center text-xs font-bold uppercase md:text-sm">
         Projeto independente · não é um site do Estado
       </div>
       <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">

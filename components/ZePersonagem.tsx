@@ -45,8 +45,7 @@ export default function ZePersonagem({
     <svg
       viewBox="0 0 340 300"
       className={className}
-      role="img"
-      aria-label="O Zé, atrás do balcão"
+      aria-hidden="true"
     >
       {/* ── Papéis voadores (pânico) ── */}
       {estado === "panico" && (

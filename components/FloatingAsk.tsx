@@ -82,7 +82,7 @@ export default function FloatingAsk() {
           className="group flex rotate-2 items-center gap-2 rounded-full border-2 border-ink bg-white py-1.5 pl-1.5 pr-4 shadow-[4px_4px_0_#1b1d22] transition-all hover:-translate-y-0.5 hover:rotate-0 hover:shadow-[5px_5px_0_#1b1d22]"
         >
           <ZeFace expressao="pisca" className="size-9" />
-          <span className="font-mono text-xs font-bold uppercase tracking-wider">
+          <span className="font-mono text-sm font-bold uppercase tracking-wider">
             Pergunta
           </span>
         </button>
