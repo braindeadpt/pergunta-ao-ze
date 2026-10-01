@@ -4,254 +4,256 @@ Este documento é a fonte de verdade para todas as decisões visuais e de voz
 do projeto. Qualquer mudança de design deve obedecer ao que aqui está —
 ou atualizar este documento primeiro, com motivo.
 
-> Útil primeiro, engraçado depois. Sempre.
+> **O visual é a piada; a resposta do chat fica sóbria e legível.**
+> O site não *fala* sobre burocracia — o site *É* burocracia: senhas de
+> atendimento com picotado, carimbos, formulário em triplicado, painel LED,
+> livro de reclamações. Os objetos são a ESTRUTURA da página, não
+> decoração por cima de uma grelha educada. Quem está a ler passos
+> oficiais tem clareza total; o carnaval fica à volta.
 
 ---
 
 ## 1. Princípios
 
-1. **Útil primeiro** — uma piada nunca pode atrapalhar quem está stressado.
-   Utilidade mede-se em: passos corretos, fonte oficial, contacto à mão.
-2. **Humor com regras** — o Zé goza com a burocracia (filas, senhas,
-   formulários), nunca com o utilizador nem com a situação dele. Ver §7.
-3. **Independência visível** — não somos o Estado. O disclaimer está sempre
-   presente; o visual não pode imitar o design system do Estado (Ágora) ao
-   ponto de gerar confusão.
-4. **Portugalidade pela linguagem, não pelo folclore** — "senha", "fila",
-   "B-23", "guia chatos". Não usamos padrões de azulejo em fundos, galos,
-   bandeiras ou calçada decorativa (ver §11, decisões registadas).
-5. **Acessibilidade não é opcional** — serviço público é para todos:
-   contraste AA, foco visível, `prefers-reduced-motion` respeitado.
-6. **Conversação é o produto** — a homepage abre com uma bolha do Zé, os
-   exemplos são mini-conversas, o chat é o centro. O site parece o produto.
+1. **O visual é a piada** — a sátira vive nos objetos (senhas, carimbos,
+   formulários), não em texto engraçado. A piada é que "um site sobre
+   burocracia parece burocracia".
+2. **Útil na hora certa** — dentro da bolha de resposta e das fontes, zero
+   estilos de brincadeira: tipografia limpa, passos legíveis, links azuis.
+   O carnaval fica à volta; o conteúdo fica sóbrio.
+3. **Independência visível** — não somos o Estado. O disclaimer LED está
+   sempre presente; a estética de formulário é paródia carinhosa, nunca
+   imitação de um site oficial.
+4. **Sólido e saturado** — cores chapadas, bordas grossas, sombras duras.
+   Nada de gradientes subtis, pastel fofo ou sombras esbatidas.
+5. **Acessibilidade não é opcional** — contraste AA, foco visível,
+   `prefers-reduced-motion` respeitado. Neo-brutalismo com leitura limpa.
+6. **Conversação é o produto** — o Zé (balão com cara) é quem fala; os
+   objetos burocráticos são o cenário.
 
 ## 2. Marca
 
 ### 2.1 Nome e assinatura
 
-- Nome: **Pergunta ao Zé** — a marca é o gesto do utilizador.
-- Tagline: *"Os serviços públicos, sem fila nem senha."*
-- Personagem: o **Zé** — descendente espiritual do Zé Povinho: o cidadão
-  comum que já passou pelas filas todas e sabe os atalhos. Não é mascote
-  colada; é o conceito do produto.
+- Nome: **Pergunta ao Zé**
+- Tagline: *"Os serviços públicos, sem fila nem senha."* — e o site goza
+  precisamente com senhas e filas.
+- Personagem: o **Zé** — o cidadão comum que já passou pelas filas todas.
+  Balão de fala verde com cara.
 
-### 2.2 Dois símbolos, dois papéis
+### 2.2 Três símbolos, três papéis
 
 | Símbolo | Ficheiro | Onde se usa |
 |---|---|---|
 | **ZeMark** — balão verde com "Zé" | `components/ZeMark.tsx` | Logotipo (header, footer), favicon. Só marca. |
-| **ZeFace** — balão verde com cara | `components/ZeFace.tsx` | Avatar do Zé no chat, hero, estado vazio, 404, CTA. Só personagem. |
+| **ZeFace** — balão verde com cara | `components/ZeFace.tsx` | Avatar pequeno no chat e balões de fala. |
+| **ZePersonagem** — Zé completo | `components/ZePersonagem.tsx` | Cabeça de balão verde + corpo atrás do balcão: óculos, crachá, caneta atrás da orelha, pilha de papéis. Traço grosso, cores chapadas. |
+
+**Estados do Zé** (prop `estado`):
+
+| Estado | Contexto real |
+|---|---|
+| `normal` | Hero (olhos seguem o cursor), repouso |
+| `pensar` | Loading do chat ("a pedir carimbo ao chefe…") |
+| `carimbar` | Resposta recebida / submissão do formulário |
+| `panico` | Erro / sem resultados |
+| `aliviado` | Resposta útil, FAQ, 404 resolvido |
 
 Regras:
-- O ZeFace aparece **uma vez por contexto** — é quem fala, não é papel de
-  parede. Nunca em cada cartão, nunca em fundos.
-- Rotações suaves permitidas (`-rotate-3`, `rotate-3`) para dar vida.
+- ZePersonagem/ZeFace **uma vez por contexto** — é quem fala, não papel de parede.
+- Na hero o Zé tem ≥200px e os olhos seguem o cursor (`olhosVivos`).
 - Cores fixas: verde `#046a38`, cara branca, pupilas `#0b3d24`.
-
-### 2.3 Cartão de partilha
-
-`app/opengraph-image.tsx` gera o OG card: fundo creme, balão + nome +
-tagline + URL + "Grátis. Sem registo.". Atualizar se a identidade mudar.
 
 ## 3. Cores
 
 ### 3.1 Tokens (`app/globals.css` → `@theme`)
 
-| Token | Hex | Papel semântico |
+| Token | Hex | Papel |
 |---|---|---|
-| `--color-paper` | `#faf8f4` | Fundo base — calor editorial |
-| `--color-ink` | `#1b1d22` | Texto principal |
-| `--color-band-verde` | `#046a38` | **Ação** — botões primários, foco, bolhas do utilizador, "avançar" |
-| `--color-band-verde-escuro` | `#035129` | Hover de ação, bandas escuras |
-| `--color-band-vermelho` | `#d5232f` | **Aviso/negação** — "não faz", alertas. Nunca decoração |
-| `--color-azulejo` | `#1d4f9c` | **Fonte oficial/link externo** — cartões de fonte, links gov |
-| `--color-azulejo-suave` | `#eef3fb` | Superfície de fonte (hover, fundo suave) |
+| `--color-paper` | `#faf6ec` | Fundo — papel de formulário |
+| `--color-ink` | `#1b1d22` | Texto + **bordas de todos os objetos** |
+| `--color-band-verde` | `#046a38` | Ação primária, bolhas do utilizador, Zé |
+| `--color-band-verde-escuro` | `#035129` | Hover de ação |
+| `--color-band-vermelho` | `#d5232f` | **Tinta de carimbo** — selos, "urgente", avisos |
+| `--color-azulejo` | `#1d4f9c` | Fonte oficial / link externo |
+| `--color-azulejo-suave` | `#eef3fb` | Hover de fontes |
+| `--color-form-amarelo` | `#f5c518` | Vias de formulário / destaques saturados |
+| `--color-amarelo-papel` | `#f5e27a` | Fundo de secção — papel de formulário |
+| `--color-esferografica` | `#1b3fa0` | Fundo de secção — azul esferográfica |
+| `--color-led` | `#ffb020` | Texto do painel LED (sobre preto) |
 
-Neutros: escala `stone` do Tailwind (bordas `stone-200`, texto secundário
-`stone-500/600`, desativado `stone-400`).
+Neutros: escala `stone` para texto secundário; bordas de objetos são
+**sempre `ink`**, nunca `stone`.
 
 ### 3.2 Regras de cor
 
-- **Verde = agir.** Botão primário é sempre verde; nada mais o é.
-- **Azul = fonte oficial.** Links para fora usam azul; confiança visual.
-- **Vermelho = apenas aviso/negação** ("Não faz", erros). Proibido como
-  acento decorativo — foi essa a lição da risca de bandeira.
-- **Verde sobre branco/cream**: `#046a38` tem contraste 7.9:1 → AA/AAA.
-  Verde claro para texto: mínimo `#0f6b4f` sobre fundos claros.
-- `::selection` verde — detalhe de marca subtil.
+- **Verde = agir.** Botão primário verde; nada mais o é.
+- **Vermelho = carimbo.** Só para selos rotacionados, avisos e negações.
+- **Azul = fonte oficial.** Links para fora e cartões de fonte.
+- **Amarelo = via de formulário** — segundo plano de cópia em triplicado,
+  destaques de painel.
+- Cor de fundo sólida dentro de bordas ink — sem gradientes.
 
 ## 4. Tipografia
 
-| Papel | Fonte | Peso |
+| Papel | Fonte | Uso |
 |---|---|---|
-| Títulos (h1, h2, h3), citações, marca | **Newsreader** (serif editorial) | 500–600, `tracking-tight` |
-| Corpo, UI, botões, tabelas | **Inter** | 400–500 |
-| Metadados/etiquetas | Inter, `uppercase`, `tracking-wide`, `text-[11px]` | 500 |
-
-Escala em uso (rem): `0.6875` meta · `0.8125` small · `0.9375` body-sm ·
-`1.125` lead · `1.5–1.55` h3 · `2.25–3` h2 · `3.4–4.5` h1.
+| **Display** | `Archivo Black` (`--font-display`) | Títulos h1/h2, palavras de impacto. Caixa alta opcional, `tracking-tight` |
+| **Mono** | `Space Mono` (`--font-mono`) | Etiquetas de formulário, números de senha, domínios, metadados, cabeçalhos de talão |
+| **Corpo** | Inter (`--font-sans`) | Texto, respostas, botões |
 
 Regras:
-- Serif = voz e editorial; sans = funcional. Nunca misturar no mesmo elemento.
-- Line-height: títulos `1.05–1.1`, corpo `relaxed`.
-- O italic da Newsreader é reservado para citações/exemplos.
+- Display só em títulos — nunca em corpo.
+- Mono é a "letra de máquina de escrever/talão": uppercase + tracking para
+  etiquetas (`FORMULÁRIO Z-01`, `SENHA`, `BALCÃO`).
+- Respostas do chat: Inter normal — **proibido** mono/display dentro da
+  bolha de resposta.
 
-## 5. Layout e forma
+## 5. Forma e materiais
 
-- **Containers**: `max-w-3xl` (hero, FAQ, conversas) · `max-w-5xl`
-  (header/footer) · `max-w-6xl` (secções de conteúdo).
-- **Ritmo vertical**: secções `py-20`, hero `pt-14 md:pt-20`.
-- **Raios**: `rounded-2xl` para bolhas de chat · `rounded-[1.75rem]` para
-  cartões · `rounded-full` para pills/botões/chips.
-- **Cantos de bolha**: bolha do utilizador `rounded-br-sm`; do Zé
-  `rounded-tl-sm` — a geometria diz quem fala.
-- **Sombras**: discretas — `shadow-sm` em cartões; elevada só no hover
-  (`hover:shadow-[0_16px_40px_-16px_rgba(0,0,0,0.18)]`) e na caixa hero.
-- **Bordas**: `border-stone-200` por defeito; `border-stone-300` em inputs.
+- **Bordas**: `2px solid ink` em todos os objetos (cartões, botões,
+  inputs, selos). Finas `1px` só dentro de conteúdo legível.
+- **Sombras duras**: `box-shadow: 4px 4px 0 ink` por defeito; `8px 8px 0`
+  no hero/cartões grandes; sem blur, sem alpha.
+- **Raios**: pequenos (`rounded-lg`, `rounded-xl`) — documentos têm
+  cantos retos; pills só para chips/CTAs se fizer sentido (senhas são
+  retangulares — preferir retos para objetos de papel).
+- **Perfuração**: separadores tracejados (`border-dashed`) e semicírculos
+  de corte nas laterais de senhas/talões.
+- **Hover**: deslocamento físico — o objeto "levanta": `translate(-2px,
+  -2px)` e a sombra cresce para `6px 6px 0` (ou fica `8px`).
 
-## 6. Componentes
+### Motivos — os objetos SÃO a estrutura
 
-### 6.1 Inventário atual
+1. **Senha de atendimento** (`SenhaTema`) — talão com picotado serrilhado
+   em cima/baixo, entalhes laterais na linha de picotar, número grande
+   `A-047`, `À SUA FRENTE: N PESSOAS`, `BALCÃO 3 · ENTIDADE`, pergunta no
+   corpo do talão. Rotações ±1-2°; no hover a via rasga-se (o talão de
+   cima desloca).
+2. **Carimbo** — caixa de tinta vermelha mono uppercase, rotação -6° a
+   -12°. "SEM FILA", "DEFERIDO", "VIA DO CIDADÃO". O botão de submeter É
+   um carimbo que bate (slam de ~180ms) antes de navegar.
+3. **Formulário** — `FORMULÁRIO Z-01` (caixa de pergunta), `Z-02`
+   (faz/não faz): etiqueta mono, linhas pautadas, ✓/✗ manuscritos.
+4. **Painel LED** — barra/painel preto, texto mono âmbar; usado para o
+   hero ("é a tua vez") e para as estatísticas (dígitos a rodar).
+5. **Livro de reclamações** — FAQ: lombada vermelha, folha com via do
+   cidadão, entradas "RECLAMAÇÃO Nº 01".
+6. **Setas à mão** — traço irregular a apontar para o CTA ("carimba aqui").
 
-| Componente | Ficheiro | Notas |
-|---|---|---|
-| Header | `Header.tsx` | Sticky, disclaimer verde no topo, ZeMark + wordmark, CTA |
-| HeroBox | `HeroBox.tsx` | Caixa de pergunta com placeholder animado + cartão rotativo por baixo |
-| Chat | `Chat.tsx` | Bolhas, avatar ZeFace, fontes com contactos, sugestões |
-| TemaArt | `TemaArt.tsx` | Banda pastel + pontilhado + cartão branco com ícone Lucide |
-| FloatingAsk | `FloatingAsk.tsx` | Pill flutuante "Pergunta ao Zé" |
-| Fontes (página) | `app/fontes/page.tsx` | Cartões por entidade: telefone, horário, email, links |
-| Footer | `Footer.tsx` | Wordmark, disclaimer, autor, links sociais |
+Regras de composição:
+- Fundos alternam: creme → amarelo-papel → azul-esferográfica → creme.
+  Nunca uma faixa uniforme de creme.
+- Cada secção tem pelo menos um elemento a sair do contentor, sobreposto
+  ou rodado 1-3°. Nada alinhado e educado demais.
+- Títulos enormes em display uppercase.
+- Verde só para marca e ação primária; tintas de carimbo: vermelho,
+  azul-esferográfica, preto-fotocópia.
 
-### 6.2 Estados obrigatórios
+## 6. Componentes (direção v2 — decidido)
 
-Todo o elemento interativo tem de ter:
-- `:hover` — mudança visível (cor, elevação ou deslocamento ≤4px)
-- `:focus-visible` — anel verde `ring-band-verde` (ver §8)
-- `disabled` — `opacity-40` + `cursor-not-allowed`
-- Transição `transition-colors` ou `transition-all` ≤300ms
-
-### 6.3 Regras específicas
-
-- **Botão primário**: `bg-band-verde` pill, texto branco, hover
-  `bg-band-verde-escuro`. Só existe um primário por vista.
-- **Cartão de fonte**: azul (`azulejo`) para o título + domínio ↗ —
-  azul = "isto é oficial e está lá fora".
-- **Faixa "Ligar:"**: fundo `stone-50`, telefone em `font-medium` — frio
-  e legível, sem decoração.
-- **Ilustração de tema**: sempre `TemaArt` — pastel + dots + cartão
-  inclinado com ícone Lucide `strokeWidth={1.6}`. Ícones novos só da
-  Lucide, mesmo peso.
+| Componente | Objeto |
+|---|---|
+| Hero | **Assimétrico**: texto+formulário à esquerda, Zé atrás do balcão à direita (≥200px, olhos vivos). Botão = carimbo que bate. Seta à mão "carimba aqui" |
+| Senha de tema | `components/SenhaTema.tsx` — talão picotado (ver §5.1) |
+| Estatísticas | `components/PainelLED.tsx` — painel preto, dígitos âmbar a rodar |
+| FAQ | Livro de Reclamações — lombada vermelha, entradas "RECLAMAÇÃO Nº" |
+| Faz / Não faz | `FORMULÁRIO Z-02` — folha única, ✓/✗ manuscritos, linhas pautadas |
+| Caixa de pergunta | `FORMULÁRIO Z-01` — etiqueta mono, perfuração, carimbo "SEM FILA" |
+| Fontes na resposta | Cartão azul claro sóbrio — **zona sem brincadeiras** |
+| Chat | (R3, após aprovação) bolhas ink + sombra dura; resposta sóbria |
+| 404 | Senha "A SUA VEZ É DAQUI A 3 ANOS" + Zé panico/aliviado |
 
 ## 7. Voz e tom
 
-### 7.1 A matriz do humor
+### 7.1 Matriz do humor
 
-| Contexto | Humor? | Exemplo aprovado |
+| Contexto | Humor | Exemplo |
 |---|---|---|
-| Hero/tagline/placeholder | ✔ leve | "sem apanhar a fila das 7h" |
-| Estado vazio/loading do chat | ✔ | "A folhear os guias oficiais…" |
-| 404 | ✔ | "Esta página entrou para a fila e nunca mais voltou." |
+| Objetos visuais (selos, etiquetas, senhas) | ✔ **aqui mora a piada** | `FORMULÁRIO Z-01`, `SEM FILA`, `VIA ÚNICA` |
+| Hero/tagline/placeholder | ✔ | "sem apanhar a fila das 7h" |
+| Estado vazio/loading/404 | ✔ | "A folhear os guias oficiais…" |
 | FAQ/footer | ✔ leve | "Nem sequer temos onde meter um IBAN." |
-| **Corpo das respostas** | ✖ nunca | passos curtos, factuais |
-| **Temas sensíveis** (desemprego, saúde, óbito, multas, dívidas, imigração em vulnerabilidade) | ✖ | máximo: abertura neutra |
+| **Bolha de resposta do Zé** | ✖ sóbria | passos + fontes, sem enfeites |
+| Temas sensíveis | ✖ | máximo: abertura neutra |
 | Erros técnicos | ✖ | erro claro + solução |
-| Emojis | ✖ em respostas; ✔ raros em marketing | o Zé é a cara — não precisa de emojis |
+| Emojis | ✖ | os objetos fazem o trabalho |
 
 ### 7.2 Gramática
 
-- Português europeu sempre: "dirige-te", "inscreve-te", gerúndio proibido
-  ("está a carregar", não "carregando"), "ecrã" não "tela", "telemóvel".
-- Frases curtas. Passos em imperativo informal ("Agenda", "Leva").
-- O Zé fala em 1.ª pessoa só para se apresentar: "já li os guias chatos
-  por ti". Nas respostas, some — não há "eu acho".
+- PT-PT sempre; frases curtas; imperativo informal nos passos.
+- Etiquetas mono em **uppercase** com o vocabulário da repartição:
+  SENHA, BALCÃO, VIA, URGENTE, TRIPLICADO, CARIMBO, REGISTO.
+- O Zé fala em 1.ª pessoa só para se apresentar; nas respostas, some.
 
-### 7.3 Proibido escrever
+### 7.3 Proibido
 
-- Piadas sobre temas sensíveis (§7.1)
-- Goço com o utilizador, a entidade ou os funcionários
-- "Nós" institucional — somos um projeto de uma pessoa; "o Zé" ou "nós"
-  informal conforme o contexto
-- Promessas absolutas ("resolve tudo", "sempre correto")
+- Goço com o utilizador, funcionários ou situações sensíveis
+- Piadas dentro da bolha de resposta
+- Azulejo, galo, bandeira, calçada (ver §11)
 
 ## 8. Acessibilidade
 
-- Contraste de texto ≥ 4.5:1 (AA). Cores semânticas já o cumprem.
-- `:focus-visible` em todos os interativos: anel `ring-2 ring-band-verde
-  ring-offset-2 ring-offset-paper`.
-- `aria-label` em ícones-only, `aria-hidden` em decorativos, `sr-only`
-  para contexto extra.
-- `prefers-reduced-motion`: animações desligadas (ver §9).
-- Ilustrações (`TemaArt`) são `aria-hidden` — decoração, nunca informação.
-- Toque mínimo 44×44px nos alvos de toque em mobile.
+- Contraste AA: texto ≥4.5:1. Led-âmbar `#ffb020` só sobre preto; carimbo
+  vermelho só como decoração (o texto real vai em ink).
+- `focus-visible`: anel `2px solid band-verde` + offset — visível mesmo
+  com bordas ink grossas.
+- `aria-hidden` em selos, perfurações, LED decorativo; texto repetido em
+  `sr-only` quando necessário.
+- Marquee/LED desligado com `prefers-reduced-motion`.
 
 ## 9. Motion
 
-- Micro-animações existentes: `fade-in-up` (cartão de exemplo),
-  `caret-blink` (placeholder), `faq-plus` (rotação do +), hovers.
-- Durações: ≤300ms transições; ≤450ms entradas. Easing `ease`.
-- Deslocamento: translate ≤4px em hover; ≤10px em entradas.
-- `prefers-reduced-motion`: desligar caret, typewriter e translates.
-- O Zé pode "escrever" (typing dots) — única animação de status
-  permitida para além do texto de loading.
+- Entradas `fade-in-up` ≤450ms; hovers com translate físico ≤4px.
+- Typing dots no loading do chat (Zé a escrever).
+- LED marquee lento opcional — única animação contínua permitida, e off
+  com reduced-motion.
+- Sem parallax, sem scroll-jacking.
 
 ## 10. Conteúdo e dados
 
-- Só fontes oficiais verificadas (`curl`/browser antes de entrar).
-- Contactos: telefone + horário + email/formulário, sempre da página
-  oficial. Horários de balcões físicos → link para o localizador (Siga),
-  nunca inventados.
-- Respostas: 3–5 passos; nota âmbar (`amber-50`) para exceções.
+- Só fontes oficiais verificadas; contactos com telefone/horário/email
+  confirmados na página oficial.
+- Respostas: 3–5 passos; nota âmbar para exceções; fontes sempre.
 
-## 11. Decisões registadas (não voltar atrás sem motivo)
+## 11. Decisões registadas
 
 | Data | Decisão | Motivo |
 |---|---|---|
-| 2026-10 | Removidos azulejo em fundo, calçada, faixa de bandeira, Galo de Barcelos | "Mudança por mudança" — ficou folclórico, não português |
-| 2026-10 | ZeMark/ZeFace = único sistema visual de personagem | Coerência logo↔mascote |
-| 2026-10 | Identidade portuguesa pela linguagem, não por decoração | Portugalidade real vs. cliché |
-| 2026-10 | Verde=ação, azul=fonte, vermelho=aviso | Convenção GOV.UK; semântica previsível |
-| 2026-10 | Humor só fora das respostas | Matriz §7.1 — referência: guia de voz Mailchimp |
+| 2026-10 | Removidos azulejo/calçada/flag/galo | Folclore decorativo, não português de produto |
+| 2026-10 | ZeMark/ZeFace = sistema de personagem | Coerência marca↔mascote |
+| 2026-10 | Verde=ação, azul=fonte, vermelho=carimbo/aviso | Semântica previsível |
+| 2026-10 | **Direção v2: burocracia como objeto físico** (neo-brutalismo pop) | Direção escolhida pelo autor; a sátira vive nos objetos |
+| 2026-10 | Resposta do chat sempre sóbria | Quem lê passos oficiais precisa de clareza |
+| 2026-10 | **Objetos = estrutura, não decoração** | A v1 aplicou só uma "pele" sobre a mesma grelha — rejeitado. Senhas, formulários, livro e LED passam a ser o layout (home: hero assimétrico, senhas picotadas, stats em LED, FAQ = livro de reclamações) |
 
-## 12. Referências externas
+## 12. Referências
 
-- **GOV.UK Design Principles** — "do the hard work to make it simple";
-  cores funcionais; disciplina tipográfica.
-- **Ágora Design System (AMA)** — referência de rigor e acessibilidade
-  para serviços públicos PT (não copiar — somos independentes).
-- **Italia Aperta** — calor editorial, ilustrações pastel, conversação.
+- **Neo-brutalismo pop** (Gumroad, Figma Config): bordas grossas, sombras
+  duras, cores saturadas chapadas, composição atrevida, tipografia enorme.
+- **Duolingo** — a personagem é o produto: o Zé tem corpo, crachá e
+  estados reais (pensar, carimbar, pânico, aliviado), nunca só um avatar.
+- **A burocracia real** — senhas de atendimento, impressos em triplicado,
+  carimbos, painéis LED de senhas, livro de reclamações.
 - **Mailchimp Voice & Tone** — humor nos momentos calmos, nunca no stress.
-- **Bordalo Pinheiro / Zé Povinho** — legitimidade cultural do Zé.
+- (Rigor informativo: GOV.UK/Ágora ficam só como referência de clareza de
+  conteúdo — não de tom nem visual.)
 
 ---
 
-## 13. Roadmap de execução por fases
+## 13. Roadmap do redesign (v2)
 
-Cada fase é pequena, verificável (build + screenshots desktop/mobile) e
-reversível. Não avançar sem checkpoint.
+Regra: **apresentar antes de aplicar**. A home foi aprovada como piloto.
 
-- [x] **F0 — Documento** (esta página): tokens, voz, regras, anti-padrões
-- [x] **F1 — Fundações**: tokens semânticos completos no `@theme`
-  (superfícies de sucesso/aviso), `focus-visible` global, respeito por
-  `prefers-reduced-motion` (CSS + JS do typewriter e do scroll do chat)
-- [x] **F2 — Microcopy**: auditoria contra a matriz §7.1 — erro de rede
-  passou a mensagem honesta (antes disfarçava erro técnico de falha de
-  conteúdo); email em `/fontes` é `mailto:`; resto já conforme
-- [x] **F3 — Componentes**: classes partilhadas `btn-primary`,
-  `btn-outline`, `chip`, `chip-sm` (header, hero, chat, 404, homepage);
-  typing dots do Zé no loading do chat (respeita reduced-motion)
-- [x] **F4 — Homepage**: entrada em cascata no hero (greeting → título →
-  subtítulo → caixa, 120ms entre cada); cartões de tema com seta subtil
-  (cinza → verde + deslocamento no hover) em vez de círculos verdes
-  repetidos
-- [x] **F5 — Páginas secundárias**: correção de facto em `/privacidade`
-  e na FAQ — o texto dizia "sem IA nem envio a terceiros" mas o LLM já
-  estava ativo; agora nomeia a Groq, explica o que é enviado e menciona
-  o Vercel Analytics. Cartões de `/fontes` com o raio do sistema
-  (`1.75rem`)
-- [x] **F6 — Motion**: mensagens e bubble de loading entram com
-  `animate-fade-in-up`; typing dots; reduced-motion verificado (CSS + JS)
-- [x] **F7 — Revisão final**: rotas todas 200, mobile 390px verificado
-  (hero, chat, /fontes), `focus-visible` global ativo, contraste ok nos
-  tokens semânticos; único erro de consola é o script do Vercel Analytics
-  em localhost (esperado)
+- [x] **R0 — Documento v2**: esta direção
+- [ ] **R1 — Piloto home** (estrutura, não pele): hero assimétrico com
+  ZePersonagem, temas = senhas picotadas, stats = painel LED, faz/não faz
+  = formulário Z-02, FAQ = Livro de Reclamações — **aguarda aprovação**
+- [ ] **R2 — Sistema**: `.senha`, `.carimbo`, `.led-bar`, `.folha-linhas`
+  consolidados em `globals.css`
+- [ ] **R3 — Chat**: bolhas ink + sombra; input = campo de formulário;
+  loading = Zé pensar + frases de balcão; resposta entra com carimbo
+  "DEFERIDO"; sem resultados = Zé panico. Resposta sempre sóbria
+- [ ] **R4 — Secundárias**: `/fontes` (diretório "repartições"), legais
+  (impresso simples), 404 (senha "a sua vez é daqui a 3 anos")
+- [ ] **R5 — Revisão**: mobile, reduced-motion, contraste AA, consola

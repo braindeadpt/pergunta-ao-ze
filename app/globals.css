@@ -3,14 +3,20 @@
 @theme {
   --font-sans: "Inter", "Inter Fallback", ui-sans-serif, system-ui, sans-serif;
   --font-serif: "Newsreader", "Newsreader Fallback", Georgia, serif;
+  --font-display: "Archivo Black", "Arial Black", sans-serif;
+  --font-mono: "Space Mono", "Courier New", monospace;
 
-  --color-paper: #faf8f4;
+  --color-paper: #faf6ec;
   --color-ink: #1b1d22;
   --color-band-verde: #046a38;
   --color-band-verde-escuro: #035129;
   --color-band-vermelho: #d5232f;
   --color-azulejo: #1d4f9c;
   --color-azulejo-suave: #eef3fb;
+  --color-form-amarelo: #f5c518;
+  --color-amarelo-papel: #f5e27a;
+  --color-esferografica: #1b3fa0;
+  --color-led: #ffb020;
 
   /* Superfícies semânticas — DESIGN.md §3 */
   --color-ok: #0f6b4f;
@@ -76,23 +82,145 @@ details[open] .faq-plus {
   transition: transform 0.2s ease;
 }
 
-/* Classes partilhadas — DESIGN.md §6.2/6.3 */
+/* Classes partilhadas — DESIGN.md §5/§6 (direção v2: objetos físicos) */
 @layer components {
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-1.5 rounded-full bg-band-verde font-medium text-white transition-colors hover:bg-band-verde-escuro disabled:cursor-not-allowed disabled:opacity-40;
+    @apply inline-flex items-center justify-center gap-1.5 rounded-lg border-2 border-ink bg-band-verde font-semibold text-white shadow-[3px_3px_0_#1b1d22] transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-band-verde-escuro hover:shadow-[5px_5px_0_#1b1d22] active:translate-x-0 active:translate-y-0 active:shadow-[2px_2px_0_#1b1d22] disabled:cursor-not-allowed disabled:opacity-40;
   }
   .btn-outline {
-    @apply inline-flex items-center justify-center gap-1.5 rounded-full border border-stone-300 font-medium transition-colors hover:border-band-verde hover:text-band-verde;
+    @apply inline-flex items-center justify-center gap-1.5 rounded-lg border-2 border-ink bg-white font-semibold shadow-[3px_3px_0_#1b1d22] transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[5px_5px_0_#1b1d22];
   }
   .chip {
-    @apply rounded-full border border-stone-200 bg-white px-4 py-2 text-sm text-stone-600 shadow-sm transition-colors hover:border-band-verde hover:bg-emerald-50 hover:text-band-verde-escuro;
+    @apply rounded-md border-2 border-ink/60 bg-white px-4 py-2 text-sm text-stone-700 transition-all hover:-translate-y-0.5 hover:border-ink hover:bg-form-amarelo/30 hover:shadow-[3px_3px_0_#1b1d22];
   }
   .chip-sm {
-    @apply rounded-full border border-stone-200 px-3 py-1 text-xs text-stone-600 transition-colors hover:border-band-verde hover:bg-emerald-50;
+    @apply rounded-md border border-ink/40 px-3 py-1 text-xs text-stone-600 transition-colors hover:border-ink hover:bg-form-amarelo/30;
+  }
+  /* Objeto base: papel com borda ink + sombra dura */
+  .obj {
+    border: 2px solid var(--color-ink);
+    background: #fff;
+    box-shadow: 5px 5px 0 var(--color-ink);
+  }
+  /* Carimbo de tinta vermelha — sempre rotacionado */
+  .carimbo {
+    @apply inline-block border-2 border-band-vermelho px-2.5 py-1 font-mono text-[11px] font-bold uppercase tracking-widest text-band-vermelho;
+    transform: rotate(-6deg);
+  }
+  .carimbo-claro {
+    @apply inline-block border-2 border-white/90 px-2.5 py-1 font-mono text-[11px] font-bold uppercase tracking-widest text-white;
+    transform: rotate(-6deg);
+  }
+  /* Painel LED de senhas */
+  .led-bar {
+    background: #141413;
+    color: var(--color-led);
+    font-family: var(--font-mono);
+    letter-spacing: 0.14em;
+  }
+  /* Senha de atendimento — picotado serrilhado em cima/baixo;
+     --fundo = cor da secção onde o talão está pousado */
+  .senha {
+    --fundo: var(--color-paper);
+    position: relative;
+    border: 2px solid var(--color-ink);
+    background: #fff;
+    box-shadow: 5px 5px 0 var(--color-ink);
+  }
+  .senha::before,
+  .senha::after {
+    content: "";
+    position: absolute;
+    left: -2px;
+    right: -2px;
+    height: 12px;
+    background:
+      linear-gradient(45deg, transparent 50%, var(--fundo) 50%),
+      linear-gradient(-45deg, transparent 50%, var(--fundo) 50%);
+    background-size: 20px 20px;
+    background-position: 0 0, 10px 0;
+  }
+  .senha::before {
+    top: -2px;
+  }
+  .senha::after {
+    bottom: -2px;
+    transform: scaleY(-1);
+  }
+  /* Entalhes laterais na linha de picotar do talão */
+  .senha-corte {
+    position: relative;
+    border-top: 2px dashed rgb(27 29 34 / 0.3);
+    height: 0;
+  }
+  .senha-corte::before,
+  .senha-corte::after {
+    content: "";
+    position: absolute;
+    top: -13px;
+    width: 24px;
+    height: 24px;
+    border-radius: 9999px;
+    background: var(--fundo, var(--color-paper));
+    border: 2px solid var(--color-ink);
+  }
+  .senha-corte::before {
+    left: -15px;
+    clip-path: inset(0 0 0 50%);
+  }
+  .senha-corte::after {
+    right: -15px;
+    clip-path: inset(0 50% 0 0);
+  }
+  /* Folha de formulário com linhas pautadas */
+  .folha-linhas {
+    background-image: repeating-linear-gradient(
+      transparent,
+      transparent 31px,
+      rgb(27 29 34 / 0.08) 32px
+    );
   }
 }
 
 /* Indicador "o Zé está a escrever" — DESIGN.md §9 */
+/* Carimbo a bater — slam curto antes de navegar */
+@keyframes stamp-hit {
+  0% {
+    transform: rotate(-7deg) scale(1.3);
+    opacity: 0.6;
+  }
+  55% {
+    transform: rotate(-7deg) scale(0.88);
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(-7deg) scale(1);
+  }
+}
+.stamp-batendo {
+  animation: stamp-hit 0.22s ease-in;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stamp-batendo {
+    animation: none;
+  }
+  .senha .senha-stub {
+    transition: none;
+  }
+}
+
+/* Senha — a via rasga-se um pouco no hover */
+@media (prefers-reduced-motion: no-preference) {
+  .senha-stub {
+    transition: transform 0.18s ease;
+    transform-origin: left center;
+  }
+  .senha:hover .senha-stub {
+    transform: rotate(1.6deg) translateY(-2px);
+  }
+}
+
 @keyframes typing-bounce {
   0%, 60%, 100% { transform: translateY(0); opacity: 0.35; }
   30% { transform: translateY(-4px); opacity: 1; }

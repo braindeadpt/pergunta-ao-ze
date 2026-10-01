@@ -3,13 +3,13 @@ import ZeMark from "@/components/ZeMark";
 
 export default function Footer() {
   return (
-    <footer className="border-t border-stone-200 bg-white">
+    <footer className="border-t-2 border-ink bg-white">
       <div className="mx-auto max-w-5xl px-4 py-10">
         <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
           <div>
             <div className="flex items-center gap-2.5">
               <ZeMark className="size-7" />
-              <span className="font-serif text-lg font-semibold tracking-tight">
+              <span className="font-display text-lg tracking-tight">
                 Pergunta ao <span className="text-band-verde">Zé</span>
               </span>
             </div>
@@ -63,7 +63,7 @@ export default function Footer() {
               target="_blank"
               rel="noopener noreferrer"
               title="Código-fonte no GitHub — se o Zé ajudou, uma estrela ajuda o projeto"
-              className="inline-flex items-center gap-1.5 rounded-full border border-stone-200 px-3 py-1.5 font-medium text-stone-600 transition-colors hover:border-ink hover:text-ink"
+              className="inline-flex items-center gap-1.5 rounded-md border-2 border-ink/50 px-3 py-1.5 font-mono text-xs font-bold uppercase tracking-wider text-stone-600 transition-all hover:border-ink hover:bg-form-amarelo/30 hover:text-ink"
             >
               <svg
                 viewBox="0 0 24 24"

@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { useRouter } from "next/navigation";
-import TemaArt from "@/components/TemaArt";
+
 
 const EXEMPLOS: { q: string; tema: string; entidade: string }[] = [
   { q: "Como renovo o Cartão de Cidadão sem apanhar a fila das 7h?", tema: "cartao-de-cidadao", entidade: "IRN" },
@@ -21,6 +21,7 @@ export default function HeroBox() {
   const [pergunta, setPergunta] = useState("");
   const [idx, setIdx] = useState(0);
   const [texto, setTexto] = useState("");
+  const [batendo, setBatendo] = useState(false);
   const char = useRef(0);
   const apagando = useRef(false);
   const router = useRouter();
@@ -65,13 +66,29 @@ export default function HeroBox() {
     if (trimmed) router.push(`/chat?q=${encodeURIComponent(trimmed)}`);
   };
 
+  // O carimbo "bate" (~220ms) antes de navegar
+  const baterCarimbo = () => {
+    if (!pergunta.trim()) return;
+    setBatendo(true);
+    setTimeout(() => enviar(pergunta), 220);
+  };
+
   const exemplo = EXEMPLOS[idx];
 
   return (
     <div className="w-full">
-      {/* Caixa de pergunta */}
-      <div className="relative z-10 rounded-3xl border border-stone-300 bg-white shadow-[0_4px_28px_-8px_rgba(0,0,0,0.15)] focus-within:border-band-verde focus-within:ring-4 focus-within:ring-band-verde/10">
+      {/* FORMULÁRIO Z-01 — a caixa de pergunta */}
+      <div className="relative z-10 rounded-lg border-2 border-ink bg-white text-left shadow-[8px_8px_0_#1b1d22] transition-shadow focus-within:shadow-[10px_10px_0_#1b1d22]">
+        <div className="flex items-center justify-between border-b-2 border-dashed border-ink/20 px-5 py-2.5">
+          <p className="font-mono text-[11px] font-bold uppercase tracking-widest text-stone-500">
+            Formulário Z-01 · via única
+          </p>
+          <span className="carimbo -my-1">Sem fila</span>
+        </div>
         <div className="relative">
+          <p className="px-6 pt-4 font-mono text-[10px] uppercase tracking-[0.25em] text-stone-400">
+            Assunto
+          </p>
           <textarea
             value={pergunta}
             onChange={(e) => setPergunta(e.target.value)}
@@ -83,55 +100,61 @@ export default function HeroBox() {
             }}
             rows={3}
             aria-label="A tua pergunta para o Zé"
-            className="w-full resize-none rounded-t-3xl bg-transparent px-6 pt-5 text-lg outline-none"
+            className="w-full resize-none bg-transparent px-6 pt-2 text-lg outline-none"
           />
           {pergunta === "" && (
             <div
               aria-hidden
-              className="pointer-events-none absolute inset-x-6 top-5 text-lg text-stone-400"
+              className="pointer-events-none absolute inset-x-6 top-11 text-lg text-stone-400"
             >
               {texto}
               <span className="caret-blink ml-0.5 inline-block h-5 w-[2px] translate-y-0.5 bg-stone-400" />
             </div>
           )}
         </div>
-        <div className="flex flex-col gap-3 px-5 pb-4 pt-1 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-xs text-stone-400">
-            Não precisas de dados pessoais, como o NIF ou números de documentos.
+        <div className="flex flex-col gap-3 border-t-2 border-dashed border-ink/20 px-5 py-3.5 sm:flex-row sm:items-center sm:justify-between">
+          <p className="font-mono text-[11px] uppercase tracking-wide text-stone-400">
+            NIF ou nºs de documento: não são precisos
           </p>
+          {/* O botão de submeter É um carimbo — bate antes de navegar */}
           <button
-            onClick={() => enviar(pergunta)}
+            onClick={baterCarimbo}
             disabled={!pergunta.trim()}
-            className="btn-primary shrink-0 self-end px-5 py-2.5 text-sm sm:self-auto"
+            className={`carimbo shrink-0 self-end px-4 py-2 text-sm sm:self-auto ${
+              batendo ? "stamp-batendo" : ""
+            } bg-white disabled:opacity-30`}
+            style={{ transform: "rotate(-7deg)" }}
           >
-            Continuar na conversa →
+            Entregar →
           </button>
         </div>
       </div>
 
-      {/* Cartão de exemplo rotativo — espreita por baixo da caixa */}
-      <div className="relative -top-6 mx-auto w-[92%] max-w-lg">
+      {/* Senha rotativa — espreita por baixo do formulário */}
+      <div className="relative -top-4 mx-auto w-[88%] max-w-md rotate-1">
         <div
           key={idx}
-          className="animate-fade-in-up overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-md"
+          className="senha animate-fade-in-up"
+          style={{ "--fundo": "#faf6ec" } as CSSProperties}
         >
-          <TemaArt temaId={exemplo.tema} className="h-28" />
-          <div className="flex items-center justify-between gap-4 px-5 py-4">
-            <div>
-              <p className="text-[11px] font-medium uppercase tracking-wide text-stone-400">
-                {exemplo.entidade} · exemplo {idx + 1} de {EXEMPLOS.length}
-              </p>
-              <p className="mt-1 font-serif text-lg font-medium leading-snug">
+          <div className="px-5 pt-6 pb-4">
+            <div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.25em] text-stone-400">
+              <span>Senha Z-{String(idx + 1).padStart(3, "0")}</span>
+              <span>{exemplo.entidade}</span>
+            </div>
+            <div className="senha-corte my-3" aria-hidden />
+            <div className="flex items-center justify-between gap-4">
+              <p className="font-display text-[17px] leading-snug">
                 {exemplo.q}
               </p>
+              <button
+                onClick={() => enviar(exemplo.q)}
+                className="grid size-10 shrink-0 place-items-center rounded-lg border-2 border-ink bg-band-verde text-white shadow-[3px_3px_0_#1b1d22] transition-all hover:-translate-y-0.5 hover:bg-band-verde-escuro hover:shadow-[4px_4px_0_#1b1d22]"
+                aria-label="Usa esta pergunta"
+              >
+                →
+              </button>
             </div>
-            <button
-              onClick={() => enviar(exemplo.q)}
-              className="grid size-10 shrink-0 place-items-center rounded-full bg-band-verde text-white transition-colors hover:bg-band-verde-escuro"
-              aria-label="Usa esta pergunta"
-            >
-              →
-            </button>
           </div>
         </div>
       </div>

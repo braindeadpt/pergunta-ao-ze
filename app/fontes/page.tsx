@@ -13,7 +13,10 @@ export default function FontesPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-14">
-      <h1 className="font-serif text-4xl font-semibold tracking-tight">
+      <p className="font-mono text-xs font-bold uppercase tracking-[0.25em] text-band-vermelho">
+        ▸ Diretório de repartições
+      </p>
+      <h1 className="mt-2 font-display text-4xl uppercase tracking-tight">
         Fontes oficiais
       </h1>
       <p className="mt-3 text-stone-600">
@@ -23,19 +26,22 @@ export default function FontesPage() {
         Europeia.
       </p>
 
-      <div className="mt-10 space-y-6">
-        {grupos.map((g) => (
+      <div className="mt-10 space-y-7">
+        {grupos.map((g, i) => (
           <section
             key={g.entidade.dominio}
-            className="rounded-[1.75rem] border border-stone-200 bg-white p-6"
+            className="rounded-lg border-2 border-ink bg-white p-6 shadow-[5px_5px_0_#1b1d22]"
+            style={{ transform: `rotate(${i % 2 === 0 ? -0.4 : 0.4}deg)` }}
           >
             <div className="flex items-baseline justify-between gap-4">
-              <h2 className="font-semibold">{g.entidade.nome}</h2>
-              <span className="shrink-0 rounded-full bg-stone-100 px-2.5 py-0.5 text-xs text-stone-500">
+              <h2 className="font-display text-xl">{g.entidade.nome}</h2>
+              <span className="shrink-0 rounded-md border-2 border-ink/40 px-2.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-widest text-stone-500">
                 {g.entidade.ambito}
               </span>
             </div>
-            <p className="mt-0.5 text-sm text-stone-400">{g.entidade.dominio}</p>
+            <p className="mt-0.5 font-mono text-xs text-stone-400">
+              {g.entidade.dominio}
+            </p>
             {g.entidade.contacto && (
               <div className="mt-2.5 space-y-0.5 text-sm text-stone-600">
                 {g.entidade.contacto.telefone && (
@@ -71,7 +77,7 @@ export default function FontesPage() {
                 )}
               </div>
             )}
-            <ul className="mt-4 space-y-2">
+            <ul className="mt-4 space-y-2 border-t-2 border-dashed border-ink/15 pt-4">
               {g.fontes.map((f) => (
                 <li key={f.url}>
                   <a

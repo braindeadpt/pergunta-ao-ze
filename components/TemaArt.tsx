@@ -45,32 +45,18 @@ export function getArte(id: string): Arte {
 }
 
 /**
- * Banda de ilustração flat estilo "pastel + pontilhado + cartão com ícone",
- * inspirada nos cartões do Italia Aperta.
+ * Cabeçalho de documento do tema — bloco sólido saturado + ícone branco.
+ * DESIGN.md v2 §5/§6: cor chapada, sem blobs nem pontilhado pastel.
  */
 export default function TemaArt({ temaId, className = "" }: { temaId: string; className?: string }) {
-  const { icon: Icon, bg, ink, blob } = getArte(temaId);
+  const { icon: Icon, ink } = getArte(temaId);
   return (
     <div
       aria-hidden
-      className={`art-dots relative overflow-hidden ${className}`}
-      style={{ backgroundColor: bg }}
+      className={`relative flex items-center justify-center overflow-hidden ${className}`}
+      style={{ backgroundColor: ink }}
     >
-      <div
-        className="absolute -right-6 -top-8 size-28 rounded-full opacity-70"
-        style={{ backgroundColor: blob }}
-      />
-      <div
-        className="absolute -bottom-10 -left-4 size-24 rounded-full opacity-60"
-        style={{ backgroundColor: blob }}
-      />
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div
-          className="grid size-20 -rotate-3 place-items-center rounded-2xl bg-white shadow-[0_6px_20px_-8px_rgba(0,0,0,0.25)]"
-        >
-          <Icon className="size-10" style={{ color: ink }} strokeWidth={1.6} />
-        </div>
-      </div>
+      <Icon className="size-14 -rotate-6 text-white/95" strokeWidth={1.7} />
     </div>
   );
 }

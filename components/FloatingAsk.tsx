@@ -30,19 +30,19 @@ export default function FloatingAsk() {
         visivel ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-6 opacity-0"
       }`}
     >
-      <div className="flex w-full max-w-md items-center gap-2 rounded-full border border-stone-200 bg-white p-2 pl-5 shadow-[0_8px_30px_-6px_rgba(0,0,0,0.25)]">
+      <div className="flex w-full max-w-md rotate-[0.5deg] items-center gap-2 rounded-lg border-2 border-ink bg-white p-2 pl-5 shadow-[5px_5px_0_#1b1d22]">
         <input
           value={texto}
           onChange={(e) => setTexto(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && enviar()}
           placeholder="Pergunta ao Zé…"
           aria-label="Pergunta ao Zé"
-          className="w-full bg-transparent text-sm outline-none placeholder:text-stone-400"
+          className="w-full bg-transparent font-mono text-sm outline-none placeholder:text-stone-400"
         />
         <button
           onClick={enviar}
           aria-label="Enviar pergunta"
-          className="grid size-9 shrink-0 place-items-center rounded-full bg-band-verde text-white transition-colors hover:bg-band-verde-escuro"
+          className="grid size-9 shrink-0 place-items-center rounded-md border-2 border-ink bg-band-verde text-white shadow-[2px_2px_0_#1b1d22] transition-all hover:-translate-y-0.5 hover:bg-band-verde-escuro"
         >
           →
         </button>

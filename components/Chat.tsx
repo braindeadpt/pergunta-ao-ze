@@ -6,6 +6,14 @@ import type { Pergunta, Tema } from "@/lib/types";
 import type { Sugestao } from "@/lib/engine";
 import { getContactoPorDominio } from "@/lib/data/fontes";
 import ZeFace from "@/components/ZeFace";
+import ZePersonagem from "@/components/ZePersonagem";
+
+const FRASES_BALCAO = [
+  "A pedir carimbo ao chefe…",
+  "A procurar o impresso certo…",
+  "A conferir o livro de ponto…",
+  "Quase — a fila anda devagar…",
+];
 
 const SUGESTOES_INICIAIS = [
   "Como renovo o Cartão de Cidadão?",
@@ -32,8 +40,19 @@ export default function Chat() {
   const [mensagens, setMensagens] = useState<Mensagem[]>([]);
   const [input, setInput] = useState("");
   const [aCarregar, setACarregar] = useState(false);
+  const [fraseIdx, setFraseIdx] = useState(0);
   const fim = useRef<HTMLDivElement>(null);
   const enviado = useRef(false);
+
+  // Frases de balcão a rodar durante o loading
+  useEffect(() => {
+    if (!aCarregar) {
+      setFraseIdx(0);
+      return;
+    }
+    const t = setInterval(() => setFraseIdx((i) => (i + 1) % FRASES_BALCAO.length), 1900);
+    return () => clearInterval(t);
+  }, [aCarregar]);
 
   useEffect(() => {
     const suave = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -77,12 +96,15 @@ export default function Chat() {
     <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-4">
       <div className="flex-1 space-y-6 py-8">
         {mensagens.length === 0 && (
-          <div className="pt-6 text-center sm:pt-12">
-            <ZeFace className="mx-auto size-16 -rotate-3 drop-shadow-[0_10px_20px_rgba(4,106,56,0.35)]" />
-            <p className="mt-5 font-serif text-3xl font-semibold tracking-tight sm:text-4xl">
+          <div className="pt-4 text-center sm:pt-8">
+            <ZePersonagem estado="normal" className="mx-auto w-52" />
+            <p className="mt-4 font-display text-3xl uppercase tracking-tight sm:text-4xl">
               Olá, sou o Zé.
             </p>
-            <p className="mx-auto mt-3 max-w-md text-[15px] leading-relaxed text-stone-500">
+            <p className="mx-auto mt-3 max-w-md font-mono text-[12px] uppercase leading-relaxed tracking-wider text-stone-500">
+              Balcão aberto · sem senha · sem fila
+            </p>
+            <p className="mx-auto mt-3 max-w-md text-[15px] leading-relaxed text-stone-600">
               Pergunta-me sobre serviços públicos portugueses — documentos,
               impostos, saúde, trabalho, empresa. Já li os guias chatos por ti.
             </p>
@@ -103,25 +125,35 @@ export default function Chat() {
         {mensagens.map((m, i) =>
           m.papel === "utilizador" ? (
             <div key={i} className="animate-fade-in-up flex justify-end">
-              <div className="max-w-[85%] rounded-2xl rounded-br-sm bg-band-verde px-4 py-3 text-white">
+              <div className="max-w-[85%] rounded-lg rounded-br-sm border-2 border-ink bg-band-verde px-4 py-3 text-white shadow-[3px_3px_0_#1b1d22]">
                 {m.texto}
               </div>
             </div>
           ) : (
             <div key={i} className="animate-fade-in-up flex gap-3">
-              <ZeFace className="mt-1 size-8 shrink-0" />
-              <div className="max-w-[85%] flex-1 rounded-2xl rounded-tl-sm border border-stone-200 bg-white px-5 py-4">
+              <ZeFace
+                expressao={m.tipo === "erro" ? "hmm" : "normal"}
+                className="mt-1 size-8 shrink-0"
+              />
+              <div className="relative max-w-[85%] flex-1 rounded-lg rounded-tl-sm border-2 border-ink bg-white px-5 py-4 shadow-[3px_3px_0_#1b1d22]">
+                {m.tipo === "resposta" && (
+                  <span
+                    aria-hidden
+                    className="carimbo stamp-batendo absolute -right-3 -top-4 rotate-[7deg] bg-white"
+                  >
+                    Deferido
+                  </span>
+                )}
                 {m.tipo === "erro" ? (
                   <p className="text-[15px]">
-                    Algo falhou ao contactar o servidor — tenta outra vez daqui
-                    a um momento.
+                    A máquina engasgou-se — tenta outra vez daqui a um momento.
                   </p>
                 ) : m.tipo === "resposta" && m.pergunta ? (
                   <>
-                    <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-stone-400">
+                    <p className="flex items-center gap-2 font-mono text-[11px] font-bold uppercase tracking-widest text-stone-400">
                       {m.tema?.entidade} · {m.tema?.titulo}
                       {m.via === "llm" && (
-                        <span className="rounded-full bg-azulejo-suave px-2 py-0.5 text-[10px] font-semibold text-azulejo">
+                        <span className="rounded-md border border-azulejo/50 bg-azulejo-suave px-2 py-0.5 text-[10px] font-bold text-azulejo">
                           gerada por IA
                         </span>
                       )}
@@ -132,23 +164,23 @@ export default function Chat() {
                       ))}
                     </ul>
                     {m.pergunta.resposta.nota && (
-                      <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-900">
+                      <p className="mt-3 rounded-md border-2 border-dashed border-amber-400/60 bg-amber-50 px-3 py-2 text-sm text-amber-900">
                         {m.pergunta.resposta.nota}
                       </p>
                     )}
-                    <div className="mt-4 space-y-2 border-t border-stone-100 pt-3">
+                    <div className="mt-4 space-y-2 border-t-2 border-dashed border-ink/15 pt-3">
                       {m.pergunta.resposta.fontes.map((f, j) => (
                         <a
                           key={j}
                           href={f.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center justify-between gap-3 rounded-lg border border-stone-200 px-3 py-2 text-sm transition-colors hover:border-azulejo hover:bg-azulejo-suave"
+                          className="flex items-center justify-between gap-3 rounded-md border-2 border-azulejo/40 px-3 py-2 text-sm transition-colors hover:bg-azulejo-suave"
                         >
                           <span className="font-medium text-azulejo">
                             {j + 1}. {f.titulo}
                           </span>
-                          <span className="shrink-0 text-xs text-stone-400">
+                          <span className="shrink-0 font-mono text-[11px] text-stone-400">
                             {f.dominio} ↗
                           </span>
                         </a>
@@ -165,10 +197,10 @@ export default function Chat() {
                         });
                       if (linhas.length === 0) return null;
                       return (
-                        <div className="mt-3 space-y-1 rounded-lg bg-stone-50 px-3 py-2.5 text-[13px] text-stone-600">
+                        <div className="mt-3 space-y-1 rounded-md border-2 border-dashed border-ink/20 bg-stone-50 px-3 py-2.5 text-[13px] text-stone-600">
                           {linhas.map((c) => (
                             <p key={c.nome}>
-                              <span className="font-medium text-ink">
+                              <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-ink">
                                 Ligar:
                               </span>{" "}
                               {c.contacto.telefone}
@@ -195,9 +227,9 @@ export default function Chat() {
                         <button
                           key={s.id}
                           onClick={() => perguntar(s.texto)}
-                          className="rounded-lg border border-stone-200 px-3 py-2 text-left text-sm transition-colors hover:border-band-verde hover:bg-emerald-50"
+                          className="rounded-md border-2 border-dashed border-ink/30 px-3 py-2 text-left text-sm transition-colors hover:border-ink hover:bg-form-amarelo/20"
                         >
-                          <span className="text-xs text-stone-400">
+                          <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-stone-400">
                             {s.tema}
                           </span>
                           <br />
@@ -209,7 +241,7 @@ export default function Chat() {
                 )}
                 {m.sugestoes.length > 0 && m.tipo === "resposta" && (
                   <div className="mt-4">
-                    <p className="text-xs text-stone-400">
+                    <p className="font-mono text-[11px] font-bold uppercase tracking-widest text-stone-400">
                       Perguntas relacionadas:
                     </p>
                     <div className="mt-2 flex flex-wrap gap-2">
@@ -232,22 +264,23 @@ export default function Chat() {
 
         {aCarregar && (
           <div className="animate-fade-in-up flex gap-3">
-            <ZeFace className="mt-1 size-8 shrink-0" />
-            <div className="flex items-center gap-3 rounded-2xl rounded-tl-sm border border-stone-200 bg-white px-5 py-4 text-stone-400">
-              <span className="flex gap-1" aria-hidden>
-                <span className="typing-dot" />
-                <span className="typing-dot" />
-                <span className="typing-dot" />
-              </span>
-              A folhear os guias oficiais…
+            <div className="flex items-center gap-4 rounded-lg rounded-tl-sm border-2 border-ink bg-white px-5 py-4 shadow-[3px_3px_0_#1b1d22]">
+              <ZePersonagem estado="pensar" className="w-20 shrink-0" />
+              <p
+                key={fraseIdx}
+                className="animate-fade-in-up font-mono text-[13px] text-stone-500"
+                aria-live="polite"
+              >
+                {FRASES_BALCAO[fraseIdx]}
+              </p>
             </div>
           </div>
         )}
         <div ref={fim} />
       </div>
 
-      <div className="sticky bottom-0 border-t border-stone-200 bg-paper py-4">
-        <div className="flex items-end gap-2 rounded-2xl border border-stone-300 bg-white p-2 focus-within:border-band-verde focus-within:ring-2 focus-within:ring-band-verde/20">
+      <div className="sticky bottom-0 border-t-2 border-ink bg-paper py-4">
+        <div className="flex items-end gap-2 rounded-lg border-2 border-ink bg-white p-2 shadow-[4px_4px_0_#1b1d22] focus-within:shadow-[5px_5px_0_#1b1d22]">
           <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -267,7 +300,7 @@ export default function Chat() {
             disabled={!input.trim() || aCarregar}
             className="btn-primary px-4 py-2 text-sm"
           >
-            Enviar
+            Carimbar →
           </button>
         </div>
         <p className="mt-2 text-center text-xs text-stone-400">
