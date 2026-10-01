@@ -17,6 +17,8 @@
   --color-amarelo-papel: #f5e27a;
   --color-esferografica: #1b3fa0;
   --color-led: #ffb020;
+  /* Vermelho-carimbo escuro para TEXTO sobre amarelo-papel (AA 4.5+) */
+  --color-carimbo-tinta: #a31522;
 
   /* Superfícies semânticas — DESIGN.md §3 */
   --color-ok: #0f6b4f;
@@ -57,6 +59,7 @@ summary:focus-visible {
     scroll-behavior: auto;
   }
   .animate-fade-in-up,
+  .animate-pulse,
   .caret-blink,
   .typing-dot {
     animation: none;
@@ -172,6 +175,16 @@ details[open] .faq-plus {
     right: -15px;
     clip-path: inset(0 50% 0 0);
   }
+  /* Fita-cola translúcida — cola cantos de impressos */
+  .fita {
+    position: absolute;
+    width: 92px;
+    height: 26px;
+    background: rgb(245 226 122 / 0.55);
+    border-left: 1px dashed rgb(27 29 34 / 0.25);
+    border-right: 1px dashed rgb(27 29 34 / 0.25);
+    box-shadow: 0 1px 2px rgb(27 29 34 / 0.15);
+  }
   /* Folha de formulário com linhas pautadas */
   .folha-linhas {
     background-image: repeating-linear-gradient(
@@ -219,6 +232,20 @@ details[open] .faq-plus {
   .senha:hover .senha-stub {
     transform: rotate(1.6deg) translateY(-2px);
   }
+}
+
+/* Senha tombada — caiu do dispensador; endireita ao interagir */
+@media (prefers-reduced-motion: no-preference) {
+  .senha-tombada {
+    transition: transform 0.3s ease;
+  }
+  .senha-tombada:hover,
+  .senha-tombada:focus-within {
+    transform: rotate(-2deg) !important;
+  }
+}
+.senha-tombada {
+  box-shadow: 5px -5px 0 var(--color-ink);
 }
 
 @keyframes typing-bounce {

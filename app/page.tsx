@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { CSSProperties } from "react";
 import HeroBox from "@/components/HeroBox";
 import FloatingAsk from "@/components/FloatingAsk";
 import SenhaTema from "@/components/SenhaTema";
@@ -21,10 +22,31 @@ const XMao = () => (
     <path d="M14.5 3 C11 7 7 11 3 14" />
   </svg>
 );
+/* Clipe de papel — prende senhas ao tabuleiro */
+const Clipe = ({ className = "" }: { className?: string }) => (
+  <svg viewBox="0 0 24 56" className={className} fill="none" stroke="#1b1d22" strokeWidth="4" strokeLinecap="round" aria-hidden>
+    <path d="M12 10 V44" />
+    <path d="M6 20 V50 Q6 54 10 54 H14 Q18 54 18 50 V24" />
+  </svg>
+);
+
+const porId = (id: string) => TEMAS.find((t) => t.id === id)!;
+
+/* Os balcões do atendimento — agrupamento dos temas */
+const BALCOES: { rotulo: string; letra: string; ids: string[] }[] = [
+  { rotulo: "Identificação", letra: "I", ids: ["passaporte", "chave-movel-digital", "certidoes"] },
+  { rotulo: "Dinheiro", letra: "D", ids: ["irs-financas", "seguranca-social", "pensoes-reforma"] },
+  { rotulo: "Trabalho e empresa", letra: "T", ids: ["desemprego-iefp", "empresa-atividade"] },
+  { rotulo: "Saúde e família", letra: "S", ids: ["sns", "familia"] },
+  { rotulo: "Estrada e casa", letra: "E", ids: ["carta-conducao-imt", "transportes", "habitacao"] },
+  { rotulo: "Fronteiras", letra: "F", ids: ["aima-imigracao", "vistos-entrada", "noutro-pais-ue"] },
+  { rotulo: "Balcão do povo", letra: "P", ids: ["eleicoes-voto", "justica-multas", "reclamacoes", "educacao", "eportugal-agendamento"] },
+];
 
 export default function Home() {
   const stats = getEstatisticas();
   const fontes = getFontes();
+  const destaque = porId("cartao-de-cidadao");
 
   return (
     <>
@@ -73,16 +95,17 @@ export default function Home() {
             <span className="carimbo absolute -top-2 right-2 z-10 bg-white md:-right-4">
               Balcão aberto
             </span>
+            <Clipe className="absolute -left-6 top-24 z-10 hidden w-5 -rotate-12 lg:block" />
             <ZePersonagem estado="normal" olhosVivos />
           </div>
         </div>
       </section>
 
-      {/* ── TEMAS — senhas de atendimento sobre papel amarelo ── */}
-      <section id="temas" className="border-t-2 border-ink bg-amarelo-papel">
+      {/* ── TEMAS — senhas de atendimento, agrupadas por balcão ── */}
+      <section id="temas" className="overflow-x-clip border-t-2 border-ink bg-amarelo-papel">
         <div className="mx-auto max-w-6xl px-4 py-20">
           <div className="relative">
-            <p className="font-mono text-xs font-bold uppercase tracking-[0.25em] text-band-vermelho">
+            <p className="font-mono text-xs font-bold uppercase tracking-[0.25em] text-carimbo-tinta">
               ▸ Retire a sua senha
             </p>
             <h2 className="mt-2 max-w-2xl font-display text-4xl uppercase leading-none tracking-tight md:text-6xl">
@@ -91,21 +114,69 @@ export default function Home() {
             <span className="carimbo absolute -top-4 right-0 hidden rotate-6 bg-white md:block">
               Senhas grátis
             </span>
-            <p className="mt-4 max-w-lg text-stone-700">
+            <p className="mt-4 max-w-lg text-stone-800">
               Cada tema é uma senha. Toca na que precisas — a tua vez chega
               sempre, aqui.
             </p>
           </div>
-          <div className="mt-12 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-            {TEMAS.map((tema, i) => (
-              <SenhaTema key={tema.id} tema={tema} i={i} fundo="#f5e27a" />
-            ))}
+
+          {/* A senha mais pedida — ocupa 2 colunas */}
+          <div className="relative mt-12 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="relative sm:col-span-2">
+              <Clipe className="absolute -top-4 left-10 z-10 w-6 rotate-6" />
+              <SenhaTema tema={destaque} i={0} fundo="#f5e27a" numero="A-001" balcao="Balcão 1" destaque />
+            </div>
+
+            {/* Senha caída — decorativa, saiu do dispensador */}
+            <div
+              aria-hidden
+              className="senha senha-tombada hidden w-52 lg:block"
+              style={{ "--fundo": "#f5e27a", position: "absolute", right: "-3rem", bottom: "-5.5rem", transform: "rotate(163deg)" } as CSSProperties}
+            >
+              <div className="px-4 pb-3 pt-4">
+                <p className="font-mono text-2xl font-bold">X-000</p>
+                <p className="font-mono text-[11px] uppercase tracking-widest text-stone-600">Erro de impressão</p>
+              </div>
+            </div>
           </div>
+
+          {/* Um balcão por grupo de temas */}
+          {BALCOES.map((b, bi) => (
+            <div key={b.letra} className="mt-14">
+              <p className="flex items-center gap-3 font-mono text-sm font-bold uppercase tracking-[0.2em]">
+                <span className="rounded border-2 border-ink bg-white px-2.5 py-1 shadow-[2px_2px_0_#1b1d22]">
+                  Balcão {bi + 1}
+                </span>
+                <span className="text-carimbo-tinta">— {b.rotulo}</span>
+              </p>
+              <div className="mt-6 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+                {b.ids.map((id, j) => {
+                  const tema = porId(id);
+                  const ultimo = bi === BALCOES.length - 1 && j === b.ids.length - 1;
+                  return (
+                    <SenhaTema
+                      key={id}
+                      tema={tema}
+                      i={bi * 4 + j + 1}
+                      fundo="#f5e27a"
+                      numero={`${b.letra}-${String(j + 1).padStart(3, "0")}`}
+                      balcao={`Balcão ${bi + 1}`}
+                      tombada={ultimo}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
       {/* ── STATS — painel LED sobre azul esferográfica ── */}
-      <section id="como-funciona" className="border-t-2 border-ink bg-esferografica text-white">
+      <section id="como-funciona" className="relative border-t-2 border-ink bg-esferografica text-white">
+        {/* Carimbo que invade da secção anterior */}
+        <span className="carimbo absolute -top-5 right-6 rotate-[10deg] bg-white md:right-16">
+          Urgente
+        </span>
         <div className="mx-auto max-w-6xl px-4 py-20">
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <div>
@@ -149,7 +220,7 @@ export default function Home() {
       {/* ── EXEMPLO DE RESPOSTA — zona sóbria (a piada fica à volta) ── */}
       <section className="mx-auto max-w-6xl px-4 py-20">
         <div className="grid items-center gap-10 lg:grid-cols-2">
-          <div>
+          <div className="relative">
             <p className="font-mono text-xs font-bold uppercase tracking-[0.25em] text-band-vermelho">
               ▸ Despacho interno
             </p>
@@ -160,8 +231,14 @@ export default function Home() {
               O Zé só cita páginas oficiais. Um clique e estás no site do
               Estado, onde as decisões se tomam.
             </p>
+            {/* O Zé a carimbar — sai do contentor, vigia o exemplo */}
+            <div className="mt-6 hidden w-44 -rotate-2 lg:block">
+              <ZePersonagem estado="carimbar" />
+            </div>
           </div>
           <div className="relative rotate-[0.4deg]">
+            <span aria-hidden className="fita -left-4 -top-3 -rotate-45" />
+            <span aria-hidden className="fita -right-4 -top-3 rotate-45" />
             <div className="rounded-lg border-2 border-ink bg-paper p-5 shadow-[6px_6px_0_#1b1d22] sm:p-6">
               <div className="flex justify-end">
                 <p className="max-w-[85%] rounded-xl rounded-br-sm border-2 border-ink bg-band-verde px-4 py-2.5 text-[15px] text-white shadow-[3px_3px_0_#1b1d22]">
@@ -197,7 +274,7 @@ export default function Home() {
                     <span className="font-medium text-azulejo">
                       1. Renovar o Cartão de Cidadão
                     </span>
-                    <span className="font-mono text-xs text-stone-400">
+                    <span className="font-mono text-xs text-stone-500">
                       eportugal.gov.pt ↗
                     </span>
                   </a>
@@ -212,10 +289,12 @@ export default function Home() {
       <section className="border-t-2 border-ink bg-amarelo-papel">
         <div className="mx-auto max-w-4xl px-4 py-20">
           <div className="relative rotate-[0.5deg] border-2 border-ink bg-white shadow-[8px_8px_0_#1b1d22]">
+            <span aria-hidden className="fita -left-5 -top-3 -rotate-45" />
+            <span aria-hidden className="fita -right-5 -top-3 rotate-45" />
             {/* Cabeçalho do impresso */}
             <div className="flex flex-wrap items-center justify-between gap-3 border-b-2 border-ink px-6 py-4 sm:px-8">
               <div>
-                <p className="font-mono text-[11px] font-bold uppercase tracking-[0.25em] text-stone-500">
+                <p className="font-mono text-[11px] font-bold uppercase tracking-[0.25em] text-stone-600">
                   Formulário Z-02 · preencher a tinta
                 </p>
                 <h2 className="mt-1 font-display text-2xl uppercase tracking-tight md:text-3xl">
@@ -243,7 +322,7 @@ export default function Home() {
                 </ul>
               </div>
               <div className="border-t-2 border-dashed border-ink/25 px-6 py-7 sm:px-8 md:border-t-0">
-                <p className="font-mono text-[11px] font-bold uppercase tracking-[0.25em] text-band-vermelho">
+                <p className="font-mono text-[11px] font-bold uppercase tracking-[0.25em] text-carimbo-tinta">
                   Indeferido
                 </p>
                 <ul className="mt-5 space-y-4">
@@ -260,7 +339,7 @@ export default function Home() {
                 </ul>
               </div>
             </div>
-            <p className="border-t-2 border-dashed border-ink/25 px-6 py-3.5 font-mono text-[11px] uppercase tracking-wide text-stone-400 sm:px-8">
+            <p className="border-t-2 border-dashed border-ink/25 px-6 py-3.5 font-mono text-[11px] uppercase tracking-wide text-stone-500 sm:px-8">
               A informação pode ficar desatualizada — confirma sempre na fonte.
             </p>
           </div>
@@ -270,19 +349,24 @@ export default function Home() {
       {/* ── FAQ — Livro de Reclamações ── */}
       <section id="perguntas" className="border-t-2 border-ink">
         <div className="mx-auto max-w-3xl px-4 py-20">
-          <div className="text-center">
+          <div className="relative text-center">
             <p className="font-mono text-xs font-bold uppercase tracking-[0.25em] text-band-vermelho">
               ▸ Artigo 74.º da Lei nº 144/2015
             </p>
             <h2 className="mt-2 font-display text-4xl uppercase tracking-tight md:text-5xl">
               Livro de reclamações
             </h2>
-            <p className="mt-3 text-stone-500">
+            <p className="mt-3 text-stone-600">
               As queixas mais frequentes — respondidas antes de chegarem ao
               livro.
             </p>
+            {/* O Zé em pânico — as reclamações chegaram */}
+            <div className="absolute -right-24 -top-16 hidden w-36 rotate-3 lg:block xl:-right-32">
+              <ZePersonagem estado="panico" />
+            </div>
           </div>
           <div className="relative mt-10 -rotate-[0.4deg]">
+            <span aria-hidden className="fita -top-3 left-16 -rotate-3" />
             {/* Lombada vermelha do livro */}
             <div
               aria-hidden
@@ -321,12 +405,12 @@ export default function Home() {
                   <details key={f.q} className="group px-6 py-5">
                     <summary className="flex items-start justify-between gap-4">
                       <span>
-                        <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-band-vermelho">
+                        <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-carimbo-tinta">
                           Reclamação nº {String(i + 1).padStart(2, "0")}
                         </span>
                         <span className="mt-1 block font-medium">{f.q}</span>
                       </span>
-                      <span aria-hidden className="faq-plus mt-1 text-xl text-stone-400">
+                      <span aria-hidden className="faq-plus mt-1 text-xl text-stone-500">
                         +
                       </span>
                     </summary>
@@ -341,24 +425,25 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── CTA final ── */}
-      <section className="border-t-2 border-ink bg-band-verde-escuro">
-        <div className="mx-auto max-w-3xl px-4 py-16 text-center">
-          <div className="relative inline-block">
-            <ZeFace expressao="pisca" className="mx-auto size-14 rotate-3" />
-            <span className="carimbo-claro absolute -right-20 -top-1 hidden rotate-6 md:block">
+      {/* ── CTA final — tinta de carimbo ── */}
+      <section className="overflow-x-clip border-t-2 border-ink bg-band-vermelho">
+        <div className="relative mx-auto max-w-3xl px-4 py-16 text-center">
+          {/* O Zé aliviado — despachou o dia */}
+          <div className="relative mx-auto w-52 -rotate-1">
+            <span className="carimbo-claro absolute -right-8 top-6 z-10 rotate-6 bg-band-vermelho">
               Grátis
             </span>
+            <ZePersonagem estado="aliviado" />
           </div>
-          <h2 className="mt-5 font-display text-4xl uppercase tracking-tight text-emerald-50 md:text-5xl">
+          <h2 className="mt-6 font-display text-4xl uppercase tracking-tight text-white md:text-5xl">
             A tua vez é agora.
           </h2>
-          <p className="mt-3 font-mono text-sm uppercase tracking-widest text-emerald-100/70">
+          <p className="mt-3 font-mono text-sm uppercase tracking-widest text-white/80">
             Sem senha. Sem fila. Sem impresso em triplicado.
           </p>
           <Link
             href="/chat"
-            className="mt-8 inline-block rounded-lg border-2 border-ink bg-white px-8 py-3.5 font-semibold text-band-verde-escuro shadow-[5px_5px_0_#1b1d22] transition-all hover:-translate-y-1 hover:shadow-[7px_7px_0_#1b1d22]"
+            className="btn-primary mt-8 px-8 py-3.5 text-base shadow-[5px_5px_0_#1b1d22] hover:shadow-[7px_7px_0_#1b1d22]"
           >
             Pergunta ao Zé →
           </Link>
