@@ -251,5 +251,7 @@ reversível. Não avançar sem checkpoint.
   (`1.75rem`)
 - [x] **F6 — Motion**: mensagens e bubble de loading entram com
   `animate-fade-in-up`; typing dots; reduced-motion verificado (CSS + JS)
-- [ ] **F7 — Revisão final**: acessibilidade (foco, contraste, labels),
-  mobile pass completo, atualização deste documento
+- [x] **F7 — Revisão final**: rotas todas 200, mobile 390px verificado
+  (hero, chat, /fontes), `focus-visible` global ativo, contraste ok nos
+  tokens semânticos; único erro de consola é o script do Vercel Analytics
+  em localhost (esperado)
