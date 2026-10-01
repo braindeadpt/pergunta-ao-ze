@@ -33,6 +33,13 @@ const BASE_URL = (process.env.LLM_BASE_URL ?? "").replace(/\/+$/, "");
 const API_KEY = process.env.LLM_API_KEY ?? "";
 const MODEL = process.env.LLM_MODEL ?? "openai/gpt-oss-120b";
 const MODO_DRY = process.argv.includes("--dry-run");
+/** --forcar id1,id2: re-traduz mesmo que o hash PT não tenha mudado. */
+const FORCAR = new Set(
+  (process.argv.find((a, i) => process.argv[i - 1] === "--forcar") ?? "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean)
+);
 
 if (!MODO_DRY && (!BASE_URL || !API_KEY)) {
   console.error("Falta LLM_BASE_URL/LLM_API_KEY — vê .env.example.");
@@ -41,6 +48,7 @@ if (!MODO_DRY && (!BASE_URL || !API_KEY)) {
 
 // --- dados ------------------------------------------------------------------
 const { TEMAS } = await import("../lib/data/temas.ts");
+const { normalizarRespostaEn } = await import("../lib/glossario-en.ts");
 
 let existente = {};
 try {
@@ -178,8 +186,10 @@ for (const tema of TEMAS) {
   for (const p of tema.perguntas) {
     const hash = hashOrigem(p);
     const prev = existente[p.id];
-    if (prev && prev.hashOrigem === hash) {
-      saida[p.id] = prev;
+    if (prev && prev.hashOrigem === hash && !FORCAR.has(p.id)) {
+      // Mesmo mantida, passa pelo pós-processamento do glossário —
+      // corrige variantes antigas sem nova chamada ao LLM.
+      saida[p.id] = { ...prev, ...normalizarRespostaEn(prev) };
       mantidas++;
       continue;
     }
@@ -188,7 +198,7 @@ for (const tema of TEMAS) {
       continue;
     }
     try {
-      const en = await traduzir(p);
+      const en = normalizarRespostaEn(await traduzir(p));
       const falhas = [
         ...p.resposta.passos.map((pt, i) =>
           en.passos[i] ? diffInvariantes(pt, en.passos[i]) : ["passo em falta"]
