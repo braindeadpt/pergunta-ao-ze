@@ -249,7 +249,7 @@ reversível. Não avançar sem checkpoint.
   estava ativo; agora nomeia a Groq, explica o que é enviado e menciona
   o Vercel Analytics. Cartões de `/fontes` com o raio do sistema
   (`1.75rem`)
-- [ ] **F6 — Motion**: entrada das mensagens no chat (stagger suave),
-  typing dots, reduced-motion verificado
+- [x] **F6 — Motion**: mensagens e bubble de loading entram com
+  `animate-fade-in-up`; typing dots; reduced-motion verificado (CSS + JS)
 - [ ] **F7 — Revisão final**: acessibilidade (foco, contraste, labels),
   mobile pass completo, atualização deste documento

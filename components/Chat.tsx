@@ -102,13 +102,13 @@ export default function Chat() {
 
         {mensagens.map((m, i) =>
           m.papel === "utilizador" ? (
-            <div key={i} className="flex justify-end">
+            <div key={i} className="animate-fade-in-up flex justify-end">
               <div className="max-w-[85%] rounded-2xl rounded-br-sm bg-band-verde px-4 py-3 text-white">
                 {m.texto}
               </div>
             </div>
           ) : (
-            <div key={i} className="flex gap-3">
+            <div key={i} className="animate-fade-in-up flex gap-3">
               <ZeFace className="mt-1 size-8 shrink-0" />
               <div className="max-w-[85%] flex-1 rounded-2xl rounded-tl-sm border border-stone-200 bg-white px-5 py-4">
                 {m.tipo === "erro" ? (
@@ -231,7 +231,7 @@ export default function Chat() {
         )}
 
         {aCarregar && (
-          <div className="flex gap-3">
+          <div className="animate-fade-in-up flex gap-3">
             <ZeFace className="mt-1 size-8 shrink-0" />
             <div className="flex items-center gap-3 rounded-2xl rounded-tl-sm border border-stone-200 bg-white px-5 py-4 text-stone-400">
               <span className="flex gap-1" aria-hidden>
