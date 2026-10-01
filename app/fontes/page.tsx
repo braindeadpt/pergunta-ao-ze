@@ -58,7 +58,12 @@ export default function FontesPage() {
                 {g.entidade.contacto.email && (
                   <p>
                     <span className="text-stone-400">Email:</span>{" "}
-                    {g.entidade.contacto.email}
+                    <a
+                      href={`mailto:${g.entidade.contacto.email}`}
+                      className="font-medium text-ink underline decoration-stone-300 underline-offset-2 hover:decoration-ink"
+                    >
+                      {g.entidade.contacto.email}
+                    </a>
                   </p>
                 )}
                 {g.entidade.contacto.nota && (

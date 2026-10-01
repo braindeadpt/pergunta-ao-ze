@@ -26,6 +26,11 @@ export default function HeroBox() {
   const router = useRouter();
 
   useEffect(() => {
+    // DESIGN.md §9 — com prefers-reduced-motion, placeholder estático
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setTexto(EXEMPLOS[0].q);
+      return;
+    }
     const tick = () => {
       const alvo = EXEMPLOS[idx].q;
       if (!apagando.current) {

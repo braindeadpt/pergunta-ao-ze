@@ -20,7 +20,7 @@ type Mensagem =
   | { papel: "utilizador"; texto: string }
   | {
       papel: "ze";
-      tipo: "resposta" | "sugestoes";
+      tipo: "resposta" | "sugestoes" | "erro";
       pergunta?: Pergunta;
       tema?: Tema;
       sugestoes: Sugestao[];
@@ -36,7 +36,8 @@ export default function Chat() {
   const enviado = useRef(false);
 
   useEffect(() => {
-    fim.current?.scrollIntoView({ behavior: "smooth" });
+    const suave = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    fim.current?.scrollIntoView({ behavior: suave ? "smooth" : "auto" });
   }, [mensagens, aCarregar]);
 
   async function perguntar(texto: string) {
@@ -57,14 +58,7 @@ export default function Chat() {
         { papel: "ze", tipo: data.tipo ?? "sugestoes", pergunta: data.pergunta, tema: data.tema, sugestoes: data.sugestoes ?? [], via: data.via },
       ]);
     } catch {
-      setMensagens((m) => [
-        ...m,
-        {
-          papel: "ze",
-          tipo: "sugestoes",
-          sugestoes: [],
-        },
-      ]);
+      setMensagens((m) => [...m, { papel: "ze", tipo: "erro", sugestoes: [] }]);
     } finally {
       setACarregar(false);
     }
@@ -117,7 +111,12 @@ export default function Chat() {
             <div key={i} className="flex gap-3">
               <ZeFace className="mt-1 size-8 shrink-0" />
               <div className="max-w-[85%] flex-1 rounded-2xl rounded-tl-sm border border-stone-200 bg-white px-5 py-4">
-                {m.tipo === "resposta" && m.pergunta ? (
+                {m.tipo === "erro" ? (
+                  <p className="text-[15px]">
+                    Algo falhou ao contactar o servidor — tenta outra vez daqui
+                    a um momento.
+                  </p>
+                ) : m.tipo === "resposta" && m.pergunta ? (
                   <>
                     <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-stone-400">
                       {m.tema?.entidade} · {m.tema?.titulo}

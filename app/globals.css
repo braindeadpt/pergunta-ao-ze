@@ -11,6 +11,13 @@
   --color-band-vermelho: #d5232f;
   --color-azulejo: #1d4f9c;
   --color-azulejo-suave: #eef3fb;
+
+  /* Superfícies semânticas — DESIGN.md §3 */
+  --color-ok: #0f6b4f;
+  --color-ok-suave: #ecfdf5;
+  --color-aviso-suave: #fffbeb;
+  --color-aviso-tinta: #78350f;
+  --color-erro-suave: #fef2f2;
 }
 
 html {
@@ -27,6 +34,31 @@ body {
 ::selection {
   background: var(--color-band-verde);
   color: white;
+}
+
+/* Foco visível global — DESIGN.md §8 */
+a:focus-visible,
+button:focus-visible,
+summary:focus-visible {
+  outline: 2px solid var(--color-band-verde);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Movimento reduzido — DESIGN.md §9 */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .animate-fade-in-up,
+  .caret-blink {
+    animation: none;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+  }
 }
 
 details > summary {
