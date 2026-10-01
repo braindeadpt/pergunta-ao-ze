@@ -15,22 +15,28 @@ export default function Home() {
       {/* Hero — a página começa como uma conversa */}
       <section>
         <div className="mx-auto max-w-3xl px-4 pb-20 pt-14 text-center md:pt-20">
-          <div className="flex items-end justify-center gap-3">
+          <div className="animate-fade-in-up flex items-end justify-center gap-3">
             <ZeFace className="size-12 shrink-0 -rotate-3" />
             <p className="rounded-2xl rounded-bl-md border border-stone-200 bg-white px-4 py-2.5 text-left font-serif text-lg font-medium leading-snug shadow-sm">
               Olá! Sou o Zé — já li os guias chatos por ti.
             </p>
           </div>
-          <h1 className="mt-9 font-serif text-[3.4rem] font-semibold leading-[1.05] tracking-tight md:text-[4.5rem]">
+          <h1
+            className="animate-fade-in-up mt-9 font-serif text-[3.4rem] font-semibold leading-[1.05] tracking-tight md:text-[4.5rem]"
+            style={{ animationDelay: "120ms" }}
+          >
             Serviços públicos?
             <br />
             Pergunta ao Zé.
           </h1>
-          <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-stone-600">
+          <p
+            className="animate-fade-in-up mx-auto mt-6 max-w-xl text-lg leading-relaxed text-stone-600"
+            style={{ animationDelay: "240ms" }}
+          >
             Encontra a página oficial certa — sem fila, sem senha, sem
             formulário em triplicado.
           </p>
-          <div className="mt-10">
+          <div className="animate-fade-in-up mt-10" style={{ animationDelay: "360ms" }}>
             <HeroBox />
           </div>
         </div>
@@ -72,7 +78,7 @@ export default function Home() {
                         </span>
                         <span
                           aria-hidden
-                          className="grid size-8 shrink-0 place-items-center rounded-full bg-band-verde text-sm text-white transition-transform group-hover/q:translate-x-0.5"
+                          className="shrink-0 text-lg text-stone-300 transition-all group-hover/q:translate-x-1 group-hover/q:text-band-verde"
                         >
                           →
                         </span>

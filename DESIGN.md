@@ -240,8 +240,10 @@ reversível. Não avançar sem checkpoint.
 - [x] **F3 — Componentes**: classes partilhadas `btn-primary`,
   `btn-outline`, `chip`, `chip-sm` (header, hero, chat, 404, homepage);
   typing dots do Zé no loading do chat (respeita reduced-motion)
-- [ ] **F4 — Homepage**: hierarquia do hero, polish dos cartões de tema,
-  secção de conversa
+- [x] **F4 — Homepage**: entrada em cascata no hero (greeting → título →
+  subtítulo → caixa, 120ms entre cada); cartões de tema com seta subtil
+  (cinza → verde + deslocamento no hover) em vez de círculos verdes
+  repetidos
 - [ ] **F5 — Páginas secundárias**: `/fontes`, `/privacidade`, `/termos`,
   404 — consistência de títulos, espaçamento, tom
 - [ ] **F6 — Motion**: entrada das mensagens no chat (stagger suave),
