@@ -18,16 +18,31 @@ export default function FloatingAsk() {
   const router = useRouter();
 
   useEffect(() => {
-    const hero = document.getElementById("temas");
-    const limite = hero ? hero.offsetTop : 520;
-    const onScroll = () => {
-      const v = window.scrollY > limite;
+    const temas = document.getElementById("temas");
+    const cta = document.getElementById("cta");
+    const limite = temas ? temas.offsetTop : 520;
+    let passouHero = false;
+    let noCta = false;
+    const atualizar = () => {
+      const v = passouHero && !noCta;
       setVisivel(v);
       if (!v) setExpandido(false);
     };
+    const onScroll = () => {
+      passouHero = window.scrollY > limite;
+      atualizar();
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    // Esconde quando a secção CTA está visível — nunca tapa o painel/rodapé
+    const io = cta
+      ? new IntersectionObserver(([e]) => { noCta = e.isIntersecting; atualizar(); }, { threshold: 0.15 })
+      : null;
+    if (io && cta) io.observe(cta);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      io?.disconnect();
+    };
   }, []);
 
   useEffect(() => {

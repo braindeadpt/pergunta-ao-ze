@@ -53,7 +53,7 @@ export default function Home() {
       <section className="overflow-x-clip">
         <div className="mx-auto grid max-w-6xl items-start gap-10 px-4 pb-16 pt-10 md:pt-14 lg:grid-cols-[1.05fr_0.95fr] lg:gap-6">
           <div className="text-left">
-            <div className="animate-fade-in-up led-bar inline-block -rotate-1 rounded-md border-2 border-ink px-4 py-1.5 text-xs font-bold uppercase shadow-[4px_4px_0_#1b1d22] md:text-sm">
+            <div className="animate-fade-in-up led-bar inline-block -rotate-1 rounded-md border-2 border-ink px-4 py-1.5 text-sm font-bold uppercase shadow-[4px_4px_0_#1b1d22]">
               Senha Z-001 → É a tua vez
             </div>
 
@@ -160,7 +160,7 @@ export default function Home() {
                 href={`https://${g.entidade.dominio}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-md border border-white/30 px-3.5 py-1.5 font-mono text-[12px] tracking-wide text-blue-100 transition-colors hover:border-white hover:bg-white/10 hover:text-white"
+                className="rounded-md border border-white/30 px-3.5 py-1.5 font-mono text-sm tracking-wide text-blue-100 transition-colors hover:border-white hover:bg-white/10 hover:text-white"
               >
                 {g.entidade.dominio}
               </a>
@@ -226,7 +226,7 @@ export default function Home() {
                     <span className="font-medium text-azulejo">
                       1. Renovar o Cartão de Cidadão
                     </span>
-                    <span className="font-mono text-xs text-stone-500">
+                    <span className="font-mono text-sm text-stone-500">
                       eportugal.gov.pt ↗
                     </span>
                   </a>
@@ -246,7 +246,7 @@ export default function Home() {
             {/* Cabeçalho do impresso */}
             <div className="flex flex-wrap items-center justify-between gap-3 border-b-2 border-ink px-6 py-4 sm:px-8">
               <div>
-                <p className="font-mono text-xs font-bold uppercase tracking-[0.25em] text-stone-600">
+                <p aria-hidden className="font-mono text-xs font-bold uppercase tracking-[0.25em] text-stone-600">
                   Formulário Z-02 · preencher a tinta
                 </p>
                 <h2 className="mt-1 font-display text-2xl uppercase tracking-tight md:text-3xl">
@@ -291,7 +291,7 @@ export default function Home() {
                 </ul>
               </div>
             </div>
-            <p className="border-t-2 border-dashed border-ink/25 px-6 py-3.5 font-mono text-xs uppercase tracking-wide text-stone-600 sm:px-8">
+            <p className="border-t-2 border-dashed border-ink/25 px-6 py-3.5 font-mono text-sm uppercase tracking-wide text-stone-600 sm:px-8">
               A informação pode ficar desatualizada — confirma sempre na fonte.
             </p>
           </div>
@@ -326,7 +326,7 @@ export default function Home() {
             />
             <div className="border-2 border-ink bg-white shadow-[8px_8px_0_#1b1d22]">
               <div className="flex items-center justify-between border-b-2 border-ink bg-form-amarelo/40 px-6 py-3.5">
-                <p className="font-mono text-xs font-bold uppercase tracking-[0.25em] sm:text-sm">
+                <p className="font-mono text-sm font-bold uppercase tracking-[0.25em]">
                   Livro de reclamações — via do cidadão
                 </p>
                 <span aria-hidden="true" className="carimbo rotate-[8deg]">Via do cidadão</span>
@@ -378,7 +378,7 @@ export default function Home() {
       </section>
 
       {/* ── CTA final — tinta de carimbo ── */}
-      <section className="overflow-x-clip border-t-2 border-ink bg-band-vermelho">
+      <section id="cta" className="overflow-x-clip border-t-2 border-ink bg-band-vermelho">
         <div className="relative mx-auto max-w-3xl px-4 py-16 text-center">
           {/* O Zé aliviado — despachou o dia */}
           <div className="relative mx-auto w-64 -rotate-1 md:w-72">

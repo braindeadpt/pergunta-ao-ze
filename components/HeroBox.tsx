@@ -113,7 +113,7 @@ export default function HeroBox() {
           )}
         </div>
         <div className="flex flex-col gap-3 border-t-2 border-dashed border-ink/20 px-5 py-3.5 sm:flex-row sm:items-center sm:justify-between">
-          <p className="font-mono text-xs uppercase tracking-wide text-stone-600 sm:text-sm">
+          <p className="font-mono text-sm uppercase tracking-wide text-stone-600">
             NIF ou nºs de documento: não são precisos
           </p>
           {/* O botão de submeter É um carimbo — bate antes de navegar */}

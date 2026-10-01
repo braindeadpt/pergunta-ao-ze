@@ -4,7 +4,7 @@ import ZeMark from "@/components/ZeMark";
 export default function Header() {
   return (
     <header className="sticky top-0 z-40 border-b-2 border-ink bg-paper/95 backdrop-blur">
-      <div className="led-bar px-4 py-2 text-center text-xs font-bold uppercase md:text-sm">
+      <div className="led-bar px-4 py-2 text-center text-sm font-bold uppercase">
         Projeto independente · não é um site do Estado
       </div>
       <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
@@ -15,7 +15,7 @@ export default function Header() {
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-6 font-mono text-xs font-bold uppercase tracking-wider text-stone-600 md:flex">
+        <nav className="hidden items-center gap-6 font-mono text-sm font-bold uppercase tracking-wider text-stone-600 md:flex">
           <Link href="/#temas" className="hover:text-band-verde">
             Senhas
           </Link>

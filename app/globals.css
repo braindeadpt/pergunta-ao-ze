@@ -62,7 +62,7 @@ summary:focus-visible {
   .animate-pulse,
   .caret-blink,
   .typing-dot {
-    animation: none;
+    animation: none !important;
   }
   *,
   *::before,
@@ -217,7 +217,7 @@ details[open] .faq-plus {
 
 @media (prefers-reduced-motion: reduce) {
   .stamp-batendo {
-    animation: none;
+    animation: none !important;
   }
   .senha .senha-stub {
     transition: none;
