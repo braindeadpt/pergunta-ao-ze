@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import type { Pergunta, Tema } from "@/lib/types";
 import type { Sugestao } from "@/lib/engine";
 import { detetarIdioma, idiomaDoNavegador, type Lang } from "@/lib/i18n";
-import { getContactoPorDominio } from "@/lib/data/fontes";
+import { contactosDeFontes } from "@/lib/contactos";
 import { TEMAS } from "@/lib/data/temas";
 import ZePersonagem from "@/components/ZePersonagem";
 import SenhaTema from "@/components/SenhaTema";
@@ -406,27 +406,20 @@ export default function Chat() {
                       ))}
                     </div>
                     {(() => {
-                      const vistos = new Set<string>();
-                      const linhas = m.pergunta.resposta.fontes
-                        .map((f) => getContactoPorDominio(f.dominio))
-                        .filter((c): c is NonNullable<typeof c> => {
-                          if (!c || vistos.has(c.nome)) return false;
-                          vistos.add(c.nome);
-                          return true;
-                        });
+                      const linhas = contactosDeFontes(m.pergunta.resposta.fontes);
                       if (linhas.length === 0) return null;
                       return (
                         <div className="mt-3 space-y-1 rounded-md border-2 border-dashed border-ink/20 bg-stone-50 px-3 py-2.5 text-sm text-stone-700">
                           {linhas.map((c) => (
-                            <p key={c.nome}>
+                            <p key={c.telefone}>
                               <span className="font-mono text-sm font-bold uppercase tracking-wider text-ink">
                                 {T.ligar}
                               </span>{" "}
-                              {c.contacto.telefone}
-                              {c.contacto.horario && (
+                              {c.telefone}
+                              {c.horario && (
                                 <span className="text-stone-500">
                                   {" "}
-                                  — {c.contacto.horario}
+                                  — {c.horario}
                                 </span>
                               )}
                             </p>

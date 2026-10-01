@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { TEMAS } from "@/lib/data/temas";
-import { getContactoPorDominio } from "@/lib/data/fontes";
+import { contactosDeFontes } from "@/lib/contactos";
 import ZePersonagem from "@/components/ZePersonagem";
 
 /* Uma página estática por pergunta curada — /p/<id da pergunta> */
@@ -54,14 +54,7 @@ export default async function PaginaPergunta({
   const { tema, pergunta } = hit;
 
   const relacionadas = tema.perguntas.filter((p) => p.id !== slug).slice(0, 3);
-  const vistos = new Set<string>();
-  const contactos = pergunta.resposta.fontes
-    .map((f) => getContactoPorDominio(f.dominio))
-    .filter((c): c is NonNullable<typeof c> => {
-      if (!c || vistos.has(c.nome)) return false;
-      vistos.add(c.nome);
-      return true;
-    });
+  const contactos = contactosDeFontes(pergunta.resposta.fontes);
 
   const faqLd = {
     "@context": "https://schema.org",
@@ -170,13 +163,13 @@ export default async function PaginaPergunta({
         {contactos.length > 0 && (
           <div className="mt-3 space-y-1 rounded-md border-2 border-dashed border-ink/20 bg-stone-50 px-3 py-2.5 text-sm text-stone-700">
             {contactos.map((c) => (
-              <p key={c.nome}>
+              <p key={c.telefone}>
                 <span className="font-mono text-sm font-bold uppercase tracking-wider text-ink">
-                  Ligar — {c.nome}:
+                  Ligar — {c.entidades.join(" · ")}:
                 </span>{" "}
-                {c.contacto.telefone}
-                {c.contacto.horario && (
-                  <span className="text-stone-500"> — {c.contacto.horario}</span>
+                {c.telefone}
+                {c.horario && (
+                  <span className="text-stone-500"> — {c.horario}</span>
                 )}
               </p>
             ))}
