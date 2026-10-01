@@ -237,8 +237,9 @@ reversível. Não avançar sem checkpoint.
 - [x] **F2 — Microcopy**: auditoria contra a matriz §7.1 — erro de rede
   passou a mensagem honesta (antes disfarçava erro técnico de falha de
   conteúdo); email em `/fontes` é `mailto:`; resto já conforme
-- [ ] **F3 — Componentes**: classes partilhadas de botão/chip; typing
-  indicator do Zé (3 pontos); cartões de fonte e contacto consistentes
+- [x] **F3 — Componentes**: classes partilhadas `btn-primary`,
+  `btn-outline`, `chip`, `chip-sm` (header, hero, chat, 404, homepage);
+  typing dots do Zé no loading do chat (respeita reduced-motion)
 - [ ] **F4 — Homepage**: hierarquia do hero, polish dos cartões de tema,
   secção de conversa
 - [ ] **F5 — Páginas secundárias**: `/fontes`, `/privacidade`, `/termos`,

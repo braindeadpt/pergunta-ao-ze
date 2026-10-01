@@ -126,7 +126,7 @@ export default function Home() {
               </div>
               <Link
                 href="/fontes"
-                className="mt-9 inline-block rounded-full border border-stone-300 px-6 py-2.5 text-sm font-medium transition-colors hover:border-azulejo hover:text-azulejo"
+                className="btn-outline mt-9 px-6 py-2.5 text-sm"
               >
                 Vê todas as fontes
               </Link>
@@ -305,7 +305,7 @@ export default function Home() {
               href={`/chat?q=${encodeURIComponent(
                 "Vivo em Faro e acabei de ser mãe. Trabalho por conta de outrem: como peço o subsídio de parentalidade?"
               )}`}
-              className="mt-5 inline-block rounded-full bg-band-verde px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-band-verde-escuro"
+              className="btn-primary mt-5 px-5 py-2.5 text-sm"
             >
               Pergunta ao Zé
             </Link>

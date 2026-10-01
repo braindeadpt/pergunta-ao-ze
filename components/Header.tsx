@@ -27,10 +27,7 @@ export default function Header() {
           </Link>
         </nav>
 
-        <Link
-          href="/chat"
-          className="rounded-full bg-band-verde px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-band-verde-escuro"
-        >
+        <Link href="/chat" className="btn-primary px-4 py-1.5 text-sm">
           Perguntar ao Zé
         </Link>
       </div>

@@ -102,7 +102,7 @@ export default function HeroBox() {
           <button
             onClick={() => enviar(pergunta)}
             disabled={!pergunta.trim()}
-            className="shrink-0 self-end rounded-full bg-band-verde px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-band-verde-escuro disabled:cursor-not-allowed disabled:opacity-40 sm:self-auto"
+            className="btn-primary shrink-0 self-end px-5 py-2.5 text-sm sm:self-auto"
           >
             Continuar na conversa →
           </button>

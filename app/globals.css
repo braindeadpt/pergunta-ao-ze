@@ -51,7 +51,8 @@ summary:focus-visible {
     scroll-behavior: auto;
   }
   .animate-fade-in-up,
-  .caret-blink {
+  .caret-blink,
+  .typing-dot {
     animation: none;
   }
   *,
@@ -74,6 +75,37 @@ details[open] .faq-plus {
 .faq-plus {
   transition: transform 0.2s ease;
 }
+
+/* Classes partilhadas — DESIGN.md §6.2/6.3 */
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-full bg-band-verde font-medium text-white transition-colors hover:bg-band-verde-escuro disabled:cursor-not-allowed disabled:opacity-40;
+  }
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-full border border-stone-300 font-medium transition-colors hover:border-band-verde hover:text-band-verde;
+  }
+  .chip {
+    @apply rounded-full border border-stone-200 bg-white px-4 py-2 text-sm text-stone-600 shadow-sm transition-colors hover:border-band-verde hover:bg-emerald-50 hover:text-band-verde-escuro;
+  }
+  .chip-sm {
+    @apply rounded-full border border-stone-200 px-3 py-1 text-xs text-stone-600 transition-colors hover:border-band-verde hover:bg-emerald-50;
+  }
+}
+
+/* Indicador "o Zé está a escrever" — DESIGN.md §9 */
+@keyframes typing-bounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.35; }
+  30% { transform: translateY(-4px); opacity: 1; }
+}
+.typing-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: var(--color-band-verde);
+  animation: typing-bounce 1.2s ease-in-out infinite;
+}
+.typing-dot:nth-child(2) { animation-delay: 0.15s; }
+.typing-dot:nth-child(3) { animation-delay: 0.3s; }
 
 /* Grelha de pontos para as bandas de ilustração pastel */
 .art-dots {

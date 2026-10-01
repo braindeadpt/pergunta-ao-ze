@@ -14,16 +14,10 @@ export default function NotFound() {
         diretamente ao Zé.
       </p>
       <div className="mt-8 flex flex-wrap justify-center gap-3">
-        <Link
-          href="/"
-          className="rounded-full border border-stone-300 px-6 py-2.5 text-sm font-medium transition-colors hover:border-band-verde hover:text-band-verde"
-        >
+        <Link href="/" className="btn-outline px-6 py-2.5 text-sm">
           Voltar ao início
         </Link>
-        <Link
-          href="/chat"
-          className="rounded-full bg-band-verde px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-band-verde-escuro"
-        >
+        <Link href="/chat" className="btn-primary px-6 py-2.5 text-sm">
           Perguntar ao Zé
         </Link>
       </div>

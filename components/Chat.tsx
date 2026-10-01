@@ -91,7 +91,7 @@ export default function Chat() {
                 <button
                   key={s}
                   onClick={() => perguntar(s)}
-                  className="rounded-full border border-stone-200 bg-white px-4 py-2 text-sm text-stone-600 shadow-sm transition-colors hover:border-band-verde hover:bg-emerald-50 hover:text-band-verde-escuro"
+                  className="chip"
                 >
                   {s}
                 </button>
@@ -217,7 +217,7 @@ export default function Chat() {
                         <button
                           key={s.id}
                           onClick={() => perguntar(s.texto)}
-                          className="rounded-full border border-stone-200 px-3 py-1 text-xs text-stone-600 transition-colors hover:border-band-verde hover:bg-emerald-50"
+                          className="chip-sm"
                         >
                           {s.texto}
                         </button>
@@ -233,7 +233,12 @@ export default function Chat() {
         {aCarregar && (
           <div className="flex gap-3">
             <ZeFace className="mt-1 size-8 shrink-0" />
-            <div className="rounded-2xl rounded-tl-sm border border-stone-200 bg-white px-5 py-4 text-stone-400">
+            <div className="flex items-center gap-3 rounded-2xl rounded-tl-sm border border-stone-200 bg-white px-5 py-4 text-stone-400">
+              <span className="flex gap-1" aria-hidden>
+                <span className="typing-dot" />
+                <span className="typing-dot" />
+                <span className="typing-dot" />
+              </span>
               A folhear os guias oficiais…
             </div>
           </div>
@@ -260,7 +265,7 @@ export default function Chat() {
           <button
             onClick={() => perguntar(input)}
             disabled={!input.trim() || aCarregar}
-            className="rounded-full bg-band-verde px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-band-verde-escuro disabled:opacity-40"
+            className="btn-primary px-4 py-2 text-sm"
           >
             Enviar
           </button>
