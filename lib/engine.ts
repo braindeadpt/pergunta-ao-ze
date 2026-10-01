@@ -166,7 +166,7 @@ interface FonteIndexada extends Fonte {
 interface LlmConfig {
   baseUrl: string;
   apiKey: string;
-  model: string;
+  models: string[];
   timeoutMs: number;
 }
 
@@ -195,19 +195,21 @@ export class LlmEngine implements AnswerEngine {
 
     const { contexto, fontes } = montarContexto(candidatos.slice(0, 6));
 
-    try {
-      const bruto = await this.chamarModelo(pergunta, contexto);
-      const resposta = this.parseResposta(bruto, fontes, candidatos[0]);
-      if (resposta) return resposta;
-    } catch (err) {
-      console.error("[LlmEngine] falhou, a usar keyword:", err);
+    for (const model of this.cfg.models) {
+      try {
+        const bruto = await this.chamarModelo(model, pergunta, contexto);
+        const resposta = this.parseResposta(bruto, fontes, candidatos[0]);
+        if (resposta) return resposta;
+      } catch (err) {
+        console.error(`[LlmEngine] modelo ${model} falhou:`, err);
+      }
     }
 
     const fallback = await this.fallback.responder(pergunta);
     return { ...fallback, via: "keyword" };
   }
 
-  private async chamarModelo(pergunta: string, contexto: string) {
+  private async chamarModelo(model: string, pergunta: string, contexto: string) {
     const ctrl = new AbortController();
     const t = setTimeout(() => ctrl.abort(), this.cfg.timeoutMs);
     try {
@@ -219,7 +221,7 @@ export class LlmEngine implements AnswerEngine {
           Authorization: `Bearer ${this.cfg.apiKey}`,
         },
         body: JSON.stringify({
-          model: this.cfg.model,
+          model,
           temperature: 0.2,
           response_format: { type: "json_object" },
           messages: [
@@ -327,10 +329,16 @@ export function getEngine(): AnswerEngine {
       process.env.LLM_BASE_URL &&
       process.env.LLM_MODEL
     ) {
+      const models = [
+        process.env.LLM_MODEL,
+        ...(process.env.LLM_MODEL_FALLBACK?.split(",") ?? []),
+      ]
+        .map((m) => m.trim())
+        .filter(Boolean);
       engine = new LlmEngine({
         baseUrl: process.env.LLM_BASE_URL.replace(/\/+$/, ""),
         apiKey: process.env.LLM_API_KEY ?? "",
-        model: process.env.LLM_MODEL,
+        models,
         timeoutMs: Number(process.env.LLM_TIMEOUT_MS ?? 20000),
       });
     } else {
