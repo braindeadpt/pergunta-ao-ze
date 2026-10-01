@@ -1,5 +1,6 @@
 import Link from "next/link";
 import ZeMark from "@/components/ZeMark";
+import AvisoRodape from "@/components/AvisoRodape";
 
 export default function Footer() {
   return (
@@ -45,10 +46,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-10 flex flex-col gap-4 border-t border-stone-100 pt-6 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm text-stone-600">
-            Informação de orientação — confirma sempre na fonte oficial antes de
-            agir.
-          </p>
+          <AvisoRodape />
           <div className="flex items-center gap-4 text-sm text-stone-600">
             <span>
               Feito por{" "}
