@@ -41,7 +41,7 @@ const TXT = {
     semRes2: ". Estas talvez ajudem:",
     relacionadas: "Perguntas relacionadas:",
     fontes: "Fontes oficiais",
-    ligar: "Ligar:",
+    ligar: "Ligar",
     ia: "gerada por IA",
     anuncioOk: "Resposta recebida.",
     anuncioLimite: "Limite de pedidos. Tenta de novo mais tarde.",
@@ -60,7 +60,7 @@ const TXT = {
     semRes2: ". These might help:",
     relacionadas: "Related questions:",
     fontes: "Official sources",
-    ligar: "Call:",
+    ligar: "Call",
     ia: "AI-generated",
     anuncioOk: "Response received.",
     anuncioLimite: "Request limit reached. Try again later.",
@@ -413,7 +413,7 @@ export default function Chat() {
                           {linhas.map((c) => (
                             <p key={c.telefone}>
                               <span className="font-mono text-sm font-bold uppercase tracking-wider text-ink">
-                                {T.ligar}
+                                {T.ligar} — {c.entidades.join(" · ")}:
                               </span>{" "}
                               {c.telefone}
                               {c.horario && (
