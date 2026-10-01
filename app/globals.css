@@ -1,0 +1,66 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", "Inter Fallback", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Newsreader", "Newsreader Fallback", Georgia, serif;
+
+  --color-paper: #faf8f4;
+  --color-ink: #1b1d22;
+  --color-band-verde: #046a38;
+  --color-band-verde-escuro: #035129;
+  --color-band-vermelho: #d5232f;
+  --color-azulejo: #1d4f9c;
+  --color-azulejo-suave: #eef3fb;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-band-verde);
+  color: white;
+}
+
+details > summary {
+  list-style: none;
+  cursor: pointer;
+}
+details > summary::-webkit-details-marker {
+  display: none;
+}
+details[open] .faq-plus {
+  transform: rotate(45deg);
+}
+.faq-plus {
+  transition: transform 0.2s ease;
+}
+
+/* Grelha de pontos para as bandas de ilustração pastel */
+.art-dots {
+  background-image: radial-gradient(rgba(0, 0, 0, 0.07) 1px, transparent 1.4px);
+  background-size: 14px 14px;
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in-up {
+  animation: fade-in-up 0.45s ease both;
+}
+
+@keyframes caret-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+.caret-blink {
+  animation: caret-blink 1s step-end infinite;
+}
