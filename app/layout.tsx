@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Newsreader } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -22,7 +23,12 @@ export const metadata: Metadata = {
   },
   description:
     "O Zé responde a perguntas sobre serviços públicos portugueses e indica as páginas oficiais por onde começar. Projeto independente.",
-  metadataBase: new URL("https://perguntaaoze.pt"),
+  metadataBase: new URL("https://perguntaaoze.vercel.app"),
+  openGraph: {
+    type: "website",
+    locale: "pt_PT",
+    siteName: "Pergunta ao Zé",
+  },
 };
 
 export default function RootLayout({
@@ -36,6 +42,7 @@ export default function RootLayout({
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />
+        <Analytics />
       </body>
     </html>
   );
