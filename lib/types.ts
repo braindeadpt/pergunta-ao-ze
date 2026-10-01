@@ -25,6 +25,18 @@ export interface Tema {
   perguntas: Pergunta[];
 }
 
+/** Tradução EN gerada por scripts/gerar-temas-en.mjs (ficheiro commitado). */
+export interface RespostaEn {
+  traduzidaDe: string;
+  geradoEm: string;
+  hashOrigem: string;
+  /** true = gerada mas retida até revisão humana — não é servida */
+  revisao?: boolean;
+  palavras: string[];
+  passos: string[];
+  nota?: string;
+}
+
 export type Ambito = "Nacional" | "Regional" | "Europeu";
 
 export interface ContactoEntidade {

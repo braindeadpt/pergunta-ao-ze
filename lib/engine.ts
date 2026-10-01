@@ -1,5 +1,7 @@
 import { TEMAS } from "@/lib/data/temas";
+import { TEMAS_EN } from "@/lib/data/temas.en";
 import type { Fonte, Pergunta, Tema } from "@/lib/types";
+import type { Lang } from "@/lib/i18n";
 
 export interface Sugestao {
   id: string;
@@ -13,6 +15,10 @@ export interface ResultadoResposta {
   tema?: Tema;
   sugestoes: Sugestao[];
   via?: "keyword" | "llm";
+  /** Língua efetiva da resposta devolvida */
+  idioma?: Lang;
+  /** Pedida EN mas a tradução não existe/está por rever — a resposta é PT */
+  soEmPt?: boolean;
 }
 
 /**
@@ -24,7 +30,7 @@ export interface ResultadoResposta {
  * Ativa-se com ANSWER_ENGINE=llm + LLM_BASE_URL/LLM_API_KEY/LLM_MODEL.
  */
 export interface AnswerEngine {
-  responder(pergunta: string): Promise<ResultadoResposta>;
+  responder(pergunta: string, lang?: Lang): Promise<ResultadoResposta>;
 }
 
 const STOPWORDS = new Set([
@@ -73,7 +79,8 @@ function pontuar(
   tokens: Set<string>,
   pergunta: Pergunta,
   tema: Tema,
-  cache: Map<string, string[]>
+  cache: Map<string, string[]>,
+  lang: Lang
 ): number {
   const norm = (s: string) => {
     if (!cache.has(s)) cache.set(s, normalizar(s));
@@ -88,6 +95,12 @@ function pontuar(
   };
 
   soma(3, pergunta.palavras);
+  // Palavras-chave EN geradas — entram no ranking quando o pedido é em inglês.
+  // Podem ser frases ("citizen card"), por isso passam pelo mesmo normalizar.
+  if (lang === "en") {
+    const en = TEMAS_EN[pergunta.id];
+    if (en) soma(3, en.palavras.flatMap((w) => norm(w)));
+  }
   soma(2, norm(pergunta.texto));
   soma(1.5, norm(tema.titulo));
   soma(1.5, norm(tema.entidade));
@@ -97,7 +110,7 @@ function pontuar(
 }
 
 /** Ranking partilhado pelos dois motores: devolve os candidatos por score. */
-function rankear(pergunta: string): Candidato[] {
+function rankear(pergunta: string, lang: Lang = "pt"): Candidato[] {
   const tokens = new Set(normalizar(pergunta));
   if (tokens.size === 0) return [];
 
@@ -105,7 +118,7 @@ function rankear(pergunta: string): Candidato[] {
   const candidatos: Candidato[] = [];
   for (const tema of TEMAS) {
     for (const p of tema.perguntas) {
-      const score = pontuar(tokens, p, tema, cache);
+      const score = pontuar(tokens, p, tema, cache, lang);
       if (score > 0) candidatos.push({ p, tema, score });
     }
   }
@@ -130,8 +143,11 @@ function populares(): Sugestao[] {
 }
 
 export class KeywordEngine implements AnswerEngine {
-  async responder(pergunta: string): Promise<ResultadoResposta> {
-    const candidatos = rankear(pergunta);
+  async responder(
+    pergunta: string,
+    lang: Lang = "pt"
+  ): Promise<ResultadoResposta> {
+    const candidatos = rankear(pergunta, lang);
     const melhor = candidatos[0];
 
     if (melhor && melhor.score >= 4) {
@@ -139,12 +155,29 @@ export class KeywordEngine implements AnswerEngine {
         .slice(1, 4)
         .filter((c) => c.p.id !== melhor.p.id && c.score >= 2)
         .map(paraSugestao);
+
+      // Tradução EN curada — só é servida depois de revista (revisao !== true)
+      const en = lang === "en" ? TEMAS_EN[melhor.p.id] : undefined;
+      const servirEn = en && en.revisao !== true;
+      const devolvida: Pergunta = servirEn
+        ? {
+            ...melhor.p,
+            resposta: {
+              ...melhor.p.resposta,
+              passos: en.passos,
+              nota: en.nota,
+            },
+          }
+        : melhor.p;
+
       return {
         tipo: "resposta",
-        pergunta: melhor.p,
+        pergunta: devolvida,
         tema: melhor.tema,
         sugestoes: outras,
         via: "keyword",
+        idioma: servirEn ? "en" : "pt",
+        soEmPt: lang === "en" && !servirEn,
       };
     }
 
@@ -155,6 +188,7 @@ export class KeywordEngine implements AnswerEngine {
           ? candidatos.slice(0, 4).map(paraSugestao)
           : populares(),
       via: "keyword",
+      idioma: lang,
     };
   }
 }
@@ -187,29 +221,37 @@ export class LlmEngine implements AnswerEngine {
 
   constructor(private cfg: LlmConfig) {}
 
-  async responder(pergunta: string): Promise<ResultadoResposta> {
-    const candidatos = rankear(pergunta);
+  async responder(
+    pergunta: string,
+    lang: Lang = "pt"
+  ): Promise<ResultadoResposta> {
+    const candidatos = rankear(pergunta, lang);
     if (candidatos.length === 0) {
-      return { tipo: "sugestoes", sugestoes: populares(), via: "llm" };
+      return { tipo: "sugestoes", sugestoes: populares(), via: "llm", idioma: lang };
     }
 
     const { contexto, fontes } = montarContexto(candidatos.slice(0, 6));
 
     for (const model of this.cfg.models) {
       try {
-        const bruto = await this.chamarModelo(model, pergunta, contexto);
+        const bruto = await this.chamarModelo(model, pergunta, contexto, lang);
         const resposta = this.parseResposta(bruto, fontes, candidatos[0]);
-        if (resposta) return resposta;
+        if (resposta) return { ...resposta, idioma: lang };
       } catch (err) {
         console.error(`[LlmEngine] modelo ${model} falhou:`, err);
       }
     }
 
-    const fallback = await this.fallback.responder(pergunta);
+    const fallback = await this.fallback.responder(pergunta, lang);
     return { ...fallback, via: "keyword" };
   }
 
-  private async chamarModelo(model: string, pergunta: string, contexto: string) {
+  private async chamarModelo(
+    model: string,
+    pergunta: string,
+    contexto: string,
+    lang: Lang
+  ) {
     const ctrl = new AbortController();
     const t = setTimeout(() => ctrl.abort(), this.cfg.timeoutMs);
     try {
@@ -228,7 +270,11 @@ export class LlmEngine implements AnswerEngine {
             { role: "system", content: SYSTEM_PROMPT },
             {
               role: "user",
-              content: `Contexto:\n${contexto}\n\nPergunta do cidadão: ${pergunta}`,
+              content: `Contexto:\n${contexto}\n\nPergunta do cidadão: ${pergunta}${
+                lang === "en"
+                  ? "\n\nResponde em inglês claro e simples (o cidadão não lê português). Mantém nomes de entidades, telefones, valores e URLs exatamente como no contexto."
+                  : ""
+              }`,
             },
           ],
         }),

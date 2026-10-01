@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import type { Pergunta, Tema } from "@/lib/types";
 import type { Sugestao } from "@/lib/engine";
+import { detetarIdioma, idiomaDoNavegador, type Lang } from "@/lib/i18n";
 import { getContactoPorDominio } from "@/lib/data/fontes";
 import { TEMAS } from "@/lib/data/temas";
 import ZePersonagem from "@/components/ZePersonagem";
@@ -16,6 +17,62 @@ const FRASES_BALCAO = [
   "A fotocopiar em triplicado…",
   "A perguntar ao colega do balcão 3…",
 ];
+
+const FRASES_BALCAO_EN = [
+  "Searching the archive…",
+  "Asking the boss for a stamp…",
+  "Photocopying in triplicate…",
+  "Asking the colleague at counter 3…",
+];
+
+/* Mensagens do próprio chat — PT por defeito, EN quando a língua ativa é EN */
+const TXT = {
+  pt: {
+    frases: FRASES_BALCAO,
+    erroMsg: "Algo falhou ao contactar o servidor — a culpa não é tua.",
+    tentar: "Tentar de novo",
+    limiteMsg:
+      "Demasiados pedidos seguidos desta ligação — o balcão precisa de respirar.",
+    limiteDepois: (s: number) =>
+      s >= 90
+        ? `Tenta de novo daqui a ~${Math.ceil(s / 60)} min.`
+        : `Tenta de novo daqui a ${s}s.`,
+    semRes1: "Esta pergunta ficou presa na tutela — nem o Zé chega lá. Tenta reformular, ou abre o",
+    semRes2: ". Estas talvez ajudem:",
+    relacionadas: "Perguntas relacionadas:",
+    fontes: "Fontes oficiais",
+    ligar: "Ligar:",
+    ia: "gerada por IA",
+    anuncioOk: "Resposta recebida.",
+    anuncioLimite: "Limite de pedidos. Tenta de novo mais tarde.",
+    anuncioErro: "Falha ao obter resposta.",
+  },
+  en: {
+    frases: FRASES_BALCAO_EN,
+    erroMsg: "Something went wrong contacting the server — it's not your fault.",
+    tentar: "Try again",
+    limiteMsg: "Too many requests from this connection — the counter needs a breather.",
+    limiteDepois: (s: number) =>
+      s >= 90
+        ? `Try again in ~${Math.ceil(s / 60)} min.`
+        : `Try again in ${s}s.`,
+    semRes1: "This question got stuck in the pipeline — even Zé can't reach it. Try rephrasing, or open",
+    semRes2: ". These might help:",
+    relacionadas: "Related questions:",
+    fontes: "Official sources",
+    ligar: "Call:",
+    ia: "AI-generated",
+    anuncioOk: "Response received.",
+    anuncioLimite: "Request limit reached. Try again later.",
+    anuncioErro: "Failed to get an answer.",
+  },
+} as const;
+
+/** Aviso sempre visível numa resposta traduzida — nunca escondido */
+const AVISO_TRADUCAO =
+  "Automatically translated. Always confirm on the official Portuguese source.";
+const AVISO_SO_PT =
+  "This answer is only available in Portuguese — showing the original.";
 
 /* Senhas-sugestão do estado vazio */
 const SUGESTOES_IDS = [
@@ -35,6 +92,9 @@ type Mensagem =
       sugestoes: Sugestao[];
       via?: "keyword" | "llm";
       retryAte?: number;
+      langUsada?: Lang;
+      idioma?: Lang;
+      soEmPt?: boolean;
     };
 
 export default function Chat() {
@@ -46,6 +106,9 @@ export default function Chat() {
   const [batendo, setBatendo] = useState(false);
   const [movel, setMovel] = useState(false);
   const [tick, setTick] = useState(0);
+  // "auto" = deteção por pergunta; PT/EN fixa a escolha e prevalece sempre
+  const [langSel, setLangSel] = useState<"auto" | Lang>("auto");
+  const ultimaLang = useRef<Lang>("pt");
   const ultimaPergunta = useRef("");
   const senhaN = useRef(0);
   const fim = useRef<HTMLDivElement>(null);
@@ -90,42 +153,62 @@ export default function Chat() {
     return () => clearInterval(t);
   }, [mensagens, tick]);
 
+  // Preferência persistida + língua inicial = a do navegador
+  useEffect(() => {
+    ultimaLang.current = idiomaDoNavegador();
+    const guardada = localStorage.getItem("ze-lang");
+    if (guardada === "pt" || guardada === "en") setLangSel(guardada);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("ze-lang", langSel);
+  }, [langSel]);
+
+  /** Língua efetiva de uma pergunta: seletor > heurística > última língua > navegador */
+  function langDaPergunta(q: string): Lang {
+    if (langSel !== "auto") return langSel;
+    const detetada = detetarIdioma(q);
+    return detetada ?? ultimaLang.current;
+  }
+
   async function perguntar(texto: string) {
     const q = texto.trim();
     if (!q || aCarregar) return;
+    const lang = langDaPergunta(q);
+    ultimaLang.current = lang;
     ultimaPergunta.current = q;
     senhaN.current += 1;
     setMensagens((m) => [...m, { papel: "utilizador", texto: q }]);
     setInput("");
     setACarregar(true);
+    const T = TXT[lang];
     try {
       const res = await fetch("/api/responder", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ pergunta: q }),
+        body: JSON.stringify({ pergunta: q, lang }),
       });
       if (res.status === 429) {
         const data = await res.json().catch(() => ({}));
         const seg = Math.min(Math.max(Number(data.retryAfter) || 60, 5), 900);
         setMensagens((m) => [
           ...m,
-          { papel: "ze", tipo: "limite", retryAte: Date.now() + seg * 1000, sugestoes: [] },
+          { papel: "ze", tipo: "limite", retryAte: Date.now() + seg * 1000, sugestoes: [], langUsada: lang },
         ]);
-        anuncio.current &&
-          (anuncio.current.textContent = "Limite de pedidos. Tenta de novo mais tarde.");
+        anuncio.current && (anuncio.current.textContent = T.anuncioLimite);
         return;
       }
       if (!res.ok) throw new Error(`resposta ${res.status}`);
       const data = await res.json();
       setMensagens((m) => [
         ...m,
-        { papel: "ze", tipo: data.tipo ?? "sugestoes", pergunta: data.pergunta, tema: data.tema, sugestoes: data.sugestoes ?? [], via: data.via },
+        { papel: "ze", tipo: data.tipo ?? "sugestoes", pergunta: data.pergunta, tema: data.tema, sugestoes: data.sugestoes ?? [], via: data.via, langUsada: lang, idioma: data.idioma, soEmPt: data.soEmPt },
       ]);
       // Anuncia a chegada da resposta a leitores de ecrã
-      anuncio.current && (anuncio.current.textContent = "Resposta recebida.");
+      anuncio.current && (anuncio.current.textContent = T.anuncioOk);
     } catch {
-      setMensagens((m) => [...m, { papel: "ze", tipo: "erro", sugestoes: [] }]);
-      anuncio.current && (anuncio.current.textContent = "Falha ao obter resposta.");
+      setMensagens((m) => [...m, { papel: "ze", tipo: "erro", sugestoes: [], langUsada: lang }]);
+      anuncio.current && (anuncio.current.textContent = T.anuncioErro);
     } finally {
       setACarregar(false);
     }
@@ -207,9 +290,10 @@ export default function Chat() {
           </div>
         )}
 
-        {mensagens.map((m, i) =>
-          m.papel === "utilizador" ? (
-            (senhaVisivel += 1) && (
+        {mensagens.map((m, i) => {
+          if (m.papel === "utilizador") {
+            senhaVisivel += 1;
+            return (
               <div key={i} className="animate-fade-in-up flex justify-end">
                 <div className="max-w-[85%] border-2 border-ink bg-band-verde text-white shadow-[3px_3px_0_#1b1d22]">
                   {/* Cabeçalho de talão — decorativo */}
@@ -220,8 +304,10 @@ export default function Chat() {
                   <p className="px-4 py-3 text-base">{m.texto}</p>
                 </div>
               </div>
-            )
-          ) : (
+            );
+          }
+          const T = TXT[m.langUsada ?? "pt"];
+          return (
             <div key={i} className="animate-fade-in-up flex gap-3">
               <ZePersonagem
                 estado={
@@ -240,29 +326,24 @@ export default function Chat() {
                 )}
                 {m.tipo === "erro" ? (
                   <>
-                    <p className="text-base">
-                      Algo falhou ao contactar o servidor — a culpa não é tua.
-                    </p>
+                    <p className="text-base">{T.erroMsg}</p>
                     <button
                       onClick={() => ultimaPergunta.current && perguntar(ultimaPergunta.current)}
                       className="btn-outline mt-3 px-4 py-2 text-sm"
                     >
-                      Tentar de novo
+                      {T.tentar}
                     </button>
                   </>
                 ) : m.tipo === "limite" ? (
                   <>
                     <p className="text-base">
-                      Demasiados pedidos seguidos desta ligação — o balcão
-                      precisa de respirar.{" "}
+                      {T.limiteMsg}{" "}
                       {(() => {
                         const s = Math.max(
                           0,
                           Math.ceil(((m.retryAte ?? 0) - Date.now()) / 1000)
                         );
-                        return s >= 90
-                          ? `Tenta de novo daqui a ~${Math.ceil(s / 60)} min.`
-                          : `Tenta de novo daqui a ${s}s.`;
+                        return T.limiteDepois(s);
                       })()}
                     </p>
                     <button
@@ -270,7 +351,7 @@ export default function Chat() {
                       disabled={(m.retryAte ?? 0) > Date.now()}
                       className="btn-outline mt-3 px-4 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                      Tentar de novo
+                      {T.tentar}
                     </button>
                   </>
                 ) : m.tipo === "resposta" && m.pergunta ? (
@@ -279,10 +360,20 @@ export default function Chat() {
                       {m.tema?.entidade} · {m.tema?.titulo}
                       {m.via === "llm" && (
                         <span className="rounded-md border border-azulejo/50 bg-azulejo-suave px-2 py-0.5 text-xs font-bold text-azulejo">
-                          gerada por IA
+                          {T.ia}
                         </span>
                       )}
                     </p>
+                    {m.idioma === "en" && (
+                      <p className="mt-3 rounded-md border-2 border-dashed border-azulejo/50 bg-azulejo-suave/40 px-3 py-2 font-mono text-xs uppercase tracking-wider text-esferografica">
+                        {AVISO_TRADUCAO}
+                      </p>
+                    )}
+                    {m.soEmPt && (
+                      <p className="mt-3 rounded-md border-2 border-dashed border-stone-300 bg-stone-50 px-3 py-2 font-mono text-xs uppercase tracking-wider text-stone-600">
+                        {AVISO_SO_PT}
+                      </p>
+                    )}
                     <ul className="mt-3 list-disc space-y-2 pl-5 text-base leading-relaxed">
                       {m.pergunta.resposta.passos.map((p, j) => (
                         <li key={j}>{p}</li>
@@ -295,7 +386,7 @@ export default function Chat() {
                     )}
                     <div className="mt-4 space-y-2 border-t-2 border-dashed border-ink/15 pt-3">
                       <p className="font-mono text-sm font-bold uppercase tracking-widest text-esferografica">
-                        Fontes oficiais
+                        {T.fontes}
                       </p>
                       {m.pergunta.resposta.fontes.map((f, j) => (
                         <a
@@ -329,7 +420,7 @@ export default function Chat() {
                           {linhas.map((c) => (
                             <p key={c.nome}>
                               <span className="font-mono text-sm font-bold uppercase tracking-wider text-ink">
-                                Ligar:
+                                {T.ligar}
                               </span>{" "}
                               {c.contacto.telefone}
                               {c.contacto.horario && (
@@ -347,8 +438,7 @@ export default function Chat() {
                 ) : (
                   <>
                     <p className="text-base">
-                      Esta pergunta ficou presa na tutela — nem o Zé chega lá.
-                      Tenta reformular, ou abre o{" "}
+                      {T.semRes1}{" "}
                       <a
                         href="https://eportugal.gov.pt"
                         target="_blank"
@@ -357,7 +447,7 @@ export default function Chat() {
                       >
                         ePortugal ↗
                       </a>
-                      . Estas talvez ajudem:
+                      {T.semRes2}
                     </p>
                     <div className="mt-3 flex flex-col gap-2">
                       {m.sugestoes.map((s) => (
@@ -379,7 +469,7 @@ export default function Chat() {
                 {m.sugestoes.length > 0 && m.tipo === "resposta" && (
                   <div className="mt-4">
                     <p className="font-mono text-xs font-bold uppercase tracking-widest text-stone-600">
-                      Perguntas relacionadas:
+                      {T.relacionadas}
                     </p>
                     <div className="mt-2 flex flex-wrap gap-2">
                       {m.sugestoes.map((s) => (
@@ -396,8 +486,8 @@ export default function Chat() {
                 )}
               </div>
             </div>
-          )
-        )}
+          );
+        })}
 
         {aCarregar && (
           <div className="animate-fade-in-up flex gap-3">
@@ -408,7 +498,7 @@ export default function Chat() {
                 className="animate-fade-in-up font-mono text-sm text-stone-600"
                 aria-live="polite"
               >
-                {FRASES_BALCAO[fraseIdx]}
+                {TXT[ultimaLang.current].frases[fraseIdx]}
               </p>
             </div>
           </div>
@@ -419,9 +509,35 @@ export default function Chat() {
       {/* FORMULÁRIO Z-01 — a mesma família visual da home */}
       <div ref={barra} className="sticky bottom-0 border-t-2 border-ink bg-paper py-4">
         <div className="rounded-lg border-2 border-ink bg-white shadow-[4px_4px_0_#1b1d22] focus-within:shadow-[5px_5px_0_#1b1d22]">
-          <div aria-hidden className="flex items-center justify-between border-b-2 border-dashed border-ink/20 px-4 py-1.5 font-mono text-xs font-bold uppercase tracking-widest text-stone-600">
-            <span>Formulário Z-01</span>
-            <span>Via única</span>
+          <div className="flex items-center justify-between border-b-2 border-dashed border-ink/20 px-4 py-1.5 font-mono text-xs font-bold uppercase tracking-widest text-stone-600">
+            <span aria-hidden>Formulário Z-01</span>
+            <div className="flex items-center gap-1.5 normal-case tracking-normal">
+              {/* Seletor PT|EN — fixa a língua das respostas; "auto" deteta por pergunta */}
+              <span className="sr-only">Idioma das respostas</span>
+              {(["pt", "en"] as const).map((l) => (
+                <button
+                  key={l}
+                  type="button"
+                  aria-pressed={langSel === l}
+                  title={
+                    l === "pt"
+                      ? "Respostas em português (clique de novo para deteção automática)"
+                      : "Answers in English (click again for auto-detect)"
+                  }
+                  onClick={() => setLangSel((s) => (s === l ? "auto" : l))}
+                  className={`transition-all ${
+                    langSel === l
+                      ? "carimbo bg-white"
+                      : "rounded border-2 border-stone-300 px-1.5 py-0.5 font-mono text-xs font-bold uppercase tracking-wider text-stone-400 hover:border-stone-500 hover:text-stone-600"
+                  }`}
+                >
+                  {l}
+                </button>
+              ))}
+              <span aria-hidden className="text-stone-400">
+                {langSel === "auto" ? "· auto" : ""}
+              </span>
+            </div>
           </div>
           <div className="flex items-end gap-2 p-2">
             <textarea

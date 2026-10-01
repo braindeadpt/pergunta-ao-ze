@@ -55,6 +55,17 @@ LLM_MODEL=openai/gpt-oss-120b
 LLM_MODEL_FALLBACK=openai/gpt-oss-20b   # opcional
 ```
 
+### Chat bilingue (PT | EN)
+
+O chat deteta a língua da pergunta (heurística → última língua → navegador)
+e há um seletor PT|EN que fixa a escolha. Em inglês, o Zé serve traduções
+curadas de `lib/data/temas.en.ts` — ficheiro **gerado e commitado** por
+`npm run traduzir:en` (não é gerado em runtime nem a cada build). O script
+só re-traduz respostas cujo texto PT mudou (hash por entrada) e falha se a
+tradução alterar números, valores em € ou URLs. Respostas marcadas
+`revisao: true` não são servidas até revisão humana — nesse caso, e quando
+falta tradução, o chat responde em PT com uma nota em inglês.
+
 ## Estrutura
 
 ```
@@ -64,8 +75,10 @@ app/opengraph-image   cartão de partilha gerado automaticamente
 components/           Header, Footer, Chat, ZePersonagem, SenhaTema,
                       FontesArquivo (arquivo expansível de /fontes)...
 lib/data/temas.ts     base de conhecimento curada (temas, perguntas, fontes)
+lib/data/temas.en.ts  traduções EN geradas (scripts/gerar-temas-en.mjs)
 lib/data/fontes.ts    entidades oficiais + contactos (telefone, horário, email)
 lib/engine.ts         motores de resposta (keyword + LLM com fallback)
+lib/i18n.ts           deteção de língua da pergunta (heurística)
 ```
 
 ## Contribuir

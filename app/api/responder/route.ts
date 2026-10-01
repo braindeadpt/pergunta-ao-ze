@@ -39,9 +39,11 @@ export async function POST(request: Request) {
   }
 
   let pergunta: unknown;
+  let lang: "pt" | "en" = "pt";
   try {
     const body = await request.json();
     pergunta = body?.pergunta;
+    if (body?.lang === "en") lang = "en";
   } catch {
     return NextResponse.json({ erro: "Pedido inválido." }, { status: 400 });
   }
@@ -60,7 +62,7 @@ export async function POST(request: Request) {
   // Teto diário de chamadas LLM: acima dele responde só o KeywordEngine.
   const llmDisponivel = contadorLlm.verificar(MAX_LLM_CALLS_PER_DAY);
   const engine = llmDisponivel ? getEngine() : keywordFallback;
-  const resultado = await engine.responder(pergunta.trim());
+  const resultado = await engine.responder(pergunta.trim(), lang);
   if (resultado.via === "llm") {
     contadorLlm.verificar(MAX_LLM_CALLS_PER_DAY, true);
   }
