@@ -2,6 +2,7 @@ import Link from "next/link";
 import HeroBox from "@/components/HeroBox";
 import FloatingAsk from "@/components/FloatingAsk";
 import SenhasGrid, { type Balcao } from "@/components/SenhasGrid";
+import { BALCOES_DEF } from "@/lib/balcoes";
 import PainelLED from "@/components/PainelLED";
 import ZePersonagem from "@/components/ZePersonagem";
 import ZeFace from "@/components/ZeFace";
@@ -31,16 +32,12 @@ const Clipe = ({ className = "" }: { className?: string }) => (
 
 const porId = (id: string) => TEMAS.find((t) => t.id === id)!;
 
-/* Os balcões do atendimento — agrupamento dos temas */
-const BALCOES: Balcao[] = [
-  { rotulo: "Identificação", letra: "I", temas: ["passaporte", "chave-movel-digital", "certidoes"].map(porId) },
-  { rotulo: "Dinheiro", letra: "D", temas: ["irs-financas", "seguranca-social", "pensoes-reforma"].map(porId) },
-  { rotulo: "Trabalho e empresa", letra: "T", temas: ["desemprego-iefp", "empresa-atividade"].map(porId) },
-  { rotulo: "Saúde e família", letra: "S", temas: ["sns", "familia"].map(porId) },
-  { rotulo: "Estrada e casa", letra: "E", temas: ["carta-conducao-imt", "transportes", "habitacao"].map(porId) },
-  { rotulo: "Fronteiras", letra: "F", temas: ["aima-imigracao", "vistos-entrada", "noutro-pais-ue"].map(porId) },
-  { rotulo: "Balcão do povo", letra: "P", temas: ["eleicoes-voto", "justica-multas", "reclamacoes", "educacao", "eportugal-agendamento"].map(porId) },
-];
+/* Os balcões do atendimento — definição partilhada em lib/balcoes.ts */
+const BALCOES: Balcao[] = BALCOES_DEF.map((b) => ({
+  rotulo: b.rotulo,
+  letra: b.letra,
+  temas: b.temas.map(porId),
+}));
 
 export default function Home() {
   const stats = getEstatisticas();
