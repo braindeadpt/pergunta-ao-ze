@@ -18,6 +18,11 @@ const temaParaBalcao = new Map<string, number>(
   BALCOES_DEF.flatMap((b, i) => b.temas.map((id) => [id, i] as const))
 );
 
+/** Balcão de um tema pelo id (a lista acima é a fonte da verdade). */
+export function balcaoDeTema(temaId: string): number {
+  return temaParaBalcao.get(temaId) ?? -1;
+}
+
 /**
  * Deduz o balcão de uma entidade pelo nº de perguntas que a referenciam
  * em cada balcão. Empate → o primeiro balcão pela ordem definida.

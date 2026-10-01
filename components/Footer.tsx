@@ -29,6 +29,9 @@ export default function Footer() {
             <Link href="/fontes" className="hover:text-ink">
               Fontes
             </Link>
+            <Link href="/p" className="hover:text-ink">
+              Todas as perguntas
+            </Link>
             <Link href="/chat" className="hover:text-ink">
               Perguntar ao Zé
             </Link>

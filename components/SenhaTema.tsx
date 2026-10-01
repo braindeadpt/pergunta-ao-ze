@@ -82,6 +82,12 @@ export default function SenhaTema({
             <span aria-hidden className="shrink-0 transition-transform group-hover:translate-x-1">→</span>
           </p>
         </Link>
+        <Link
+          href={`/p/${principal.id}`}
+          className="mt-1 inline-block font-mono text-sm text-stone-500 underline decoration-stone-300 underline-offset-2 transition-colors hover:text-azulejo"
+        >
+          ver página desta resposta ↗
+        </Link>
         {resto.length > 0 && (
           <ul className="mt-3 space-y-1.5 border-t border-dashed border-ink/20 pt-2.5">
             {(destaque ? resto : resto.slice(0, 2)).map((p) => (
@@ -91,6 +97,13 @@ export default function SenhaTema({
                   className="font-mono text-sm leading-relaxed text-stone-700 underline decoration-ink/25 underline-offset-2 transition-colors hover:text-ink"
                 >
                   {p.texto}
+                </Link>
+                <Link
+                  href={`/p/${p.id}`}
+                  aria-label={`Página da resposta: ${p.texto}`}
+                  className="ml-1.5 font-mono text-sm text-stone-400 no-underline transition-colors hover:text-azulejo"
+                >
+                  ↗
                 </Link>
               </li>
             ))}
