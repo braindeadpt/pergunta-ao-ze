@@ -8,24 +8,28 @@ import Footer from "@/components/Footer";
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
+  display: "optional",
 });
 
 const newsreader = Newsreader({
   subsets: ["latin"],
   variable: "--font-newsreader",
   style: ["normal", "italic"],
+  display: "optional",
 });
 
 const display = Archivo_Black({
   subsets: ["latin"],
   weight: "400",
   variable: "--font-display",
+  display: "optional",
 });
 
 const mono = Space_Mono({
   subsets: ["latin"],
   weight: ["400", "700"],
   variable: "--font-mono",
+  display: "optional",
 });
 
 export const metadata: Metadata = {
