@@ -7,7 +7,7 @@ const SUGESTOES = ["cartao-de-cidadao", "sns", "irs-financas"];
 
 export default function NotFound() {
   return (
-    <div className="mx-auto max-w-3xl px-4 py-16 sm:py-20">
+    <div className="mx-auto max-w-4xl px-4 py-16 sm:py-20">
       <div className="text-center">
         <ZePersonagem estado="panico" className="mx-auto w-56 sm:w-64" />
 
@@ -49,7 +49,7 @@ export default function NotFound() {
       <p className="mt-14 text-center font-mono text-sm font-bold uppercase tracking-[0.2em] text-carimbo-tinta">
         ▸ Ou tira outra senha
       </p>
-      <div className="mx-auto mt-6 grid max-w-2xl gap-6 sm:grid-cols-3">
+      <div className="mx-auto mt-6 grid max-w-3xl gap-6 sm:grid-cols-2">
         {SUGESTOES.map((id, j) => {
           const tema = TEMAS.find((t) => t.id === id);
           if (!tema) return null;
