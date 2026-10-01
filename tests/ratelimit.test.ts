@@ -3,8 +3,56 @@ import assert from "node:assert/strict";
 import {
   MemoryRateLimiter,
   ContadorDiario,
+  UpstashRateLimiter,
+  ContadorDiarioRedis,
   hashIp,
+  type RedisMin,
 } from "../lib/ratelimit.ts";
+
+/** Fake Redis em memória — mesmo contrato incr/get/pexpire/pttl/pexpireat. */
+class FakeRedis implements RedisMin {
+  store = new Map<string, { v: number; expiraEm?: number }>();
+  falhar = false;
+
+  private entry(key: string) {
+    let e = this.store.get(key);
+    if (e?.expiraEm && e.expiraEm <= Date.now()) {
+      this.store.delete(key);
+      e = undefined;
+    }
+    if (!e) {
+      e = { v: 0 };
+      this.store.set(key, e);
+    }
+    return e;
+  }
+  private maybeFail() {
+    if (this.falhar) throw new Error("redis em baixo");
+  }
+  async incr(key: string) {
+    this.maybeFail();
+    return ++this.entry(key).v;
+  }
+  async get(key: string) {
+    this.maybeFail();
+    return this.store.get(key)?.v ?? null;
+  }
+  async pexpire(key: string, ms: number) {
+    this.maybeFail();
+    this.entry(key).expiraEm = Date.now() + ms;
+    return 1;
+  }
+  async pttl(key: string) {
+    this.maybeFail();
+    const e = this.store.get(key);
+    return e?.expiraEm ? e.expiraEm - Date.now() : -1;
+  }
+  async pexpireat(key: string, unixMs: number) {
+    this.maybeFail();
+    this.entry(key).expiraEm = unixMs;
+    return 1;
+  }
+}
 
 test("dentro do limite: todos passam e 'restantes' desce", () => {
   const l = new MemoryRateLimiter();
@@ -69,4 +117,62 @@ test("teto diário: ao mudar de dia UTC o contador reinicia", () => {
   c.verificar(1, true, dia1);
   assert.equal(c.verificar(1, false, dia1), false);
   assert.equal(c.verificar(1, true, dia2), true); // novo dia
+});
+
+// --- backend Redis (Upstash) ------------------------------------------------
+
+test("Upstash: dentro do limite passa e restantes desce", async () => {
+  const l = new UpstashRateLimiter(new FakeRedis(), new MemoryRateLimiter());
+  for (let i = 0; i < 5; i++) {
+    const r = await l.check("ip-a", 5, 60_000);
+    assert.equal(r.ok, true);
+    assert.equal(r.restantes, 4 - i);
+  }
+});
+
+test("Upstash: a exceder devolve 429 com retryAfter do TTL", async () => {
+  const redis = new FakeRedis();
+  const l = new UpstashRateLimiter(redis, new MemoryRateLimiter());
+  for (let i = 0; i < 3; i++) await l.check("ip-b", 3, 60_000);
+  const r = await l.check("ip-b", 3, 60_000);
+  assert.equal(r.ok, false);
+  assert.ok(r.retryAfterSec > 0 && r.retryAfterSec <= 60);
+});
+
+test("Upstash: chave tem TTL da janela (pexpire na 1.ª contagem)", async () => {
+  const redis = new FakeRedis();
+  const l = new UpstashRateLimiter(redis, new MemoryRateLimiter());
+  await l.check("ip-ttl", 5, 60_000);
+  const e = redis.store.get("ze:rl:ip-ttl");
+  assert.ok(e?.expiraEm && e.expiraEm > Date.now() && e.expiraEm <= Date.now() + 60_000);
+});
+
+test("Upstash em baixo: fail-open para memória (pedido passa)", async () => {
+  const redis = new FakeRedis();
+  redis.falhar = true;
+  const mem = new MemoryRateLimiter();
+  const l = new UpstashRateLimiter(redis, mem);
+  const r = await l.check("ip-z", 2, 60_000);
+  assert.equal(r.ok, true); // degradou sem erro
+  // E o fallback conta mesmo (2.º do mesmo IP ainda conta na memória)
+  assert.equal((await l.check("ip-z", 2, 60_000)).restantes, 0);
+});
+
+test("Contador diário Redis: conta, esgota e expira à meia-noite UTC", async () => {
+  const redis = new FakeRedis();
+  const c = new ContadorDiarioRedis(redis);
+  const t0 = Date.UTC(2026, 9, 1, 10, 0, 0);
+  assert.equal(await c.verificar(2, true, t0), true);
+  assert.equal(await c.verificar(2, true, t0), true);
+  assert.equal(await c.verificar(2, false, t0), false); // esgotou
+  const e = redis.store.get("ze:llm:2026-10-01");
+  assert.equal(e?.expiraEm, Date.UTC(2026, 9, 2, 0, 0, 0)); // meia-noite UTC
+});
+
+test("Contador diário Redis em baixo: fail-closed → KeywordEngine", async () => {
+  const redis = new FakeRedis();
+  redis.falhar = true;
+  const c = new ContadorDiarioRedis(redis);
+  assert.equal(await c.verificar(500, false), false);
+  assert.equal(await c.verificar(500, true), false);
 });

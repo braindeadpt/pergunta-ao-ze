@@ -66,6 +66,28 @@ tradução alterar números, valores em € ou URLs. Respostas marcadas
 `revisao: true` não são servidas até revisão humana — nesse caso, e quando
 falta tradução, o chat responde em PT com uma nota em inglês.
 
+### Rate limit em produção
+
+A rota `/api/responder` limita 20 pedidos/10 min por IP (hash com sal) e
+`MAX_LLM_CALLS_PER_DAY` chamadas ao LLM por dia UTC. Por defeito corre **em
+memória** — em serverless cada instância conta por si, pelo que o limite
+real é ~limite × instâncias quentes. Para proteção real da quota:
+
+1. Cria uma base Redis grátis em [console.upstash.com](https://console.upstash.com)
+   (ou um store **Vercel KV** no dashboard do projeto).
+2. Na Vercel → Settings → Environment Variables, copia:
+   - Upstash: `UPSTASH_REDIS_REST_URL` e `UPSTASH_REDIS_REST_TOKEN`
+   - Vercel KV: `KV_REST_API_URL` e `KV_REST_API_TOKEN` (já injetadas se
+     ligares o store ao projeto)
+3. Define também `RATE_LIMIT_SALT` com um valor aleatório longo — em
+   produção o arranque **falha** sem ele (em dev usa um defeito inseguro).
+
+Se as envs existirem, o site usa Redis automaticamente; sem elas (ou se o
+Redis estiver em baixo) cai no limitador em memória, com aviso no log.
+Exceção: o teto diário do LLM falha *fechado* — se o contador não responder,
+o site responde só com o KeywordEngine. Confirma nos logs de arranque:
+com Redis não há aviso; sem ele aparece `[ratelimit] Sem UPSTASH_REDIS_…`.
+
 ## Estrutura
 
 ```

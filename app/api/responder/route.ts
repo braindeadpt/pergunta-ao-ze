@@ -16,7 +16,7 @@ const keywordFallback = new KeywordEngine();
 export async function POST(request: Request) {
   // Rate limit por IP — corre antes de ler o corpo.
   const chave = hashIp(ipDoPedido(request));
-  const limite = limiter.check(chave, LIMITE_POR_IP, JANELA_MS);
+  const limite = await limiter.check(chave, LIMITE_POR_IP, JANELA_MS);
   if (!limite.ok) {
     return NextResponse.json(
       {
@@ -60,11 +60,11 @@ export async function POST(request: Request) {
   }
 
   // Teto diário de chamadas LLM: acima dele responde só o KeywordEngine.
-  const llmDisponivel = contadorLlm.verificar(MAX_LLM_CALLS_PER_DAY);
+  const llmDisponivel = await contadorLlm.verificar(MAX_LLM_CALLS_PER_DAY);
   const engine = llmDisponivel ? getEngine() : keywordFallback;
   const resultado = await engine.responder(pergunta.trim(), lang);
   if (resultado.via === "llm") {
-    contadorLlm.verificar(MAX_LLM_CALLS_PER_DAY, true);
+    await contadorLlm.verificar(MAX_LLM_CALLS_PER_DAY, true);
   }
   return NextResponse.json(resultado);
 }
