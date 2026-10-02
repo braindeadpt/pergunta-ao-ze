@@ -76,8 +76,13 @@ Cartão de Cidadão = Citizen Card; NIF = NIF (Portuguese tax identification num
 NISS = NISS; Segurança Social = Social Security; Finanças / Autoridade Tributária = Tax Authority;
 SNS = SNS (National Health Service); SNS 24 = SNS 24; AIMA = AIMA; IRN = IRN;
 Chave Móvel Digital = Digital Mobile Key; Loja do Cidadão = Loja do Cidadão;
-ePortugal = ePortugal; IRS = IRS (income tax); IUC = IUC (vehicle tax);
-Livro de Reclamações = complaints book ("Livro de Reclamações").`;
+ePortugal = ePortugal; IRS = IRS (Portuguese personal income tax); IUC = IUC (vehicle tax);
+SEF = SEF (the former Foreigners and Borders Service);
+CESD = European Health Insurance Card (EHIC, known in Portugal as CESD);
+Livro de Reclamações = complaints book ("Livro de Reclamações").
+Notas: o visto D7 é para quem vive de rendimentos próprios/passivos (pensões,
+rendas) — nunca escrevas "self-employment" a propósito do D7. "Estrutura de
+missão" da AIMA é uma task force dedicada, não uma "mission structure".`;
 
 const PROMPT = (p) => `${GLOSSARIO}
 
@@ -189,7 +194,7 @@ for (const tema of TEMAS) {
     if (prev && prev.hashOrigem === hash && !FORCAR.has(p.id)) {
       // Mesmo mantida, passa pelo pós-processamento do glossário —
       // corrige variantes antigas sem nova chamada ao LLM.
-      saida[p.id] = { ...prev, ...normalizarRespostaEn(prev) };
+      saida[p.id] = { ...prev, ...normalizarRespostaEn(prev, p.id) };
       mantidas++;
       continue;
     }
@@ -198,7 +203,7 @@ for (const tema of TEMAS) {
       continue;
     }
     try {
-      const en = normalizarRespostaEn(await traduzir(p));
+      const en = normalizarRespostaEn(await traduzir(p), p.id);
       const falhas = [
         ...p.resposta.passos.map((pt, i) =>
           en.passos[i] ? diffInvariantes(pt, en.passos[i]) : ["passo em falta"]

@@ -78,7 +78,7 @@ test("normalizarRespostaEn é determinístico e idempotente", () => {
   const r = normalizarRespostaEn(entrada);
   assert.equal(
     r.passos[0],
-    "Contact AIMA (Agency for Integration, Migration and Asylum) or the old SEF (Foreigners and Borders Service)."
+    "Contact AIMA (Agency for Integration, Migration and Asylum) or the old SEF (the former Foreigners and Borders Service)."
   );
   assert.equal(
     r.passos[1],
@@ -91,6 +91,75 @@ test("normalizarRespostaEn é determinístico e idempotente", () => {
   assert.deepEqual(r.palavras, ["sef case", "aima", "tax authority portal"]);
   // idempotente
   assert.deepEqual(normalizarRespostaEn(r), r);
+});
+
+// --- correções da revisão humana das sensíveis (D) ---------------------------
+
+test("vis-tipos: D7 nunca é self-employment", () => {
+  const txt = textoDe(TEMAS_EN["vis-tipos"]);
+  assert.doesNotMatch(txt, /self[‑-]?employ/i);
+  assert.match(txt, /living on their own income \(D7\)/);
+});
+
+test("IRS: explicado como Portuguese personal income tax na 1.ª ocorrência", () => {
+  for (const id of ["irs-entregar", "irs-reembolso"]) {
+    const txt = textoDe(TEMAS_EN[id]);
+    const i = txt.indexOf("IRS");
+    assert.ok(i >= 0, `${id}: não menciona IRS`);
+    assert.ok(
+      txt.slice(i).startsWith("IRS (Portuguese personal income tax)"),
+      `${id}: 1.ª ocorrência de IRS sem explicação`
+    );
+  }
+});
+
+test("variantes banidas de entidades não aparecem em nenhuma entrada", () => {
+  const banidos = [
+    "Immigration and Borders Authority",
+    "Immigration Authority",
+    "Citizen Service Center",
+  ];
+  const problemas: string[] = [];
+  for (const [id, r] of Object.entries(TEMAS_EN)) {
+    const txt = textoDe(r);
+    for (const b of banidos) {
+      if (txt.includes(b)) problemas.push(`${id}: contém "${b}"`);
+    }
+  }
+  assert.deepEqual(problemas, []);
+});
+
+test("keywords sem 'se f' nem siglas partidas do modelo", () => {
+  const problemas: string[] = [];
+  for (const [id, r] of Object.entries(TEMAS_EN)) {
+    for (const p of r.palavras) {
+      if (/\bse f\b|\bse\s+f\b/i.test(p))
+        problemas.push(`${id}: "${p}"`);
+    }
+  }
+  assert.deepEqual(problemas, []);
+});
+
+test("ue-cesd: EHIC com gloss CESD na 1.ª ocorrência + keyword ehic", () => {
+  const r = TEMAS_EN["ue-cesd"];
+  assert.match(
+    textoDe(r),
+    /European Health Insurance Card \(EHIC, known in Portugal as CESD\)/
+  );
+  assert.ok(r.palavras.includes("ehic"));
+});
+
+test("irs-reembolso: estados do portal com gloss EN", () => {
+  const txt = textoDe(TEMAS_EN["irs-reembolso"]);
+  assert.match(txt, /'Recebida' \(Received\)/);
+  assert.match(txt, /'Reembolso Emitido' \(Refund issued\)/);
+  assert.match(txt, /'Liquidação Processada' \(Assessment processed\)/);
+});
+
+test("vis-agendar-aima: task force da AIMA em vez de mission structure", () => {
+  const txt = textoDe(TEMAS_EN["vis-agendar-aima"]);
+  assert.doesNotMatch(txt, /mission structure/i);
+  assert.match(txt, /dedicated task force \(estrutura de missão\)/);
 });
 
 test("números, URLs e € intactos após normalização", () => {

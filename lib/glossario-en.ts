@@ -26,16 +26,71 @@ export const ENTIDADES_EN: Entidade[] = [
   { nome: "Finanças", gloss: "Tax Authority", exc: "(?<!Portal das )" },
   { nome: "ePortugal", gloss: "public services portal" },
   { nome: "AIMA", gloss: "Agency for Integration, Migration and Asylum" },
-  { nome: "SEF", gloss: "Foreigners and Borders Service" },
+  { nome: "SEF", gloss: "the former Foreigners and Borders Service" },
   { nome: "IRN", gloss: "Institute of Registries and Notaries" },
   { nome: "SNS", gloss: "National Health Service", exc: "(?! ?24)" },
   { nome: "NISS", gloss: "Social Security identification number" },
   { nome: "NIF", gloss: "Portuguese tax identification number" },
   { nome: "IMT", gloss: "Institute for Mobility and Transport" },
   { nome: "AT", gloss: "Tax Authority" },
-  { nome: "IRS", gloss: "income tax" },
+  { nome: "IRS", gloss: "Portuguese personal income tax" },
   { nome: "IUC", gloss: "vehicle tax" },
 ];
+
+/**
+ * Correções de conteúdo determinísticas — revisão humana a entradas
+ * sensíveis. Vivem no pós-processamento para sobreviverem a
+ * regenerações via --forcar (o modelo pode voltar a errar).
+ */
+const CORRECOES: { re: RegExp; para: string }[] = [
+  // D7 é para quem vive de rendimentos próprios/passivos (pensões,
+  // rendas) — nunca "self-employment". Aceita hífen normal ou ‑ (U+2011).
+  {
+    re: /self[‑-]?employ(?:ed|ment)\s+visas?\s*\(D7\)/gi,
+    para: "visas for people living on their own income (D7)",
+  },
+  // "estrutura de missão" traduzida à letra não diz nada.
+  {
+    re: /\bthe portal and mission structure\b/gi,
+    para: "the AIMA online portal and its dedicated task force (estrutura de missão)",
+  },
+  // Estados do Portal das Finanças: termo PT mantém-se + gloss EN.
+  { re: /'Recebida'(?!\s*\()/g, para: "'Recebida' (Received)" },
+  {
+    re: /'Reembolso Emitido'(?!\s*\()/g,
+    para: "'Reembolso Emitido' (Refund issued)",
+  },
+  {
+    re: /'Liquidação Processada'(?!\s*\()/g,
+    para: "'Liquidação Processada' (Assessment processed)",
+  },
+];
+
+function aplicarCorrecoes(texto: string): string {
+  for (const c of CORRECOES) texto = texto.replace(c.re, c.para);
+  return texto;
+}
+
+/** Palavras-chave EN extra por entrada (revisão humana). */
+const PALAVRAS_EXTRA: Record<string, string[]> = {
+  "ue-cesd": ["ehic"], // o nome que um estrangeiro procura
+};
+
+/**
+ * CESD: o nome internacionalmente conhecido é EHIC — vem à frente,
+ * com o nome PT como gloss. Ocorrências seguintes ficam "EHIC/CESD".
+ * `visto` é partilhado entre passos e nota da mesma resposta.
+ */
+function normalizarCesd(texto: string, visto: { v: boolean }): string {
+  return texto.replace(
+    /\bCESD(?:\s*\(\s*European Health Insurance Card\s*\))?|\bEuropean Health Insurance Card\b/g,
+    () =>
+      visto.v
+        ? "EHIC/CESD"
+        : ((visto.v = true),
+          "European Health Insurance Card (EHIC, known in Portugal as CESD)")
+  );
+}
 
 function escapar(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -101,17 +156,24 @@ export function normalizarPalavras(palavras: string[]): string[] {
 }
 
 /** Aplica o glossário a uma resposta EN completa (passos + nota + palavras). */
-export function normalizarRespostaEn(resposta: {
-  passos: string[];
-  nota?: string;
-  palavras: string[];
-}): { passos: string[]; nota?: string; palavras: string[] } {
+export function normalizarRespostaEn(
+  resposta: {
+    passos: string[];
+    nota?: string;
+    palavras: string[];
+  },
+  id?: string
+): { passos: string[]; nota?: string; palavras: string[] } {
   const vistos = new Set<string>();
+  const cesd = { v: false };
+  const corrigir = (t: string) =>
+    normalizarCesd(normalizarEntidades(aplicarCorrecoes(t), vistos), cesd);
   return {
-    passos: resposta.passos.map((p) => normalizarEntidades(p, vistos)),
-    nota: resposta.nota
-      ? normalizarEntidades(resposta.nota, vistos)
-      : undefined,
-    palavras: normalizarPalavras(resposta.palavras),
+    passos: resposta.passos.map(corrigir),
+    nota: resposta.nota ? corrigir(resposta.nota) : undefined,
+    palavras: normalizarPalavras([
+      ...resposta.palavras,
+      ...(id ? PALAVRAS_EXTRA[id] ?? [] : []),
+    ]),
   };
 }
