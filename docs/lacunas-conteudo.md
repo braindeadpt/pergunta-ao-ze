@@ -37,4 +37,5 @@ os nomes atuais no portal antes de publicar as traduções.
 
 ---
 
-_Última revisão: outubro de 2026 (revisão humana das sensíveis)._
+_Gerado durante a revisão assistida das traduções; decisões de conteúdo
+pendentes do mantenedor._
