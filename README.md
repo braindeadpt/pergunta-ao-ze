@@ -20,6 +20,18 @@ Projeto independente — não é um site do Estado.
 
 **https://perguntaaoze.pt**
 
+### SEO: depois de mudar de domínio
+
+O redirect 308 de `perguntaaoze.vercel.app` já está ativo. Falta, na tua
+conta do Google Search Console:
+
+1. Adicionar a propriedade `perguntaaoze.pt` — verificação por registo
+   **TXT de DNS** (no Amen, onde o domínio está registado).
+2. Submeter o sitemap `https://perguntaaoze.pt/sitemap.xml`.
+3. Se `perguntaaoze.vercel.app` já estava indexado como propriedade,
+   usar **Configurações → Mudança de endereço** para indicar a migração
+   para `perguntaaoze.pt` (acelera a transferência de indexação).
+
 ## Stack
 
 - Next.js 15 (App Router) + TypeScript + Tailwind CSS v4
