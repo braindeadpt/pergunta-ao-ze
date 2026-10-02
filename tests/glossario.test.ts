@@ -1,6 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { TEMAS_EN } from "../lib/data/temas.en.ts";
+import { TEMAS } from "../lib/data/temas.ts";
+import { KeywordEngine } from "../lib/engine.ts";
 import {
   ENTIDADES_EN,
   normalizarRespostaEn,
@@ -160,6 +162,35 @@ test("vis-agendar-aima: task force da AIMA em vez de mission structure", () => {
   const txt = textoDe(TEMAS_EN["vis-agendar-aima"]);
   assert.doesNotMatch(txt, /mission structure/i);
   assert.match(txt, /dedicated task force \(estrutura de missão\)/);
+});
+
+// --- gate de revisão --------------------------------------------------------
+
+test("só at-nif e at-certidao-domicilio ficam com revisao: true", () => {
+  const marcadas = Object.entries(TEMAS_EN)
+    .filter(([, r]) => (r as { revisao?: boolean }).revisao === true)
+    .map(([id]) => id)
+    .sort();
+  assert.deepEqual(marcadas, ["at-certidao-domicilio", "at-nif"]);
+});
+
+test("entrada com revisao: true nunca é servida em EN (PT + nota)", async () => {
+  const engine = new KeywordEngine();
+  const marcadas = Object.entries(TEMAS_EN)
+    .filter(([, r]) => (r as { revisao?: boolean }).revisao === true)
+    .map(([id]) => id);
+  assert.ok(marcadas.length > 0);
+  // força cada entrada marcada como melhor match e confirma o gate
+  for (const id of marcadas) {
+    const tema = TEMAS.flatMap((t) => t.perguntas).find((p) => p.id === id)!;
+    const r = await engine.responder(tema.texto, "en");
+    // a pergunta PT deve encontrar a entrada — e ela não pode vir em EN
+    assert.equal(r.tipo, "resposta");
+    if (r.tipo === "resposta" && r.pergunta.id === id) {
+      assert.equal(r.idioma, "pt", `${id} servida em EN apesar de revisao`);
+      assert.equal(r.soEmPt, true);
+    }
+  }
 });
 
 test("números, URLs e € intactos após normalização", () => {

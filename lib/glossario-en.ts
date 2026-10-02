@@ -82,13 +82,16 @@ const PALAVRAS_EXTRA: Record<string, string[]> = {
  * `visto` é partilhado entre passos e nota da mesma resposta.
  */
 function normalizarCesd(texto: string, visto: { v: boolean }): string {
+  const canonico =
+    "European Health Insurance Card (EHIC, known in Portugal as CESD)";
   return texto.replace(
-    /\bCESD(?:\s*\(\s*European Health Insurance Card\s*\))?|\bEuropean Health Insurance Card\b/g,
-    () =>
-      visto.v
-        ? "EHIC/CESD"
-        : ((visto.v = true),
-          "European Health Insurance Card (EHIC, known in Portugal as CESD)")
+    /\bEuropean Health Insurance Card \(EHIC, known in Portugal as CESD\)|\bEuropean Health Insurance Card\b|\bCESD(?:\s*\(\s*European Health Insurance Card\s*\))?|\bEHIC\b/g,
+    (m) =>
+      m === canonico // já normalizado: idempotente
+        ? ((visto.v = true), m)
+        : visto.v
+          ? "EHIC/CESD"
+          : ((visto.v = true), canonico)
   );
 }
 

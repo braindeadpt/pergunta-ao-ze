@@ -57,16 +57,10 @@ try {
   /* primeira geração */
 }
 
-/** Respostas administrativamente sensíveis — geradas mas retidas até revisão. */
+/** Respostas administrativamente sensíveis — geradas mas retidas até revisão.
+ *  2026-10: libertadas 8 após revisão do mantenedor. Ficam retidas apenas
+ *  as duas que dependem das lacunas em docs/lacunas-conteudo.md. */
 const SENSIVEIS = new Set([
-  "aima-residencia",
-  "irn-nacionalidade",
-  "vis-tipos",
-  "vis-agendar-aima",
-  "ue-mudar",
-  "ue-cesd",
-  "irs-entregar",
-  "irs-reembolso",
   "at-nif",
   "at-certidao-domicilio",
 ]);
@@ -193,8 +187,15 @@ for (const tema of TEMAS) {
     const prev = existente[p.id];
     if (prev && prev.hashOrigem === hash && !FORCAR.has(p.id)) {
       // Mesmo mantida, passa pelo pós-processamento do glossário —
-      // corrige variantes antigas sem nova chamada ao LLM.
-      saida[p.id] = { ...prev, ...normalizarRespostaEn(prev, p.id) };
+      // corrige variantes antigas sem nova chamada ao LLM. A marca
+      // `revisao` é recalculada a partir de SENSIVEIS (não herdada,
+      // para uma regeneração não repor uma marca já libertada).
+      saida[p.id] = {
+        ...prev,
+        ...normalizarRespostaEn(prev, p.id),
+        ...(SENSIVEIS.has(p.id) ? { revisao: true } : {}),
+      };
+      if (!SENSIVEIS.has(p.id)) delete saida[p.id].revisao;
       mantidas++;
       continue;
     }

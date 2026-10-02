@@ -1,7 +1,7 @@
-import { TEMAS } from "@/lib/data/temas";
-import { TEMAS_EN } from "@/lib/data/temas.en";
-import type { Fonte, Pergunta, Tema } from "@/lib/types";
-import type { Lang } from "@/lib/i18n";
+import { TEMAS } from "./data/temas.ts";
+import { TEMAS_EN } from "./data/temas.en.ts";
+import type { Fonte, Pergunta, Tema } from "./types";
+import type { Lang } from "./i18n";
 
 export interface Sugestao {
   id: string;
@@ -218,8 +218,11 @@ Regras:
 
 export class LlmEngine implements AnswerEngine {
   private fallback = new KeywordEngine();
+  private cfg: LlmConfig;
 
-  constructor(private cfg: LlmConfig) {}
+  constructor(cfg: LlmConfig) {
+    this.cfg = cfg;
+  }
 
   async responder(
     pergunta: string,
