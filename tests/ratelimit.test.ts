@@ -9,14 +9,21 @@ import {
   type RedisMin,
 } from "../lib/ratelimit.ts";
 
-/** Fake Redis em memória — mesmo contrato incr/get/pexpire/pttl/pexpireat. */
+/** Fake Redis em memória — mesmo contrato incr/get/pexpire/pttl/pexpireat.
+ *  O relógio é injetado (`agora`) para os testes serem independentes
+ *  do Date.now() real — nunca ler o relógio do sistema aqui. */
 class FakeRedis implements RedisMin {
   store = new Map<string, { v: number; expiraEm?: number }>();
   falhar = false;
+  agora: () => number;
+
+  constructor(agora: () => number = () => Date.now()) {
+    this.agora = agora;
+  }
 
   private entry(key: string) {
     let e = this.store.get(key);
-    if (e?.expiraEm && e.expiraEm <= Date.now()) {
+    if (e?.expiraEm && e.expiraEm <= this.agora()) {
       this.store.delete(key);
       e = undefined;
     }
@@ -35,17 +42,22 @@ class FakeRedis implements RedisMin {
   }
   async get(key: string) {
     this.maybeFail();
-    return this.store.get(key)?.v ?? null;
+    const e = this.store.get(key);
+    if (!e || (e.expiraEm !== undefined && e.expiraEm <= this.agora()))
+      return null;
+    return e.v;
   }
   async pexpire(key: string, ms: number) {
     this.maybeFail();
-    this.entry(key).expiraEm = Date.now() + ms;
+    this.entry(key).expiraEm = this.agora() + ms;
     return 1;
   }
   async pttl(key: string) {
     this.maybeFail();
     const e = this.store.get(key);
-    return e?.expiraEm ? e.expiraEm - Date.now() : -1;
+    if (!e || (e.expiraEm !== undefined && e.expiraEm <= this.agora()))
+      return -2; // chave não existe (expirada)
+    return e.expiraEm !== undefined ? e.expiraEm - this.agora() : -1;
   }
   async pexpireat(key: string, unixMs: number) {
     this.maybeFail();
@@ -140,11 +152,12 @@ test("Upstash: a exceder devolve 429 com retryAfter do TTL", async () => {
 });
 
 test("Upstash: chave tem TTL da janela (pexpire na 1.ª contagem)", async () => {
-  const redis = new FakeRedis();
+  const t0 = Date.UTC(2026, 9, 1, 10, 0, 0);
+  const redis = new FakeRedis(() => t0);
   const l = new UpstashRateLimiter(redis, new MemoryRateLimiter());
-  await l.check("ip-ttl", 5, 60_000);
+  await l.check("ip-ttl", 5, 60_000, t0);
   const e = redis.store.get("ze:rl:ip-ttl");
-  assert.ok(e?.expiraEm && e.expiraEm > Date.now() && e.expiraEm <= Date.now() + 60_000);
+  assert.equal(e?.expiraEm, t0 + 60_000);
 });
 
 test("Upstash em baixo: fail-open para memória (pedido passa)", async () => {
@@ -158,16 +171,30 @@ test("Upstash em baixo: fail-open para memória (pedido passa)", async () => {
   assert.equal((await l.check("ip-z", 2, 60_000)).restantes, 0);
 });
 
-test("Contador diário Redis: conta, esgota e expira à meia-noite UTC", async () => {
-  const redis = new FakeRedis();
-  const c = new ContadorDiarioRedis(redis);
-  const t0 = Date.UTC(2026, 9, 1, 10, 0, 0);
-  assert.equal(await c.verificar(2, true, t0), true);
-  assert.equal(await c.verificar(2, true, t0), true);
-  assert.equal(await c.verificar(2, false, t0), false); // esgotou
-  const e = redis.store.get("ze:llm:2026-10-01");
-  assert.equal(e?.expiraEm, Date.UTC(2026, 9, 2, 0, 0, 0)); // meia-noite UTC
-});
+for (const t0 of [
+  Date.UTC(2026, 9, 1, 10, 0, 0),
+  Date.UTC(2030, 5, 15, 10, 0, 0),
+  Date.UTC(2024, 0, 31, 23, 30, 0),
+]) {
+  test(`Contador diário Redis: conta, esgota e expira à meia-noite UTC (t0=${new Date(t0).toISOString()})`, async () => {
+    const redis = new FakeRedis(() => t0);
+    const c = new ContadorDiarioRedis(redis);
+    const dia = new Date(t0).toISOString().slice(0, 10);
+    assert.equal(await c.verificar(2, true, t0), true);
+    assert.equal(await c.verificar(2, true, t0), true);
+    assert.equal(await c.verificar(2, false, t0), false); // esgotou
+    const meiaNoite = new Date(t0);
+    meiaNoite.setUTCHours(24, 0, 0, 0);
+    const e = redis.store.get(`ze:llm:${dia}`);
+    assert.equal(e?.expiraEm, meiaNoite.getTime());
+    // passada a meia-noite UTC, a chave expira e o contador reinicia
+    const dia2 = meiaNoite.getTime() + 60_000;
+    const redis2 = new FakeRedis(() => dia2);
+    redis2.store = redis.store;
+    const c2 = new ContadorDiarioRedis(redis2);
+    assert.equal(await c2.verificar(2, true, dia2), true);
+  });
+}
 
 test("Contador diário Redis em baixo: fail-closed → KeywordEngine", async () => {
   const redis = new FakeRedis();
