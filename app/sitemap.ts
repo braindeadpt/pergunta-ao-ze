@@ -1,7 +1,8 @@
 import type { MetadataRoute } from "next";
 import { TEMAS } from "@/lib/data/temas";
+import { SITE_URL } from "@/lib/site";
 
-const BASE = "https://perguntaaoze.vercel.app";
+const BASE = SITE_URL;
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const rotas = ["", "/chat", "/fontes", "/p", "/privacidade", "/termos"];

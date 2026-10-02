@@ -177,7 +177,7 @@ export default async function OgImage() {
           </div>
 
           <span style={{ fontSize: 26, color: "#3d3a34" }}>
-            perguntaaoze.vercel.app
+            perguntaaoze.pt
           </span>
         </div>
 

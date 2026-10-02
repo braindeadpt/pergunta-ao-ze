@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { TEMAS } from "@/lib/data/temas";
 import { contactosDeFontes } from "@/lib/contactos";
+import { SITE_URL } from "@/lib/site";
 import ZePersonagem from "@/components/ZePersonagem";
 
 /* Uma página estática por pergunta curada — /p/<id da pergunta> */
@@ -68,7 +69,7 @@ export default async function PaginaPergunta({
       },
     },
   };
-  const BASE = "https://perguntaaoze.vercel.app";
+  const BASE = SITE_URL;
   const breadcrumbLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",

@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { SITE_URL } from "@/lib/site";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -39,7 +40,7 @@ export const metadata: Metadata = {
   },
   description:
     "O Zé responde a perguntas sobre serviços públicos portugueses e indica as páginas oficiais por onde começar. Projeto independente.",
-  metadataBase: new URL("https://perguntaaoze.vercel.app"),
+  metadataBase: new URL(SITE_URL),
   openGraph: {
     type: "website",
     locale: "pt_PT",

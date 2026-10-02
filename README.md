@@ -1,6 +1,6 @@
 # Pergunta ao Zé
 
-[![Site](https://img.shields.io/badge/site-perguntaaoze.vercel.app-046a38)](https://perguntaaoze.vercel.app)
+[![Site](https://img.shields.io/badge/site-perguntaaoze.pt-046a38)](https://perguntaaoze.pt)
 [![Licença: MIT](https://img.shields.io/badge/licen%C3%A7a-MIT-blue)](LICENSE)
 [![Next.js](https://img.shields.io/badge/Next.js-15-black)](https://nextjs.org)
 
@@ -18,7 +18,7 @@ Projeto independente — não é um site do Estado.
 
 ## Live
 
-**https://perguntaaoze.vercel.app**
+**https://perguntaaoze.pt**
 
 ## Stack
 
