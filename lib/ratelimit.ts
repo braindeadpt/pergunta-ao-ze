@@ -226,6 +226,10 @@ function criarRedis(): RedisMin | null {
 
 const redis = criarRedis();
 
+/** Cliente Redis partilhado (Upstash/Vercel KV), ou null sem envs — usado
+ *  também pelo contador de stats em lib/stats.ts. */
+export const redisCliente: RedisMin | null = redis;
+
 export const limiter: RateLimiter = redis
   ? new UpstashRateLimiter(redis, memoria)
   : memoria;

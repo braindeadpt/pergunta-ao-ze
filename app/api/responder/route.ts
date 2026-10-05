@@ -9,6 +9,7 @@ import {
   JANELA_MS,
   MAX_LLM_CALLS_PER_DAY,
 } from "@/lib/ratelimit";
+import { registarResposta } from "@/lib/stats";
 
 const MAX_BODY_BYTES = 8 * 1024;
 const keywordFallback = new KeywordEngine();
@@ -66,5 +67,8 @@ export async function POST(request: Request) {
   if (resultado.via === "llm") {
     await contadorLlm.verificar(MAX_LLM_CALLS_PER_DAY, true);
   }
+  // Contadores diários de uso (ze:st:*, 90 dias). Nunca lança — stats
+  // não podem partir a resposta ao utilizador.
+  await registarResposta(resultado);
   return NextResponse.json(resultado);
 }

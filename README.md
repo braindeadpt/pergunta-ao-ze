@@ -100,6 +100,20 @@ Exceção: o teto diário do LLM falha *fechado* — se o contador não responde
 o site responde só com o KeywordEngine. Confirma nos logs de arranque:
 com Redis não há aviso; sem ele aparece `[ratelimit] Sem UPSTASH_REDIS_…`.
 
+### Uso diário (stats)
+
+Com Redis ativo, cada resposta servida incrementa contadores do dia UTC
+(`ze:st:{dia}:{total,llm,kw,en,sug}`, retidos 90 dias). Para consultar
+define `STATS_TOKEN` na Vercel e pede:
+
+```
+curl -H "Authorization: Bearer $STATS_TOKEN" \
+  "https://perguntaaoze.pt/api/stats?ultimos=7"
+# ou ?dia=2026-10-04 — devolve também llmHoje/llmTeto
+```
+
+Sem Redis, o registo é no-op e o endpoint devolve 503.
+
 ## Estrutura
 
 ```
