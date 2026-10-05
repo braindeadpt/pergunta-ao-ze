@@ -57,6 +57,15 @@ export const TITULOS_EN: Record<string, string> = {
   "rec-regulador": "When should I complain to the regulator instead of the Complaints Book?",
   "tra-navegante": "How do I get the Navegante travel pass?",
   "tra-descontos": "What discounts exist on public transport?",
+  // Entradas novas sem tradução gerada — títulos prontos para quando o
+  // gerar-temas-en.mjs produzir as respostas EN.
+  "cc-perdido": "I lost my Citizen Card or it was stolen. What do I do?",
+  "at-efatura": "How do I check and register invoices on e-Fatura?",
+  "sns-utente": "How do I find my SNS user number?",
+  "imt-pontos": "How do I check the points on my driving licence?",
+  "cert-nascimento": "A baby was born: how do I register the birth?",
+  "hab-imi": "How do I check and pay the IMI (property tax)?",
+  "rec-cancelar-contrato": "How do I cancel a telecoms contract?",
 };
 
 /** Título do tema em EN para breadcrumbs e índice (tema.id → título). */

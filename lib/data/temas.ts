@@ -81,6 +81,35 @@ export const TEMAS: Tema[] = [
           ],
         },
       },
+      {
+        id: "cc-perdido",
+        texto: "Perdi o Cartão de Cidadão ou furtaram-mo. O que faço?",
+        palavras: [
+          "perdi", "perdido", "furtado", "roubado", "furto", "roubo",
+          "segunda", "via", "cancelar", "cartao", "cidadao", "carteira",
+        ],
+        resposta: {
+          passos: [
+            "Primeiro cancela o cartão — online no ePortugal, presencialmente, ou pela Linha Cartão de Cidadão (+351) 210 990 111, que funciona 24h, todos os dias.",
+            "Se foi furto, participa à polícia (PSP ou GNR) — a participação oficializa o furto junto das autoridades.",
+            "Depois pedes a substituição: online no ePortugal (casos de perda, destruição, roubo ou furto) ou presencialmente num balcão do IRN, Espaço de Registos ou Loja do Cidadão.",
+            "Se perdeste a carteira toda, o balcão «Perdi a Carteira» da Loja de Cidadão das Laranjeiras trata de vários documentos de uma vez — funciona por agendamento.",
+          ],
+          nota: "O cancelamento online deve ser feito nos 10 dias seguintes à perda ou furto.",
+          fontes: [
+            {
+              titulo: "Pedir a 2.ª via de documentos perdidos ou roubados — gov.pt",
+              url: "https://www.gov.pt/guias/pedir-a-2-a-via-de-documentos-perdidos-ou-roubados",
+              dominio: "gov.pt",
+            },
+            {
+              titulo: "Renovar o Cartão de Cidadão — gov.pt",
+              url: "https://www.gov.pt/servicos/renovar-o-cartao-de-cidadao",
+              dominio: "gov.pt",
+            },
+          ],
+        },
+      },
     ],
   },
   {
@@ -324,6 +353,35 @@ export const TEMAS: Tema[] = [
           ],
         },
       },
+      {
+        id: "at-efatura",
+        texto: "Como consulto e registo faturas no e-fatura?",
+        palavras: [
+          "efatura", "fatura", "faturas", "validar", "registar", "consultar",
+          "deducoes", "nif", "despesas", "irs", "financas",
+        ],
+        resposta: {
+          passos: [
+            "Entra no portal e-Fatura (faturas.portaldasfinancas.gov.pt) ou na app e-Fatura — com senha das Finanças, Chave Móvel Digital ou Cartão de Cidadão.",
+            "Em «Verificar faturas» vês as emitidas com o teu NIF; valida ou corrige a classificação das pendentes (saúde, educação, habitação…).",
+            "As que não aparecerem podes registar tu — na app até pelo código QR da fatura, mesmo que não tenhas pedido com NIF.",
+            "Para efeitos de IRS, a validação do ano deve estar feita até ao fim de fevereiro seguinte; a partir de 15 de março já consultas as despesas consideradas nas deduções.",
+          ],
+          nota: "Se tens atividade independente, marca se cada despesa foi feita no âmbito da atividade — muda a dedução.",
+          fontes: [
+            {
+              titulo: "e-Fatura — Portal das Finanças",
+              url: "https://faturas.portaldasfinancas.gov.pt/",
+              dominio: "faturas.portaldasfinancas.gov.pt",
+            },
+            {
+              titulo: "e-Fatura — ajuda do Portal das Finanças",
+              url: "https://info.portaldasfinancas.gov.pt/pt/apoio_ao_contribuinte/Cidadaos/Rendimentos/Declaracao/e_Fatura/Paginas/default.aspx",
+              dominio: "portaldasfinancas.gov.pt",
+            },
+          ],
+        },
+      },
     ],
   },
   {
@@ -482,6 +540,33 @@ export const TEMAS: Tema[] = [
           ],
         },
       },
+      {
+        id: "sns-utente",
+        texto: "Como sei o meu número de utente do SNS?",
+        palavras: [
+          "utente", "numero", "sns", "saude", "registo", "rnu",
+          "identificacao", "cartao", "consultar",
+        ],
+        resposta: {
+          passos: [
+            "Se tens Cartão de Cidadão, o número nacional de utente está no verso do cartão — é atribuído automaticamente quando pedes o CC.",
+            "Também o consultas na área pessoal do portal SNS 24 ou na app SNS 24, na informação do teu registo (RNU).",
+            "Cidadãos estrangeiros sem CC: o número é atribuído na primeira vez que fores a uma unidade pública do SNS (centro de saúde ou hospital) — leva um documento de identificação.",
+          ],
+          fontes: [
+            {
+              titulo: "Obter o número de utente do SNS — gov.pt",
+              url: "https://www.gov.pt/servicos/pedir-o-numero-de-utente-do-sns",
+              dominio: "gov.pt",
+            },
+            {
+              titulo: "Portal SNS 24 — área pessoal",
+              url: "https://www.sns24.gov.pt",
+              dominio: "sns24.gov.pt",
+            },
+          ],
+        },
+      },
     ],
   },
   {
@@ -563,6 +648,34 @@ export const TEMAS: Tema[] = [
               titulo: "Automóvel Online",
               url: "https://www.automovelonline.mj.pt",
               dominio: "automovelonline.mj.pt",
+            },
+          ],
+        },
+      },
+      {
+        id: "imt-pontos",
+        texto: "Como consulto os pontos da minha carta de condução?",
+        palavras: [
+          "pontos", "carta", "conducao", "infracoes", "contraordenacoes",
+          "registo", "pontuacao", "ansr", "multas", "retirar",
+        ],
+        resposta: {
+          passos: [
+            "Regista-te no Portal de Contraordenações Rodoviárias (ANSR) — com Cartão de Cidadão (leitor) ou Chave Móvel Digital.",
+            "Lá vês os pontos da tua carta, os processos de contraordenação e o teu registo de infrações.",
+            "A carta por pontos começa com 12 pontos; as infrações graves tiram 3 e as muito graves 5.",
+            "Se estiveres registado e os pontos não aparecerem, envia email à ANSR (mail@ansr.pt) com o teu NIF.",
+          ],
+          fontes: [
+            {
+              titulo: "Portal de Contraordenações Rodoviárias — ANSR",
+              url: "https://portalcontraordenacoes.ansr.pt/",
+              dominio: "portalcontraordenacoes.ansr.pt",
+            },
+            {
+              titulo: "Consultar os pontos da carta de condução — gov.pt",
+              url: "https://www.gov.pt/servicos/consultar-os-pontos-da-carta-de-conducao",
+              dominio: "gov.pt",
             },
           ],
         },
@@ -743,6 +856,35 @@ export const TEMAS: Tema[] = [
               titulo: "Predial Online — Registos IRN",
               url: "https://www.predialonline.pt",
               dominio: "predialonline.pt",
+            },
+          ],
+        },
+      },
+      {
+        id: "cert-nascimento",
+        texto: "Nasceu um bebé: como faço o registo de nascimento?",
+        palavras: [
+          "nascimento", "bebe", "registar", "registo", "nascer", "cidadao",
+          "maternidade", "recem", "nascido", "crianca", "hospital",
+        ],
+        resposta: {
+          passos: [
+            "O mais simples é logo na maternidade: o balcão «Nascer Cidadão» regista o bebé e pede o primeiro Cartão de Cidadão — tudo grátis, antes da mãe ter alta.",
+            "Se não houver balcão, pedes online (nascimento.justica.gov.pt, com Chave Móvel Digital) ou em qualquer conservatória do registo civil.",
+            "O prazo é de 20 dias após o nascimento. Precisas da declaração da maternidade/hospital e da identificação dos pais.",
+            "No registo escolhes o nome (até 2 nomes próprios e 4 apelidos) e a naturalidade do bebé.",
+          ],
+          nota: "O registo é obrigatório e gratuito — e o primeiro Cartão de Cidadão de criança até 1 ano também é grátis.",
+          fontes: [
+            {
+              titulo: "Nascer Cidadão — justica.gov.pt",
+              url: "https://justica.gov.pt/Servicos/Nascer-Cidadao",
+              dominio: "justica.gov.pt",
+            },
+            {
+              titulo: "Declaração de nascimento online",
+              url: "https://nascimento.justica.gov.pt/nascimento",
+              dominio: "nascimento.justica.gov.pt",
             },
           ],
         },
@@ -1010,6 +1152,35 @@ export const TEMAS: Tema[] = [
           fontes: [
             {
               titulo: "Arrendamento — Portal das Finanças",
+              url: "https://www.portaldasfinancas.gov.pt",
+              dominio: "portaldasfinancas.gov.pt",
+            },
+          ],
+        },
+      },
+      {
+        id: "hab-imi",
+        texto: "Como consulto e pago o IMI?",
+        palavras: [
+          "imi", "imposto", "imovel", "municipal", "pagar", "nota",
+          "cobranca", "predial", "caderneta", "isencao",
+        ],
+        resposta: {
+          passos: [
+            "No Portal das Finanças (senha, Chave Móvel Digital ou CC): a nota de cobrança do IMI está em «Imóveis» → «Consultar Notas de Cobrança» ou em «Pagamentos a decorrer».",
+            "A nota tem o valor, o prazo e as referências — pagas por multibanco, MB Way, homebanking ou débito direto.",
+            "Presencialmente, pagas num balcão das Finanças ou Espaço Cidadão.",
+            "Para isenções ou a caderneta predial, consulta a área «Imóveis» do portal.",
+          ],
+          nota: "O IMI é anual — conforme o valor pode ser pago em prestações; confirma na nota de cobrança.",
+          fontes: [
+            {
+              titulo: "Pagar o IMI — gov.pt",
+              url: "https://www.gov.pt/servicos/pagar-o-imposto-municipal-sobre-imoveis-imi-",
+              dominio: "gov.pt",
+            },
+            {
+              titulo: "Portal das Finanças — Imóveis",
               url: "https://www.portaldasfinancas.gov.pt",
               dominio: "portaldasfinancas.gov.pt",
             },
@@ -1337,6 +1508,35 @@ export const TEMAS: Tema[] = [
               titulo: "Reclamações — ePortugal",
               url: "https://eportugal.gov.pt",
               dominio: "eportugal.gov.pt",
+            },
+          ],
+        },
+      },
+      {
+        id: "rec-cancelar-contrato",
+        texto: "Como rescindo um contrato de telecomunicações?",
+        palavras: [
+          "cancelar", "rescindir", "contrato", "operadora", "fidelizacao",
+          "cessacao", "telecomunicacoes", "net", "telemovel", "tv",
+        ],
+        resposta: {
+          passos: [
+            "Confirma primeiro se tens fidelização ativa — na área de cliente da operadora. Cancelar durante a fidelização pode ter penalização (há exceções legais, p.ex. desemprego ou emigração).",
+            "A via oficial é a Plataforma de Cessação de Contratos (cessacaodecontratos.pt), gerida pela Direção-Geral do Consumidor — autenticas com Chave Móvel Digital ou Cartão de Cidadão.",
+            "O processo na plataforma tem duas etapas: pedido de informação contratual e depois o pedido de cessação (denúncia).",
+            "Também podes rescindir diretamente à operadora — área de cliente, loja, carta ou linha de apoio. Guarda sempre prova do pedido.",
+          ],
+          nota: "Se discordares do valor cobrado, recorre a um Centro de Arbitragem de Conflitos de Consumo — é gratuito.",
+          fontes: [
+            {
+              titulo: "Plataforma de Cessação de Contratos",
+              url: "https://www.cessacaodecontratos.pt",
+              dominio: "cessacaodecontratos.pt",
+            },
+            {
+              titulo: "ANACOM — regulador das comunicações",
+              url: "https://www.anacom.pt",
+              dominio: "anacom.pt",
             },
           ],
         },
