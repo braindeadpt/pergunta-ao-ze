@@ -3,23 +3,33 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { TEMAS } from "@/lib/data/temas";
 import { TEMAS_EN } from "@/lib/data/temas.en";
+import { TITULOS_EN, TEMAS_TITULO_EN } from "@/lib/data/titulos.en";
 import { contactosDeFontes } from "@/lib/contactos";
 import { SITE_URL } from "@/lib/site";
 import ZePersonagem from "@/components/ZePersonagem";
 import Partilhar from "@/components/Partilhar";
 
-/* Uma página estática por pergunta curada — /p/<id da pergunta> */
+/* One static page per curated question, in English — /en/p/<id>.
+   Entries kept for review (revisao: true) stay PT-only → 404 here. */
 
 function encontrar(slug: string) {
   for (const tema of TEMAS) {
     const pergunta = tema.perguntas.find((p) => p.id === slug);
-    if (pergunta) return { tema, pergunta };
+    if (pergunta) {
+      const en = TEMAS_EN[slug];
+      if (!en || en.revisao || !TITULOS_EN[slug]) return null;
+      return { tema, pergunta, en };
+    }
   }
   return null;
 }
 
 export function generateStaticParams() {
-  return TEMAS.flatMap((t) => t.perguntas.map((p) => ({ slug: p.id })));
+  return TEMAS.flatMap((t) =>
+    t.perguntas
+      .filter((p) => TEMAS_EN[p.id] && !TEMAS_EN[p.id].revisao && TITULOS_EN[p.id])
+      .map((p) => ({ slug: p.id }))
+  );
 }
 
 export async function generateMetadata({
@@ -30,34 +40,22 @@ export async function generateMetadata({
   const { slug } = await params;
   const hit = encontrar(slug);
   if (!hit) return {};
-  const { tema, pergunta } = hit;
+  const { en } = hit;
   const descricao =
-    pergunta.resposta.passos[0]?.slice(0, 150) ??
-    `${tema.titulo} — ${tema.entidade}`;
-  // hreflang só aponta para EN se a versão inglesa existir (revisao → PT-only)
-  const temEn = !!TEMAS_EN[slug] && !TEMAS_EN[slug].revisao;
+    en.passos[0]?.slice(0, 150) ??
+    "Curated answer about Portuguese public services.";
   return {
-    title: pergunta.texto,
+    title: TITULOS_EN[slug],
     description: descricao,
     alternates: {
-      canonical: `/p/${slug}`,
-      ...(temEn && {
-        languages: {
-          "pt-PT": `/p/${slug}`,
-          en: `/en/p/${slug}`,
-          "x-default": `/p/${slug}`,
-        },
-      }),
+      canonical: `/en/p/${slug}`,
+      languages: { "pt-PT": `/p/${slug}`, en: `/en/p/${slug}` },
     },
+    openGraph: { locale: "en_GB" },
   };
 }
 
-const geradoEm = new Intl.DateTimeFormat("pt-PT", {
-  month: "long",
-  year: "numeric",
-}).format(new Date());
-
-export default async function PaginaPergunta({
+export default async function PaginaPerguntaEn({
   params,
 }: {
   params: Promise<{ slug: string }>;
@@ -65,9 +63,15 @@ export default async function PaginaPergunta({
   const { slug } = await params;
   const hit = encontrar(slug);
   if (!hit) notFound();
-  const { tema, pergunta } = hit;
+  const { tema, pergunta, en } = hit;
+  const titulo = TITULOS_EN[slug];
+  const temaTitulo = TEMAS_TITULO_EN[tema.id] ?? tema.titulo;
 
-  const relacionadas = tema.perguntas.filter((p) => p.id !== slug).slice(0, 3);
+  const relacionadas = tema.perguntas
+    .filter(
+      (p) => p.id !== slug && TEMAS_EN[p.id] && !TEMAS_EN[p.id].revisao && TITULOS_EN[p.id]
+    )
+    .slice(0, 3);
   const contactos = contactosDeFontes(pergunta.resposta.fontes);
 
   const faqLd = {
@@ -75,10 +79,10 @@ export default async function PaginaPergunta({
     "@type": "FAQPage",
     mainEntity: {
       "@type": "Question",
-      name: pergunta.texto,
+      name: titulo,
       acceptedAnswer: {
         "@type": "Answer",
-        text: pergunta.resposta.passos.join(" "),
+        text: en.passos.join(" "),
       },
     },
   };
@@ -87,9 +91,9 @@ export default async function PaginaPergunta({
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Início", item: BASE },
-      { "@type": "ListItem", position: 2, name: tema.titulo, item: `${BASE}/#temas` },
-      { "@type": "ListItem", position: 3, name: pergunta.texto, item: `${BASE}/p/${slug}` },
+      { "@type": "ListItem", position: 1, name: "Home", item: BASE },
+      { "@type": "ListItem", position: 2, name: temaTitulo, item: `${BASE}/en/p` },
+      { "@type": "ListItem", position: 3, name: titulo, item: `${BASE}/en/p/${slug}` },
     ],
   };
 
@@ -104,57 +108,57 @@ export default async function PaginaPergunta({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
       />
 
-      {/* Breadcrumb — Início > Tema > Pergunta */}
-      <nav aria-label="Caminho" className="font-mono text-sm text-stone-600">
+      {/* Breadcrumb — Home > Topic > Question */}
+      <nav aria-label="Breadcrumb" className="font-mono text-sm text-stone-600">
         <Link href="/" className="underline decoration-stone-300 underline-offset-2 hover:text-ink">
-          Início
+          Home
         </Link>
         <span aria-hidden> › </span>
-        <Link href="/#temas" className="underline decoration-stone-300 underline-offset-2 hover:text-ink">
-          {tema.titulo}
+        <Link href="/en/p" className="underline decoration-stone-300 underline-offset-2 hover:text-ink">
+          {temaTitulo}
         </Link>
         <span aria-hidden> › </span>
-        <span className="text-ink">{pergunta.texto}</span>
+        <span className="text-ink">{titulo}</span>
       </nav>
 
-      {/* Senha da página — a moldura é a piada, a resposta é séria */}
       <div className="mt-6 flex items-start gap-4">
         <div className="min-w-0 flex-1">
           <p aria-hidden className="font-mono text-sm font-bold uppercase tracking-[0.25em] text-carimbo-tinta">
-            ▸ Página de resposta · {tema.entidade}
+            ▸ Answer page · {tema.entidade}
           </p>
           <h1 className="mt-2 font-display text-3xl uppercase leading-tight tracking-tight sm:text-4xl">
-            {pergunta.texto}
+            {titulo}
           </h1>
           <p className="mt-3 text-base text-stone-600">
-            Resposta curada do tema «{tema.titulo}».{" "}
-            <span className="font-mono text-sm">
-              Gerado a partir da base curada em {geradoEm}.
-            </span>
+            Curated answer from the topic «{temaTitulo}».
           </p>
         </div>
         <ZePersonagem estado="normal" className="hidden w-24 shrink-0 self-start sm:block" />
       </div>
 
-      {/* Ficha de resposta — sóbria */}
       <article className="mt-6 rounded-lg border-2 border-ink bg-white px-5 py-5 shadow-[4px_4px_0_#1b1d22]">
         <p aria-hidden className="font-mono text-xs font-bold uppercase tracking-widest text-stone-600">
-          {tema.entidade} · {tema.titulo}
+          {tema.entidade} · {temaTitulo}
         </p>
         <ul className="mt-3 list-disc space-y-2 pl-5 text-base leading-relaxed">
-          {pergunta.resposta.passos.map((p, i) => (
+          {en.passos.map((p, i) => (
             <li key={i}>{p}</li>
           ))}
         </ul>
-        {pergunta.resposta.nota && (
+        {en.nota && (
           <p className="mt-3 rounded-md border-2 border-dashed border-amber-400/60 bg-amber-50 px-3 py-2 text-sm text-amber-900">
-            {pergunta.resposta.nota}
+            {en.nota}
           </p>
         )}
 
+        <p className="mt-3 rounded-md border-2 border-dashed border-azulejo/40 bg-azulejo-suave px-3 py-2 text-sm text-azulejo">
+          Automatically translated. Always confirm on the official Portuguese
+          source.
+        </p>
+
         <div className="mt-4 space-y-2 border-t-2 border-dashed border-ink/15 pt-3">
           <p className="font-mono text-sm font-bold uppercase tracking-widest text-esferografica">
-            Fontes oficiais
+            Official sources
           </p>
           {pergunta.resposta.fontes.map((f, i) => (
             <a
@@ -179,7 +183,7 @@ export default async function PaginaPergunta({
             {contactos.map((c) => (
               <p key={c.telefone}>
                 <span className="font-mono text-sm font-bold uppercase tracking-wider text-ink">
-                  Ligar — {c.entidades.join(" · ")}:
+                  Call — {c.entidades.join(" · ")}:
                 </span>{" "}
                 {c.telefone}
                 {c.horario && (
@@ -191,40 +195,39 @@ export default async function PaginaPergunta({
         )}
       </article>
 
-      {/* CTA + relacionadas */}
       <div className="mt-6 flex flex-wrap items-center gap-4">
         <Link
-          href={`/chat?q=${encodeURIComponent(pergunta.texto)}`}
+          href={`/chat?q=${encodeURIComponent(titulo)}`}
           className="btn-primary px-5 py-2.5 text-sm"
         >
-          Pergunta mais ao Zé →
+          Ask Zé more →
         </Link>
         <Link
-          href="/p"
+          href="/en/p"
           className="font-mono text-sm text-azulejo underline underline-offset-2"
         >
-          Todas as perguntas
+          All questions
         </Link>
         <Partilhar
-          texto={pergunta.texto}
-          url={`${SITE_URL}/p/${slug}`}
-          etiqueta="Partilhar no WhatsApp"
+          texto={titulo}
+          url={`${SITE_URL}/en/p/${slug}`}
+          etiqueta="Share on WhatsApp"
         />
       </div>
 
       {relacionadas.length > 0 && (
         <div className="mt-8">
           <p className="font-mono text-sm font-bold uppercase tracking-[0.2em] text-carimbo-tinta">
-            ▸ Do mesmo balcão
+            ▸ From the same counter
           </p>
           <ul className="mt-3 space-y-2">
             {relacionadas.map((p) => (
               <li key={p.id}>
                 <Link
-                  href={`/p/${p.id}`}
+                  href={`/en/p/${p.id}`}
                   className="inline-block rounded-md border-2 border-ink/25 bg-white px-3 py-2 text-sm font-medium transition-colors hover:border-ink hover:bg-form-amarelo/30"
                 >
-                  {p.texto}
+                  {TITULOS_EN[p.id]}
                 </Link>
               </li>
             ))}
@@ -233,8 +236,8 @@ export default async function PaginaPergunta({
       )}
 
       <p className="mt-10 border-t-2 border-dashed border-ink/20 pt-4 text-sm text-stone-600">
-        Informação de orientação — confirma sempre na fonte oficial antes de
-        agir.
+        Guidance only — always confirm on the official source before acting.
+        Independent project, not a government website.
       </p>
     </div>
   );

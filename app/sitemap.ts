@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { TEMAS } from "@/lib/data/temas";
+import { TEMAS_EN } from "@/lib/data/temas.en";
 import { SITE_URL } from "@/lib/site";
 
 const BASE = SITE_URL;
@@ -13,6 +14,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     changeFrequency: "weekly",
     priority: rota === "" ? 1 : 0.7,
   }));
+  paginas.push({
+    url: `${BASE}/en/p`,
+    lastModified: agora,
+    changeFrequency: "monthly",
+    priority: 0.6,
+  });
   for (const tema of TEMAS) {
     for (const p of tema.perguntas) {
       paginas.push({
@@ -21,6 +28,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
         changeFrequency: "monthly",
         priority: 0.6,
       });
+      const en = TEMAS_EN[p.id];
+      if (en && !en.revisao) {
+        paginas.push({
+          url: `${BASE}/en/p/${p.id}`,
+          lastModified: agora,
+          changeFrequency: "monthly",
+          priority: 0.5,
+        });
+      }
     }
   }
   return paginas;
