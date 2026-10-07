@@ -3,6 +3,8 @@ import ZePersonagem from "@/components/ZePersonagem";
 
 export const metadata: Metadata = {
   title: "Termos de utilização",
+  description:
+    "O que o Pergunta ao Zé é (orientação com fontes oficiais) e não é (serviço do Estado nem aconselhamento jurídico).",
 };
 
 const SECCOES = [

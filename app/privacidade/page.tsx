@@ -3,6 +3,8 @@ import ZePersonagem from "@/components/ZePersonagem";
 
 export const metadata: Metadata = {
   title: "Privacidade",
+  description:
+    "O que acontece à tua pergunta: sem contas, sem cookies de rastreamento, sem guardar dados pessoais.",
 };
 
 const SECCOES = [

@@ -4,6 +4,8 @@ import Chat from "@/components/Chat";
 
 export const metadata: Metadata = {
   title: "Falar com o Zé",
+  description:
+    "Pergunta em português normal sobre serviços públicos — o Zé indica os passos, a página oficial e os contactos.",
 };
 
 export default function ChatPage() {
