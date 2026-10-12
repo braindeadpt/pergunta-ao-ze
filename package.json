@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "postbuild": "node scripts/injetar-csp.mjs",
     "start": "next start",
     "traduzir:en": "node scripts/gerar-temas-en.mjs",
     "test": "node --experimental-strip-types --test tests/*.test.ts"
