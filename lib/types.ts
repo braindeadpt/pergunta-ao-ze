@@ -20,6 +20,20 @@ export interface Pergunta {
   resposta: Resposta;
 }
 
+/** Prazo de calendário para o cidadão — cada data confirmada numa fonte
+ *  oficial. Datas AAAA-MM-DD (calendário em Portugal); `fim` é inclusivo. */
+export interface Prazo {
+  id: string;
+  titulo: string;
+  perguntaId?: string;
+  inicio?: string;
+  fim: string;
+  descricao: string;
+  fonte: Fonte;
+  verificadoEm: string;
+  recorrente?: "anual";
+}
+
 export interface Tema {
   id: string;
   titulo: string;

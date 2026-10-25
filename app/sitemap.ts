@@ -6,7 +6,7 @@ import { SITE_URL } from "@/lib/site";
 const BASE = SITE_URL;
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const rotas = ["", "/chat", "/fontes", "/p", "/privacidade", "/termos"];
+  const rotas = ["", "/chat", "/fontes", "/p", "/prazos", "/privacidade", "/termos"];
   const agora = new Date();
   const paginas: MetadataRoute.Sitemap = rotas.map((rota) => ({
     url: `${BASE}${rota}`,
