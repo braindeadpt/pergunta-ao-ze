@@ -186,7 +186,7 @@ test("entrada com revisao: true nunca é servida em EN (PT + nota)", async () =>
     const r = await engine.responder(tema.texto, "en");
     // a pergunta PT deve encontrar a entrada — e ela não pode vir em EN
     assert.equal(r.tipo, "resposta");
-    if (r.tipo === "resposta" && r.pergunta.id === id) {
+    if (r.tipo === "resposta" && r.pergunta?.id === id) {
       assert.equal(r.idioma, "pt", `${id} servida em EN apesar de revisao`);
       assert.equal(r.soEmPt, true);
     }
