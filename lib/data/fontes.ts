@@ -83,6 +83,11 @@ export const ENTIDADES: Record<string, MetaEntidade> = {
     ambito: "Nacional",
     contacto: { telefone: "215 803 555", horario: "dias úteis, 9h–19h" },
   },
+  "iesuperior.pt": {
+    nome: "IES — Instituto para o Ensino Superior (antiga DGES)",
+    ambito: "Nacional",
+    contacto: { telefone: "213 126 000" },
+  },
   "gov.pt": { nome: "gov.pt — Portal do Governo", ambito: "Nacional", contacto: LINHA_CIDADAO },
   "justica.gov.pt": { nome: "Justiça.gov.pt", ambito: "Nacional", contacto: LINHA_REGISTOS },
   "siga.marcacaodeatendimento.pt": { nome: "Siga — Agendamento de Atendimento", ambito: "Nacional", contacto: LINHA_CIDADAO },
