@@ -83,6 +83,10 @@ export interface RedisMin {
   pexpire(key: string, ms: number): Promise<number>;
   pttl(key: string): Promise<number>;
   pexpireat(key: string, unixMs: number): Promise<number>;
+  /** Listas — usadas pelo registo de perguntas sem resposta (lib/semresposta.ts). */
+  rpush(key: string, ...values: string[]): Promise<number>;
+  lrange(key: string, start: number, stop: number): Promise<string[]>;
+  ltrim(key: string, start: number, stop: number): Promise<string>;
 }
 
 /**

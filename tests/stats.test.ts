@@ -10,6 +10,7 @@ import type { RedisMin } from "../lib/ratelimit.ts";
 /** Fake mínimo do contrato RedisMin usado pelos StatsDiarias. */
 class FakeRedis implements RedisMin {
   store = new Map<string, { v: number; expiraEm?: number }>();
+  listas = new Map<string, string[]>();
   falhar = false;
   async incr(key: string) {
     if (this.falhar) throw new Error("redis em baixo");
@@ -34,6 +35,28 @@ class FakeRedis implements RedisMin {
   }
   async pexpireat() {
     return 1;
+  }
+  async rpush(key: string, ...values: string[]) {
+    if (this.falhar) throw new Error("redis em baixo");
+    const l = this.listas.get(key) ?? [];
+    l.push(...values);
+    this.listas.set(key, l);
+    return l.length;
+  }
+  async lrange(key: string, start: number, stop: number) {
+    if (this.falhar) throw new Error("redis em baixo");
+    const l = this.listas.get(key) ?? [];
+    const ini = Math.max(0, start < 0 ? l.length + start : start);
+    const fim = stop < 0 ? l.length + stop : stop;
+    return l.slice(ini, fim + 1);
+  }
+  async ltrim(key: string, start: number, stop: number) {
+    if (this.falhar) throw new Error("redis em baixo");
+    const l = this.listas.get(key) ?? [];
+    const ini = Math.max(0, start < 0 ? l.length + start : start);
+    const fim = stop < 0 ? l.length + stop : stop;
+    this.listas.set(key, l.slice(ini, fim + 1));
+    return "OK";
   }
 }
 
