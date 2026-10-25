@@ -54,3 +54,24 @@ export function idiomaDoNavegador(): Lang {
     ? "en"
     : "pt";
 }
+
+const MESES_PT = [
+  "jan.", "fev.", "mar.", "abr.", "mai.", "jun.",
+  "jul.", "ago.", "set.", "out.", "nov.", "dez.",
+];
+
+/** "out. 2026" / "Oct 2026" — Intl pt-PT com month:"short" devolve
+ *  "10/2026" nalgumas versões de ICU, daí a lista explícita. */
+export function formatarMesAno(iso: string, lang: Lang): string | null {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(iso)) return null;
+  const mes = Number(iso.slice(5, 7));
+  const ano = iso.slice(0, 4);
+  if (lang === "en") {
+    return new Intl.DateTimeFormat("en-GB", {
+      month: "short",
+      year: "numeric",
+      timeZone: "UTC",
+    }).format(new Date(`${iso}T00:00:00Z`));
+  }
+  return `${MESES_PT[mes - 1]} ${ano}`;
+}

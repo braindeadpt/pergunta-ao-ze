@@ -53,6 +53,7 @@ export async function generateMetadata({
       languages: { "pt-PT": `/p/${slug}`, en: `/en/p/${slug}` },
     },
     openGraph: { locale: "en_GB" },
+    twitter: { card: "summary_large_image" },
   };
 }
 
