@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { TEMAS } from "@/lib/data/temas";
 import { TEMAS_EN } from "@/lib/data/temas.en";
+import { prazoDaPergunta } from "@/lib/data/prazos";
 import { contactosDeFontes } from "@/lib/contactos";
 import { SITE_URL } from "@/lib/site";
 import ZePersonagem from "@/components/ZePersonagem";
@@ -71,6 +72,7 @@ export default async function PaginaPergunta({
 
   const relacionadas = tema.perguntas.filter((p) => p.id !== slug).slice(0, 3);
   const contactos = contactosDeFontes(pergunta.resposta.fontes);
+  const prazo = prazoDaPergunta(slug);
 
   const faqLd = {
     "@context": "https://schema.org",
@@ -198,6 +200,25 @@ export default async function PaginaPergunta({
           </div>
         )}
       </article>
+
+      {prazo && (
+        <div className="mt-4 rounded-lg border-2 border-carimbo bg-white px-5 py-4 shadow-[4px_4px_0_#d5232f]">
+          <p className="font-mono text-xs font-bold uppercase tracking-widest text-carimbo-tinta">
+            ▸ Prazo{" "}
+            {prazo.inicio && prazo.inicio !== prazo.fim
+              ? `${prazo.inicio} → ${prazo.fim}`
+              : `até ${prazo.fim}`}
+          </p>
+          <p className="mt-1 text-sm text-stone-700">{prazo.titulo}</p>
+          <a
+            href={`/prazos/${prazo.id}`}
+            download={`${prazo.id}.ics`}
+            className="mt-2 inline-block btn-outline px-3 py-1.5 text-xs"
+          >
+            Adicionar ao calendário
+          </a>
+        </div>
+      )}
 
       {/* CTA + relacionadas */}
       <div className="mt-6 flex flex-wrap items-center gap-4">

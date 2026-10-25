@@ -147,6 +147,12 @@ export default function Home() {
               >
                 Ver o arquivo de fontes →
               </Link>
+              <Link
+                href="/prazos"
+                className="mt-8 ml-3 inline-block rounded-lg border-2 border-white bg-transparent px-6 py-2.5 font-semibold text-white shadow-[3px_3px_0_rgba(255,255,255,0.35)] transition-all hover:-translate-y-0.5 hover:bg-white hover:text-esferografica hover:shadow-[5px_5px_0_rgba(255,255,255,0.35)]"
+              >
+                Prazos do ano →
+              </Link>
             </div>
             <PainelLED stats={stats} className="-rotate-1" />
           </div>
