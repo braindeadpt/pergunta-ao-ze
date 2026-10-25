@@ -16,10 +16,10 @@ const tema: Tema = {
       ],
       resposta: {
         passos: [
-          "A declaração anual de IRS (Modelo 3) entrega-se no Portal das Finanças, durante o prazo legal — habitualmente de abril a junho. Confirma as datas do ano em curso na fonte.",
+          "A declaração anual de IRS (Modelo 3) entrega-se no Portal das Finanças de 1 de abril a 30 de junho do ano seguinte ao dos rendimentos.",
           "Entra com a senha do Portal das Finanças ou com a Chave Móvel Digital.",
           "Se estiveres abrangido pelo IRS Automático, a declaração vem pré-preenchida: revê e confirma.",
-          "Guarda o comprovativo de entrega. O reembolso, se existir, é pago por transferência para o IBAN registado.",
+          "Guarda o comprovativo de entrega. Se entregares dentro do prazo, o reembolso ou o pagamento está previsto até 31 de agosto; o reembolso é pago por transferência para o IBAN registado.",
         ],
         fontes: [
           {
@@ -28,11 +28,17 @@ const tema: Tema = {
             dominio: "portaldasfinancas.gov.pt",
           },
           {
+            titulo: "Principais prazos do IRS — Portal das Finanças",
+            url: "https://info.portaldasfinancas.gov.pt/pt/apoio_ao_contribuinte/Cidadaos/Rendimentos/Declaracao/prazos/Paginas/default.aspx",
+            dominio: "portaldasfinancas.gov.pt",
+          },
+          {
             titulo: "Entregar a declaração de IRS — gov.pt",
             url: "https://www.gov.pt/servicos/simular-e-entregar-a-declaracao-anual-do-irs",
             dominio: "gov.pt",
           },
         ],
+        verificadoEm: "2026-10-25",
       },
     },
     {
