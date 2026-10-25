@@ -22,9 +22,9 @@ const tema: Tema = {
         ],
         fontes: [
           {
-            titulo: "Viver, trabalhar e viajar na UE — ePortugal",
-            url: "https://eportugal.gov.pt",
-            dominio: "eportugal.gov.pt",
+            titulo: "Viver, trabalhar e viajar na UE — gov.pt",
+            url: "https://www.gov.pt",
+            dominio: "gov.pt",
           },
           {
             titulo: "Os teus direitos na UE — europa.eu",
