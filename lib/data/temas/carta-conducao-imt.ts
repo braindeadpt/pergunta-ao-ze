@@ -71,7 +71,7 @@ const tema: Tema = {
         ],
         fontes: [
           {
-            titulo: "Registar veículo — ePortugal",
+            titulo: "Registar veículo — gov.pt",
             url: "https://www.gov.pt/servicos/registar-veiculo-automovel-servico-automovel-online",
             dominio: "gov.pt",
           },
