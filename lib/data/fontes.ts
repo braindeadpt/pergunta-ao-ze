@@ -116,15 +116,6 @@ export const ENTIDADES: Record<string, MetaEntidade> = {
   "anacom.pt": { nome: "ANACOM", ambito: "Nacional" },
   "registocriminal.justica.gov.pt": { nome: "Registo Criminal Online", ambito: "Nacional", contacto: LINHA_REGISTOS },
   "sg.mai.gov.pt": { nome: "Secretaria-Geral do MAI — Eleições", ambito: "Nacional" },
-  "dges.gov.pt": {
-    nome: "DGES — Ensino Superior",
-    ambito: "Nacional",
-    contacto: {
-      telefone: "213 126 000",
-      horario: "dias úteis, 9h30–12h30",
-      nota: "Balcão eletrónico (BeCom) é o contacto preferencial",
-    },
-  },
   "vistos.mne.gov.pt": { nome: "Portal de Vistos — MNE", ambito: "Nacional" },
   "livroreclamacoes.pt": { nome: "Livro de Reclamações Eletrónico", ambito: "Nacional" },
   "navegante.pt": { nome: "Portal Navegante", ambito: "Nacional" },
