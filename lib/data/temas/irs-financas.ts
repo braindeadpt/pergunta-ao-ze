@@ -28,7 +28,7 @@ const tema: Tema = {
             dominio: "portaldasfinancas.gov.pt",
           },
           {
-            titulo: "Entregar a declaração de IRS — ePortugal",
+            titulo: "Entregar a declaração de IRS — gov.pt",
             url: "https://www.gov.pt/servicos/simular-e-entregar-a-declaracao-anual-do-irs",
             dominio: "gov.pt",
           },
@@ -73,7 +73,7 @@ const tema: Tema = {
         ],
         fontes: [
           {
-            titulo: "Pedir o NIF — ePortugal",
+            titulo: "Pedir o NIF — gov.pt",
             url: "https://www.gov.pt/servicos/pedir-o-numero-de-identificacao-fiscal-para-pessoa-singular",
             dominio: "gov.pt",
           },
