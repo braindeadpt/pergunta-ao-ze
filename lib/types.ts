@@ -32,6 +32,8 @@ export interface Prazo {
   fonte: Fonte;
   verificadoEm: string;
   recorrente?: "anual";
+  /** true = evento informativo («a partir de»), sem lembrete no .ics. */
+  semAlarme?: boolean;
 }
 
 export interface Tema {

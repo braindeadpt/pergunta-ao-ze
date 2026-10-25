@@ -1,0 +1,25 @@
+name: Rebuild diário (prazos)
+
+# A página /prazos e a caixa nas /p/<id> calculam «hoje» no build. Sem deploys
+# regulares, prazos passados continuavam visíveis. Este workflow dispara um
+# Deploy Hook da Vercel todos os dias — sem ISR (regeneração no servidor
+# perderia a meta CSP injetada no postbuild).
+
+on:
+  schedule:
+    - cron: "15 0 * * *"
+  workflow_dispatch:
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Disparar deploy (Deploy Hook da Vercel)
+        env:
+          VERCEL_DEPLOY_HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$VERCEL_DEPLOY_HOOK" ]; then
+            echo "::warning::Secret VERCEL_DEPLOY_HOOK não definido — cria um Deploy Hook na Vercel (Settings → Git → Deploy Hooks) e guarda-o como secret do repo."
+            exit 0
+          fi
+          curl -fsS -X POST "$VERCEL_DEPLOY_HOOK"

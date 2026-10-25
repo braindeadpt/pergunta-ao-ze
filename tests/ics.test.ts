@@ -38,22 +38,46 @@ test("ics: dobrar aos 75 octetos com continuação em espaço", () => {
   }
 });
 
+test("ics: desdobrado, cada linha é uma propriedade completa", () => {
+  const ics = calendarioIcs([P], OPTS);
+  const desdobrado = ics.replace(/\r\n /g, "");
+  for (const l of desdobrado.split("\r\n")) {
+    assert.ok(!l.includes("\n") && !l.includes("\r"), `CRLF dentro da linha: ${l}`);
+  }
+  assert.ok(
+    desdobrado.split("\r\n").some((l) => l.startsWith("SUMMARY:Último dia:")),
+    "sem linha SUMMARY: completa"
+  );
+  assert.ok(
+    desdobrado.split("\r\n").some((l) => l.startsWith("DTEND;VALUE=DATE:20270701")),
+    "sem linha DTEND;VALUE=DATE: completa"
+  );
+});
+
 test("ics: evento de dia inteiro com DTEND exclusivo no fim", () => {
-  const ev = eventoIcs(P, OPTS);
+  const ev = eventoIcs(P, OPTS).join("\r\n");
   assert.match(ev, /SUMMARY:Último dia: Entrega da declaração de IRS 2026/);
   assert.match(ev, /DTSTART;VALUE=DATE:20270630/);
   assert.match(ev, /DTEND;VALUE=DATE:20270701/);
   assert.match(ev, /UID:irs-entrega-2026@perguntaaoze\.pt/);
   assert.match(ev, /DTSTAMP:20261025T100000Z/);
-  assert.match(ev, /TRIGGER;RELATED=END:-P7D/);
+  // relativo ao início do evento (= dia do fim do prazo) → exatamente -7 dias
+  assert.match(ev, /TRIGGER:-P7D\r?\n/);
+  assert.ok(!ev.includes("RELATED=END"));
   assert.match(ev, /Resposta: https:\/\/perguntaaoze\.pt\/p\/irs-entregar/);
   assert.match(ev, /Fonte: https:\/\/info\.portaldasfinancas\.gov\.pt\/x/);
 });
 
 test("ics: prazo sem início usa o título simples", () => {
-  const ev = eventoIcs({ ...P, inicio: undefined }, OPTS);
+  const ev = eventoIcs({ ...P, inicio: undefined }, OPTS).join("\r\n");
   assert.match(ev, /SUMMARY:Entrega da declaração de IRS 2026/);
   assert.ok(!ev.includes("Último dia"));
+});
+
+test("ics: semAlarme tira o VALARM", () => {
+  const ev = eventoIcs({ ...P, semAlarme: true }, OPTS).join("\r\n");
+  assert.ok(!ev.includes("VALARM"));
+  assert.ok(!ev.includes("TRIGGER"));
 });
 
 test("ics: calendário válido (VCALENDAR + PRODID + CALNAME)", () => {

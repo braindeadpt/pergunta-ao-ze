@@ -51,9 +51,10 @@ export interface IcsOpts {
   agora?: Date;
 }
 
-/** Um VEVENT por prazo, sempre no dia do fim. */
-export function eventoIcs(p: Prazo, { base, agora }: IcsOpts): string {
-  const linhas = [
+/** Um VEVENT por prazo, sempre no dia do fim. Devolve linhas SEM dobrar —
+ *  a dobra acontece uma única vez em calendarioIcs. */
+export function eventoIcs(p: Prazo, { base, agora }: IcsOpts): string[] {
+  return [
     "BEGIN:VEVENT",
     `UID:${p.id}@perguntaaoze.pt`,
     `DTSTAMP:${dtstamp(agora)}`,
@@ -71,15 +72,20 @@ export function eventoIcs(p: Prazo, { base, agora }: IcsOpts): string {
         .join("\n")
     )}`,
     `URL:${base}/prazos`,
-    "BEGIN:VALARM",
-    "ACTION:DISPLAY",
-    // 7 dias antes do fim do evento (que é no dia do fim do prazo)
-    "TRIGGER;RELATED=END:-P7D",
-    `DESCRIPTION:${escIcs(`Faltam 7 dias: ${p.titulo}`)}`,
-    "END:VALARM",
+    // TRIGGER;-P7D (sem RELATED) é relativo ao início do evento — que é o
+    // próprio dia do fim do prazo — disparando exatamente 7 dias antes.
+    // (RELATED=END com DTEND exclusivo dispararia 6 dias antes.)
+    ...(p.semAlarme
+      ? []
+      : [
+          "BEGIN:VALARM",
+          "ACTION:DISPLAY",
+          "TRIGGER:-P7D",
+          `DESCRIPTION:${escIcs(`Faltam 7 dias: ${p.titulo}`)}`,
+          "END:VALARM",
+        ]),
     "END:VEVENT",
   ];
-  return linhas.map(dobrar).join("\r\n");
 }
 
 /** Calendário completo — usado por /prazos/[id] (1 evento) e /prazos/todos.ics. */
@@ -91,7 +97,7 @@ export function calendarioIcs(prazos: Prazo[], opts: IcsOpts): string {
     "CALSCALE:GREGORIAN",
     "METHOD:PUBLISH",
     `X-WR-CALNAME:${escIcs("Prazos — Pergunta ao Zé")}`,
-    ...prazos.map((p) => eventoIcs(p, opts)),
+    ...prazos.flatMap((p) => eventoIcs(p, opts)),
     "END:VCALENDAR",
   ];
   return linhas.map(dobrar).join("\r\n") + "\r\n";

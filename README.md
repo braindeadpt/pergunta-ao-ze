@@ -114,6 +114,19 @@ curl -H "Authorization: Bearer $STATS_TOKEN" \
 
 Sem Redis, o registo é no-op e o endpoint devolve 503.
 
+### Rebuild diário (prazos)
+
+A página `/prazos` e a caixa «Adicionar ao calendário» nas `/p/<id>` são
+geradas no build — sem deploys, prazos passados continuavam visíveis.
+O workflow `.github/workflows/rebuild-diario.yml` corre todos os dias às
+00:15 UTC e dispara um Deploy Hook da Vercel.
+
+Setup uma vez só: na Vercel, **Settings → Git → Deploy Hooks → Create**
+(main) e copia o URL; no GitHub, **Settings → Secrets → Actions →
+`VERCEL_DEPLOY_HOOK`**. Sem o secret, o job sai com aviso sem falhar.
+(Não usamos ISR/revalidate porque as páginas regeneradas em runtime
+perderiam a meta CSP injetada no postbuild.)
+
 ## Estrutura
 
 ```
