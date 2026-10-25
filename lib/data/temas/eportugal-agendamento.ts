@@ -22,8 +22,8 @@ const tema: Tema = {
         fontes: [
           {
             titulo: "ePortugal — Portal dos Serviços Públicos",
-            url: "https://eportugal.gov.pt",
-            dominio: "eportugal.gov.pt",
+            url: "https://www.gov.pt",
+            dominio: "gov.pt",
           },
         ],
       },

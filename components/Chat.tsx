@@ -439,7 +439,7 @@ export default function Chat() {
                     <p className="text-base">
                       {T.semRes1}{" "}
                       <a
-                        href="https://eportugal.gov.pt"
+                        href="https://www.gov.pt"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="font-medium text-azulejo underline underline-offset-2"

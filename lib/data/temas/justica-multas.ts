@@ -48,9 +48,9 @@ const tema: Tema = {
             dominio: "registocriminal.justica.gov.pt",
           },
           {
-            titulo: "Certificado do registo criminal — ePortugal",
-            url: "https://eportugal.gov.pt",
-            dominio: "eportugal.gov.pt",
+            titulo: "Certificado do registo criminal — gov.pt",
+            url: "https://www.gov.pt",
+            dominio: "gov.pt",
           },
         ],
       },

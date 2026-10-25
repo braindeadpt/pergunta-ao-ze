@@ -24,8 +24,8 @@ const tema: Tema = {
         fontes: [
           {
             titulo: "Renovar o Cartão de Cidadão",
-            url: "https://eportugal.gov.pt/servicos/renovar-o-cartao-de-cidadao",
-            dominio: "eportugal.gov.pt",
+            url: "https://www.gov.pt/servicos/renovar-o-cartao-de-cidadao",
+            dominio: "gov.pt",
           },
           {
             titulo: "Instituto dos Registos e do Notariado",
@@ -74,8 +74,8 @@ const tema: Tema = {
         fontes: [
           {
             titulo: "Alterar a morada do Cartão de Cidadão",
-            url: "https://eportugal.gov.pt/servicos/alterar-a-morada-do-cartao-de-cidadao",
-            dominio: "eportugal.gov.pt",
+            url: "https://www.gov.pt/servicos/alterar-a-morada-do-cartao-de-cidadao",
+            dominio: "gov.pt",
           },
         ],
       },

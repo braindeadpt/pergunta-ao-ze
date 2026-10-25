@@ -22,9 +22,9 @@ const tema: Tema = {
         ],
         fontes: [
           {
-            titulo: "Empresa na Hora — ePortugal",
-            url: "https://eportugal.gov.pt/servicos/criar-uma-empresa-na-hora",
-            dominio: "eportugal.gov.pt",
+            titulo: "Empresa na Hora — gov.pt",
+            url: "https://www.gov.pt/servicos/criar-uma-empresa-na-hora",
+            dominio: "gov.pt",
           },
           {
             titulo: "Balcão do Empreendedor — gov.pt",
@@ -55,9 +55,9 @@ const tema: Tema = {
             dominio: "portaldasfinancas.gov.pt",
           },
           {
-            titulo: "Trabalhador independente — ePortugal",
-            url: "https://eportugal.gov.pt",
-            dominio: "eportugal.gov.pt",
+            titulo: "Trabalhador independente — gov.pt",
+            url: "https://www.gov.pt",
+            dominio: "gov.pt",
           },
         ],
       },

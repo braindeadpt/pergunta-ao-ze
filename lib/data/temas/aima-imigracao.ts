@@ -50,9 +50,9 @@ const tema: Tema = {
             dominio: "irn.justica.gov.pt",
           },
           {
-            titulo: "Nacionalidade — ePortugal",
-            url: "https://eportugal.gov.pt",
-            dominio: "eportugal.gov.pt",
+            titulo: "Nacionalidade — gov.pt",
+            url: "https://www.gov.pt",
+            dominio: "gov.pt",
           },
         ],
       },

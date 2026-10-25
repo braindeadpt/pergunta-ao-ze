@@ -215,7 +215,7 @@ export default function Home() {
                     </li>
                   </ul>
                   <a
-                    href="https://eportugal.gov.pt/servicos/renovar-o-cartao-de-cidadao"
+                    href="https://www.gov.pt/servicos/renovar-o-cartao-de-cidadao"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="mt-4 flex items-center justify-between rounded-lg border-2 border-azulejo/60 px-4 py-3 text-sm transition-colors hover:bg-azulejo-suave"
@@ -224,7 +224,7 @@ export default function Home() {
                       1. Renovar o Cartão de Cidadão
                     </span>
                     <span className="font-mono text-sm text-stone-500">
-                      eportugal.gov.pt ↗
+                      gov.pt ↗
                     </span>
                   </a>
                 </div>
