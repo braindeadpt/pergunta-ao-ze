@@ -43,9 +43,9 @@ const tema: Tema = {
         ],
         fontes: [
           {
-            titulo: "Reclamações — ePortugal",
-            url: "https://eportugal.gov.pt",
-            dominio: "eportugal.gov.pt",
+            titulo: "Reclamações — gov.pt",
+            url: "https://www.gov.pt",
+            dominio: "gov.pt",
           },
         ],
       },
