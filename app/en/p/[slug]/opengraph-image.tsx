@@ -9,7 +9,7 @@ import {
   tamanhoLetra,
   textoSelo,
 } from "@/lib/og.ts";
-import { ColunaZe, Moldura, Senha } from "@/lib/og.tsx";
+import { ColunaZe, Moldura, Senha } from "@/lib/og-componentes";
 
 /* EN version of the per-answer OG image — only for entries that are
    actually served in English (no revisao, TITULOS_EN present). */

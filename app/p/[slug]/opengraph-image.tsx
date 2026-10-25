@@ -7,7 +7,7 @@ import {
   tamanhoLetra,
   textoSelo,
 } from "@/lib/og.ts";
-import { ColunaZe, Moldura, Senha } from "@/lib/og.tsx";
+import { ColunaZe, Moldura, Senha } from "@/lib/og-componentes";
 
 /* Uma imagem OG por resposta curada — o preview do WhatsApp mostra a
    pergunta partilhada, com senha estável e carimbo de verificação. */

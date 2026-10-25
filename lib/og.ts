@@ -81,8 +81,18 @@ async function carregarFonte(familia: string, peso: number) {
   };
 }
 
-/** Carrega as fontes OG em paralelo; devolve nomes com fallback. */
-export async function carregarFontes() {
+interface FontesOg {
+  fonts: {
+    name: string;
+    data: ArrayBuffer;
+    weight: 400 | 700;
+    style: "normal";
+  }[];
+  display: string;
+  mono: string;
+}
+
+async function tentarFontes(): Promise<FontesOg> {
   const fonts = (
     await Promise.allSettled([
       carregarFonte("Archivo+Black", 400),
@@ -102,21 +112,53 @@ export async function carregarFontes() {
   };
 }
 
+// Memoizado: as ~114 imagens OG do build partilham a mesma Promise — as
+// 3 fontes são descarregadas uma vez só. Se a primeira tentativa vier sem
+// Archivo Black ou Space Mono (falha de rede no build), tenta outra vez
+// uma única vez antes de aceitar o fallback.
+let fontesPromise: Promise<FontesOg> | null = null;
+
+export function carregarFontes(): Promise<FontesOg> {
+  fontesPromise ??= (async () => {
+    let r = await tentarFontes();
+    if (r.display === "sans-serif" || r.mono === "monospace") {
+      r = await tentarFontes();
+    }
+    if (r.display === "sans-serif" || r.mono === "monospace") {
+      console.warn(
+        "[og] Google Fonts em falta — imagens OG geradas com fallback sans/mono"
+      );
+    }
+    return r;
+  })();
+  return fontesPromise;
+}
+
 export function zeUri(): string {
   return `data:image/svg+xml;base64,${Buffer.from(ZE_SVG).toString("base64")}`;
 }
 
+/** Letra(s) do tema pela posição: A–Z até 26, depois AA, AB… (base-26). */
+export function letraTema(i: number): string {
+  if (i < 26) return String.fromCharCode(65 + i);
+  return (
+    String.fromCharCode(64 + Math.floor(i / 26)) +
+    String.fromCharCode(65 + (i % 26))
+  );
+}
+
 /**
- * Código de senha estável por pergunta: letra = posição do tema em TEMAS
- * (A–V), número = posição da pergunta dentro do tema (1-based, 2 dígitos).
- * Letra por posição — não pela inicial — porque vários temas partilham
- * a inicial (cartao, carta, certidoes, chave…).
+ * Código de senha por pergunta: letra = posição do tema em TEMAS
+ * (derivado da ordem em TEMAS — muda se reordenares), número = posição
+ * da pergunta dentro do tema (1-based, 2 dígitos). Letra por posição —
+ * não pela inicial — porque vários temas partilham a inicial
+ * (cartao, carta, certidoes, chave…).
  */
 export function codigoSenha(perguntaId: string): string | null {
   for (let i = 0; i < TEMAS.length; i++) {
     const j = TEMAS[i].perguntas.findIndex((p) => p.id === perguntaId);
     if (j >= 0) {
-      return `${String.fromCharCode(65 + i)}-${String(j + 1).padStart(2, "0")}`;
+      return `${letraTema(i)}-${String(j + 1).padStart(2, "0")}`;
     }
   }
   return null;
@@ -138,10 +180,10 @@ import { formatarMesAno } from "./i18n.ts";
 /**
  * Texto do carimbo: "Confirmado em out. 2026" / "Confirmed in Oct 2026"
  * quando a resposta tem verificadoEm (mesmo formato de VerificadoEm);
- * o selo "Grátis. Sem registo." quando não tem — em PT mesmo na imagem EN.
+ * o selo "Grátis. Sem registo." / "Free. No sign-up." quando não tem.
  */
 export function textoSelo(iso: string | undefined, lang: Lang): string {
   const texto = iso ? formatarMesAno(iso, lang) : null;
-  if (!texto) return "Grátis. Sem registo.";
+  if (!texto) return lang === "en" ? "Free. No sign-up." : "Grátis. Sem registo.";
   return lang === "en" ? `Confirmed in ${texto}` : `Confirmado em ${texto}`;
 }

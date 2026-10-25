@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 import { OG_CORES, carregarFontes } from "@/lib/og.ts";
-import { ColunaZe, Moldura, Senha } from "@/lib/og.tsx";
+import { ColunaZe, Moldura, Senha } from "@/lib/og-componentes";
 
 export const alt = "Pergunta ao Zé — os serviços públicos, sem fila nem senha";
 export const size = { width: 1200, height: 630 };
