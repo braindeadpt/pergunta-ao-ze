@@ -122,7 +122,8 @@ app/api/responder/    POST { pergunta } -> resposta do motor
 app/opengraph-image   cartão de partilha gerado automaticamente
 components/           Header, Footer, Chat, ZePersonagem, SenhaTema,
                       FontesArquivo (arquivo expansível de /fontes)...
-lib/data/temas.ts     base de conhecimento curada (temas, perguntas, fontes)
+lib/data/temas/       base de conhecimento curada — um ficheiro por tema,
+                      re-exportados por lib/data/temas.ts
 lib/data/temas.en.ts  traduções EN geradas (scripts/gerar-temas-en.mjs)
 lib/data/fontes.ts    entidades oficiais + contactos (telefone, horário, email)
 lib/engine.ts         motores de resposta (keyword + LLM com fallback)
@@ -135,9 +136,12 @@ Sugestões e correções são bem-vindas — especialmente novos temas:
 
 1. Abre um issue com o template **"Sugerir um tema ou pergunta"** (ou
    **"Reportar erro"** se encontrares um link ou contacto desatualizado).
-2. Para contribuir com código, edita `lib/data/temas.ts`: cada tema tem
+2. Para contribuir com código, edita `lib/data/temas/<id-do-tema>.ts` — um
+   ficheiro por tema, re-exportados por `lib/data/temas.ts`. Cada tema tem
    perguntas com `palavras` (keywords normalizadas, sem acentos) e uma
-   resposta com passos + fontes oficiais.
+   resposta com passos + fontes oficiais. Os testes validam ids únicos,
+   palavras, passos e que o domínio de cada fonte existe em
+   `lib/data/fontes.ts`.
 3. Regra de ouro: **toda a informação e contactos têm de estar confirmados
    numa página oficial** — links testados, sem inventar.
 
