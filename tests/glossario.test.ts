@@ -171,8 +171,7 @@ test("só as entradas por rever ficam com revisao: true", () => {
     .filter(([, r]) => (r as { revisao?: boolean }).revisao === true)
     .map(([id]) => id)
     .sort();
-  // edu-*: PT reescrito para o IES (ex-DGES) a 2026-10-25 — falta re-traduzir.
-  assert.deepEqual(marcadas, ["at-certidao-domicilio", "at-nif", "edu-bolsa", "edu-candidatura"]);
+  assert.deepEqual(marcadas, ["at-certidao-domicilio", "at-nif"]);
 });
 
 test("entrada com revisao: true nunca é servida em EN (PT + nota)", async () => {
