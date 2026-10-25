@@ -109,8 +109,9 @@ function pontuar(
   return score;
 }
 
-/** Ranking partilhado pelos dois motores: devolve os candidatos por score. */
-function rankear(pergunta: string, lang: Lang = "pt"): Candidato[] {
+/** Ranking partilhado pelos dois motores: devolve os candidatos por score.
+ *  Exportado para os testes medirem top-1/top-3 e experimentarem limiares. */
+export function rankear(pergunta: string, lang: Lang = "pt"): Candidato[] {
   const tokens = new Set(normalizar(pergunta));
   if (tokens.size === 0) return [];
 
