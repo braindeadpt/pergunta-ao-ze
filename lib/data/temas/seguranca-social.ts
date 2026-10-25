@@ -70,9 +70,9 @@ const tema: Tema = {
             dominio: "seg-social.pt",
           },
           {
-            titulo: "Baixa médica — ePortugal",
-            url: "https://eportugal.gov.pt",
-            dominio: "eportugal.gov.pt",
+            titulo: "Baixa médica — gov.pt",
+            url: "https://www.gov.pt",
+            dominio: "gov.pt",
           },
         ],
       },
