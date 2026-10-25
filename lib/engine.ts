@@ -230,7 +230,9 @@ export class LlmEngine implements AnswerEngine {
     lang: Lang = "pt"
   ): Promise<ResultadoResposta> {
     const candidatos = rankear(pergunta, lang);
-    if (candidatos.length === 0) {
+    // Só vale a pena chamar o LLM se houver contexto minimamente relevante;
+    // abaixo de 2 o match é um único token fraco — não há nada para fundamentar.
+    if (candidatos.length === 0 || candidatos[0].score < 2) {
       return { tipo: "sugestoes", sugestoes: populares(), via: "llm", idioma: lang };
     }
 
@@ -239,7 +241,7 @@ export class LlmEngine implements AnswerEngine {
     for (const model of this.cfg.models) {
       try {
         const bruto = await this.chamarModelo(model, pergunta, contexto, lang);
-        const resposta = this.parseResposta(bruto, fontes, candidatos[0]);
+        const resposta = this.parseResposta(bruto, contexto, fontes, candidatos);
         if (resposta) return { ...resposta, idioma: lang };
       } catch (err) {
         console.error(`[LlmEngine] modelo ${model} falhou:`, err);
@@ -295,9 +297,11 @@ export class LlmEngine implements AnswerEngine {
 
   private parseResposta(
     bruto: string,
+    contexto: string,
     fontes: FonteIndexada[],
-    melhorCandidato: Candidato
+    candidatos: Candidato[]
   ): ResultadoResposta | null {
+    const melhorCandidato = candidatos[0];
     const inicio = bruto.indexOf("{");
     const fim = bruto.lastIndexOf("}");
     if (inicio < 0 || fim <= inicio) return null;
@@ -314,6 +318,19 @@ export class LlmEngine implements AnswerEngine {
       (p): p is string => typeof p === "string" && p.trim().length > 0
     );
     if (passos.length === 0) return null;
+    const nota = typeof parsed.nota === "string" ? parsed.nota : undefined;
+
+    // Grounding: cada número, telefone, data, valor € ou URL do output tem
+    // de existir no contexto enviado — se inventou, descarta e cai no
+    // KeywordEngine (mesma lógica de invariantes do gerar-temas-en.mjs).
+    const saida = [...passos, nota ?? ""].join("\n");
+    const foraDoContexto = invariantesForaDoContexto(saida, contexto);
+    if (foraDoContexto.length > 0) {
+      console.error(
+        `[LlmEngine] resposta descartada — inventou ${foraDoContexto.join(", ")}`
+      );
+      return null;
+    }
 
     const refs = new Set(
       Array.isArray(parsed.fontes)
@@ -322,14 +339,16 @@ export class LlmEngine implements AnswerEngine {
     );
     const citadas = fontes.filter((f) => refs.has(f.ref));
 
+    // O id fica o da pergunta curada que serviu de base — os links /p/slug
+    // e a partilha funcionam como numa resposta keyword.
     const pergunta: Pergunta = {
-      id: "llm",
-      texto: melhorCandidato.p.texto,
-      palavras: [],
+      ...melhorCandidato.p,
       resposta: {
+        ...melhorCandidato.p.resposta,
         passos,
-        nota: typeof parsed.nota === "string" ? parsed.nota : undefined,
-        fontes: citadas.length > 0 ? citadas : melhorCandidato.p.resposta.fontes,
+        nota,
+        fontes:
+          citadas.length > 0 ? citadas : melhorCandidato.p.resposta.fontes,
       },
     };
 
@@ -337,10 +356,42 @@ export class LlmEngine implements AnswerEngine {
       tipo: "resposta",
       pergunta,
       tema: melhorCandidato.tema,
-      sugestoes: [],
+      sugestoes: candidatos
+        .slice(1, 4)
+        .filter((c) => c.score >= 2)
+        .map(paraSugestao),
       via: "llm",
     };
   }
+}
+
+/** Dígitos normalizados (sem separadores) e URLs de um texto. */
+function invariantes(texto: string): { nums: Set<string>; urls: Set<string> } {
+  const nums = new Set(
+    (texto.match(/\d[\d .:,]*\d|\d/g) ?? []).map((s) =>
+      s.replace(/[ .:,]/g, "")
+    )
+  );
+  const urls = new Set(
+    (texto.match(/https?:\/\/[^\s)"']+|[\w-]+\.(?:gov\.pt|pt|eu)\b/g) ?? []).map(
+      (u) => u.toLowerCase()
+    )
+  );
+  return { nums, urls };
+}
+
+/**
+ * Invariantes do output que não existem no contexto — sinal de alucinação.
+ * Comparação por conjunto (não por multiplicidade): a paráfrase pode
+ * reorganizar os números, mas não pode introduzir novos.
+ */
+function invariantesForaDoContexto(saida: string, contexto: string): string[] {
+  const out = invariantes(saida);
+  const ctx = invariantes(contexto);
+  const fora: string[] = [];
+  for (const n of out.nums) if (!ctx.nums.has(n)) fora.push(`número "${n}"`);
+  for (const u of out.urls) if (!ctx.urls.has(u)) fora.push(`url "${u}"`);
+  return fora;
 }
 
 function montarContexto(candidatos: Candidato[]) {
