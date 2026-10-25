@@ -166,12 +166,13 @@ test("vis-agendar-aima: task force da AIMA em vez de mission structure", () => {
 
 // --- gate de revisão --------------------------------------------------------
 
-test("só at-nif e at-certidao-domicilio ficam com revisao: true", () => {
+test("só as entradas por rever ficam com revisao: true", () => {
   const marcadas = Object.entries(TEMAS_EN)
     .filter(([, r]) => (r as { revisao?: boolean }).revisao === true)
     .map(([id]) => id)
     .sort();
-  assert.deepEqual(marcadas, ["at-certidao-domicilio", "at-nif"]);
+  // edu-*: PT reescrito para o IES (ex-DGES) a 2026-10-25 — falta re-traduzir.
+  assert.deepEqual(marcadas, ["at-certidao-domicilio", "at-nif", "edu-bolsa", "edu-candidatura"]);
 });
 
 test("entrada com revisao: true nunca é servida em EN (PT + nota)", async () => {
