@@ -1,4 +1,4 @@
-import { TEMAS } from "@/lib/data/temas";
+import { TEMAS } from "./temas.ts";
 import type { ContactoEntidade, EntidadeFonte, Fonte, Ambito } from "@/lib/types";
 
 interface MetaEntidade {
@@ -19,7 +19,7 @@ const LINHA_REGISTOS: ContactoEntidade = {
   horario: "dias úteis, 9h–17h",
 };
 
-const ENTIDADES: Record<string, MetaEntidade> = {
+export const ENTIDADES: Record<string, MetaEntidade> = {
   "eportugal.gov.pt": { nome: "ePortugal — Portal dos Serviços Públicos", ambito: "Nacional", contacto: LINHA_CIDADAO },
   "irn.justica.gov.pt": {
     nome: "Instituto dos Registos e do Notariado",
@@ -90,6 +90,25 @@ const ENTIDADES: Record<string, MetaEntidade> = {
   "predialonline.pt": { nome: "Predial Online — Registos", ambito: "Nacional", contacto: LINHA_REGISTOS },
   "portaldahabitacao.pt": { nome: "Portal da Habitação", ambito: "Nacional" },
   "ansr.pt": { nome: "ANSR — Segurança Rodoviária", ambito: "Nacional" },
+  "portalcontraordenacoes.ansr.pt": {
+    nome: "ANSR — Portal das Contraordenações Rodoviárias",
+    ambito: "Nacional",
+  },
+  "faturas.portaldasfinancas.gov.pt": {
+    nome: "Portal das Finanças — e-fatura",
+    ambito: "Nacional",
+    contacto: { telefone: "217 206 707", horario: "dias úteis, 9h–19h", nota: "Centro de Atendimento Telefónico (CAT)" },
+  },
+  "nascimento.justica.gov.pt": {
+    nome: "Nascer Cidadão (IRN)",
+    ambito: "Nacional",
+    contacto: LINHA_REGISTOS,
+  },
+  "cessacaodecontratos.pt": {
+    nome: "Comissão para a Cessação de Contratos (DGC)",
+    ambito: "Nacional",
+  },
+  "anacom.pt": { nome: "ANACOM", ambito: "Nacional" },
   "registocriminal.justica.gov.pt": { nome: "Registo Criminal Online", ambito: "Nacional", contacto: LINHA_REGISTOS },
   "sg.mai.gov.pt": { nome: "Secretaria-Geral do MAI — Eleições", ambito: "Nacional" },
   "dges.gov.pt": {
