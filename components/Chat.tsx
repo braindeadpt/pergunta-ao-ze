@@ -9,6 +9,7 @@ import { contactosDeFontes } from "@/lib/contactos";
 import { TEMAS } from "@/lib/data/temas";
 import ZePersonagem from "@/components/ZePersonagem";
 import SenhaTema from "@/components/SenhaTema";
+import VerificadoEm from "@/components/VerificadoEm";
 
 /* DESIGN.md §9 — frases de balcão a rodar durante o loading */
 const FRASES_BALCAO = [
@@ -363,6 +364,11 @@ export default function Chat() {
                           {T.ia}
                         </span>
                       )}
+                      <VerificadoEm
+                        iso={m.pergunta.resposta.verificadoEm}
+                        lang={m.langUsada}
+                        className="font-normal normal-case tracking-normal"
+                      />
                     </p>
                     {m.idioma === "en" && (
                       <p className="mt-3 rounded-md border-2 border-dashed border-azulejo/50 bg-azulejo-suave/40 px-3 py-2 font-mono text-xs uppercase tracking-wider text-esferografica">

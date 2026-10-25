@@ -7,6 +7,7 @@ import { contactosDeFontes } from "@/lib/contactos";
 import { SITE_URL } from "@/lib/site";
 import ZePersonagem from "@/components/ZePersonagem";
 import Partilhar from "@/components/Partilhar";
+import VerificadoEm from "@/components/VerificadoEm";
 
 /* Uma página estática por pergunta curada — /p/<id da pergunta> */
 
@@ -129,7 +130,13 @@ export default async function PaginaPergunta({
           <p className="mt-3 text-base text-stone-600">
             Resposta curada do tema «{tema.titulo}».{" "}
             <span className="font-mono text-sm">
-              Gerado a partir da base curada em {geradoEm}.
+              Gerado a partir da base curada em {geradoEm}
+              <VerificadoEm
+                iso={pergunta.resposta.verificadoEm}
+                lang="pt"
+                className="before:content-['_·_']"
+              />
+              .
             </span>
           </p>
         </div>

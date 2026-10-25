@@ -8,6 +8,9 @@ export interface Resposta {
   passos: string[];
   nota?: string;
   fontes: Fonte[];
+  /** Data em que a resposta foi confirmada nas fontes oficiais (AAAA-MM-DD).
+   *  Preenchida à mão pelo mantenedor — ausente enquanto não for verificada. */
+  verificadoEm?: string;
 }
 
 export interface Pergunta {

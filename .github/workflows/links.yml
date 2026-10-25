@@ -1,0 +1,54 @@
+name: Links
+
+on:
+  schedule:
+    # Segundas-feiras às 06:00 UTC
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Sem npm ci: o script não tem dependências (só importa temas.ts).
+      - name: Verificar links das fontes
+        id: links
+        continue-on-error: true
+        run: node --experimental-strip-types scripts/verificar-links.mjs | tee relatorio.txt
+
+      - name: Abrir ou atualizar issue "Links partidos"
+        if: steps.links.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          {
+            echo "## Verificação de links — $(date +%F)"
+            echo
+            echo '```'
+            cat relatorio.txt
+            echo '```'
+            echo
+            echo "Correção: editar a fonte correspondente em \`lib/data/temas.ts\` e confirmar o novo URL na página oficial."
+          } > corpo.md
+
+          NUM=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open \
+            --search 'in:title "Links partidos"' --json number --jq '.[0].number')
+          if [ -n "$NUM" ]; then
+            gh issue edit "$NUM" --repo "$GITHUB_REPOSITORY" --body-file corpo.md
+            echo "Issue #$NUM atualizado"
+          else
+            gh issue create --repo "$GITHUB_REPOSITORY" \
+              --title "Links partidos" --body-file corpo.md --label "conteudo" || \
+            gh issue create --repo "$GITHUB_REPOSITORY" \
+              --title "Links partidos" --body-file corpo.md
+            echo "Issue criado"
+          fi
