@@ -8,6 +8,7 @@ import { contactosDeFontes } from "@/lib/contactos";
 import { SITE_URL } from "@/lib/site";
 import ZePersonagem from "@/components/ZePersonagem";
 import Partilhar from "@/components/Partilhar";
+import VerificadoEm from "@/components/VerificadoEm";
 
 /* One static page per curated question, in English — /en/p/<id>.
    Entries kept for review (revisao: true) stay PT-only → 404 here. */
@@ -131,6 +132,11 @@ export default async function PaginaPerguntaEn({
           </h1>
           <p className="mt-3 text-base text-stone-600">
             Curated answer from the topic «{temaTitulo}».
+            <VerificadoEm
+              iso={pergunta.resposta.verificadoEm}
+              lang="en"
+              className="font-mono text-sm before:content-['_']"
+            />
           </p>
         </div>
         <ZePersonagem estado="normal" className="hidden w-24 shrink-0 self-start sm:block" />
