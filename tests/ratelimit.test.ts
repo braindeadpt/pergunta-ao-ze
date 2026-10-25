@@ -14,6 +14,7 @@ import {
  *  do Date.now() real — nunca ler o relógio do sistema aqui. */
 class FakeRedis implements RedisMin {
   store = new Map<string, { v: number; expiraEm?: number }>();
+  listas = new Map<string, string[]>();
   falhar = false;
   agora: () => number;
 
@@ -63,6 +64,28 @@ class FakeRedis implements RedisMin {
     this.maybeFail();
     this.entry(key).expiraEm = unixMs;
     return 1;
+  }
+  async rpush(key: string, ...values: string[]) {
+    this.maybeFail();
+    const l = this.listas.get(key) ?? [];
+    l.push(...values);
+    this.listas.set(key, l);
+    return l.length;
+  }
+  async lrange(key: string, start: number, stop: number) {
+    this.maybeFail();
+    const l = this.listas.get(key) ?? [];
+    const ini = Math.max(0, start < 0 ? l.length + start : start);
+    const fim = stop < 0 ? l.length + stop : stop;
+    return l.slice(ini, fim + 1);
+  }
+  async ltrim(key: string, start: number, stop: number) {
+    this.maybeFail();
+    const l = this.listas.get(key) ?? [];
+    const ini = Math.max(0, start < 0 ? l.length + start : start);
+    const fim = stop < 0 ? l.length + stop : stop;
+    this.listas.set(key, l.slice(ini, fim + 1));
+    return "OK";
   }
 }
 

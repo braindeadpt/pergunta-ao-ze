@@ -10,6 +10,7 @@ import {
   MAX_LLM_CALLS_PER_DAY,
 } from "@/lib/ratelimit";
 import { registarResposta } from "@/lib/stats";
+import { registarSemResposta } from "@/lib/semresposta";
 
 const MAX_BODY_BYTES = 8 * 1024;
 const keywordFallback = new KeywordEngine();
@@ -70,5 +71,10 @@ export async function POST(request: Request) {
   // Contadores diários de uso (ze:st:*, 90 dias). Nunca lança — stats
   // não podem partir a resposta ao utilizador.
   await registarResposta(resultado);
+  // Sem match curado: guarda a pergunta anonimizada (ze:sem:{dia}, 30 dias,
+  // máx 500/dia) — é a lista de espera de conteúdo. No-op sem Redis.
+  if (resultado.tipo === "sugestoes") {
+    await registarSemResposta(pergunta.trim());
+  }
   return NextResponse.json(resultado);
 }

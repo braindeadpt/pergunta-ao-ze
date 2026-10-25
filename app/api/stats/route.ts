@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { redisCliente, MAX_LLM_CALLS_PER_DAY } from "@/lib/ratelimit";
 import { StatsDiarias } from "@/lib/stats";
+import { lerSemResposta } from "@/lib/semresposta";
 
 /**
  * GET /api/stats — contadores diários de uso do /api/responder.
@@ -9,6 +10,8 @@ import { StatsDiarias } from "@/lib/stats";
  *   GET /api/stats                       → hoje (UTC)
  *   GET /api/stats?ultimos=7             → últimos 7 dias (máx 30)
  *   GET /api/stats?dia=2026-10-04        → um dia específico
+ *   GET /api/stats?semResposta=7         → perguntas sem resposta dos
+ *                                        últimos 7 dias, por frequência
  */
 export async function GET(request: Request) {
   const token = process.env.STATS_TOKEN;
@@ -28,6 +31,15 @@ export async function GET(request: Request) {
       { erro: "Sem backend Redis — stats desligadas (falta Upstash/Vercel KV)." },
       { status: 503 }
     );
+  }
+
+  const semResposta = url.searchParams.get("semResposta");
+  if (semResposta !== null) {
+    const dias = Math.min(Math.max(Number(semResposta) || 7, 1), 30);
+    return NextResponse.json({
+      dias,
+      perguntas: await lerSemResposta(redisCliente, dias),
+    });
   }
 
   const stats = new StatsDiarias(redisCliente);

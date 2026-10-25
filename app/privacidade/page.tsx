@@ -93,10 +93,17 @@ export default function PrivacidadePage() {
           O que não guardamos
         </h2>
         <ul className="list-disc space-y-1.5 pl-6">
-          <li>Não guardamos as conversas nem as perguntas.</li>
+          <li>Não guardamos as conversas.</li>
           <li>Não pedimos conta, email, NIF ou números de documentos.</li>
           <li>Não usamos cookies de rastreamento nem publicidade.</li>
         </ul>
+        <p>
+          Exceção: se a tua pergunta ficar <em>sem resposta</em>, guardamos o
+          texto durante 30 dias — depois de retirarmos automaticamente dados
+          pessoais (emails, telefones, NIF/NISS e números de documentos são
+          substituídos por «[removido]»). Serve só para sabermos que temas
+          faltam à base; nunca é associado a quem perguntou.
+        </p>
         <p>
           Usamos Vercel Analytics — métricas de visitas agregadas e anónimas,
           sem cookies nem identificação pessoal.
