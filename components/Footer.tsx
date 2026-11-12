@@ -1,8 +1,37 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import ZeMark from "@/components/ZeMark";
 import AvisoRodape from "@/components/AvisoRodape";
 
+const LINKS_RODAPE_PT = [
+  { href: "/#temas", rotulo: "O que podes perguntar" },
+  { href: "/#como-funciona", rotulo: "Como funciona" },
+  { href: "/prazos", rotulo: "Prazos" },
+  { href: "/fontes", rotulo: "Fontes" },
+  { href: "/p", rotulo: "Todas as perguntas" },
+  { href: "/chat", rotulo: "Perguntar ao Zé" },
+  { href: "/privacidade", rotulo: "Privacidade" },
+  { href: "/termos", rotulo: "Termos de utilização" },
+] as const;
+
+const LINKS_RODAPE_EN = [
+  { href: "/#temas", rotulo: "What you can ask" },
+  { href: "/#como-funciona", rotulo: "How it works" },
+  { href: "/prazos", rotulo: "Deadlines" },
+  { href: "/fontes", rotulo: "Official sources" },
+  { href: "/en/p", rotulo: "All questions" },
+  { href: "/chat", rotulo: "Ask Zé" },
+  { href: "/privacidade", rotulo: "Privacy" },
+  { href: "/termos", rotulo: "Terms" },
+] as const;
+
 export default function Footer() {
+  const pathname = usePathname();
+  const emIngles = pathname?.startsWith("/en") ?? false;
+  const links = emIngles ? LINKS_RODAPE_EN : LINKS_RODAPE_PT;
+
   return (
     <footer className="border-t-2 border-ink bg-white">
       <div className="mx-auto max-w-5xl px-4 py-10">
@@ -15,33 +44,18 @@ export default function Footer() {
               </span>
             </div>
             <p className="mt-3 max-w-sm text-sm text-stone-600">
-              Projeto independente: não é um site do Estado. Aponta para as
-              páginas oficiais, mas não fala em nome de nenhuma entidade.
+              {emIngles
+                ? "Independent project: not a government website. Points to official pages, but does not speak on behalf of any entity."
+                : "Projeto independente: não é um site do Estado. Aponta para as páginas oficiais, mas não fala em nome de nenhuma entidade."}
             </p>
           </div>
 
           <nav className="grid grid-cols-2 gap-x-12 gap-y-2 text-sm text-stone-600">
-            <Link href="/#temas" className="hover:text-ink">
-              O que podes perguntar
-            </Link>
-            <Link href="/#como-funciona" className="hover:text-ink">
-              Como funciona
-            </Link>
-            <Link href="/fontes" className="hover:text-ink">
-              Fontes
-            </Link>
-            <Link href="/p" className="hover:text-ink">
-              Todas as perguntas
-            </Link>
-            <Link href="/chat" className="hover:text-ink">
-              Perguntar ao Zé
-            </Link>
-            <Link href="/privacidade" className="hover:text-ink">
-              Privacidade
-            </Link>
-            <Link href="/termos" className="hover:text-ink">
-              Termos de utilização
-            </Link>
+            {links.map((item) => (
+              <Link key={item.href} href={item.href} className="hover:text-ink">
+                {item.rotulo}
+              </Link>
+            ))}
           </nav>
         </div>
 
@@ -49,7 +63,7 @@ export default function Footer() {
           <AvisoRodape />
           <div className="flex items-center gap-4 text-sm text-stone-600">
             <span>
-              Feito por{" "}
+              {emIngles ? "Made by " : "Feito por "}
               <a
                 href="https://www.linkedin.com/in/pedropovoas/"
                 target="_blank"
@@ -63,7 +77,11 @@ export default function Footer() {
               href="https://github.com/braindeadpt/pergunta-ao-ze"
               target="_blank"
               rel="noopener noreferrer"
-              title="Código-fonte no GitHub — se o Zé ajudou, uma estrela ajuda o projeto"
+              title={
+                emIngles
+                  ? "Source code on GitHub — if Zé helped, a star helps the project"
+                  : "Código-fonte no GitHub — se o Zé ajudou, uma estrela ajuda o projeto"
+              }
               className="inline-flex items-center gap-1.5 rounded-md border-2 border-ink/50 px-3 py-1.5 font-mono text-sm font-bold uppercase tracking-wider text-stone-700 transition-all hover:border-ink hover:bg-form-amarelo/30 hover:text-ink"
             >
               <svg
@@ -76,13 +94,19 @@ export default function Footer() {
               </svg>
               GitHub
               <span aria-hidden="true" className="text-amber-500">★</span>
-              <span className="sr-only">— dá uma estrela ao projeto</span>
+              <span className="sr-only">
+                {emIngles ? "— star the project" : "— dá uma estrela ao projeto"}
+              </span>
             </a>
             <a
               href="https://www.linkedin.com/in/pedropovoas/"
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="Pedro Póvoas no LinkedIn"
+              aria-label={
+                emIngles
+                  ? "Pedro Póvoas on LinkedIn"
+                  : "Pedro Póvoas no LinkedIn"
+              }
               className="text-stone-500 transition-colors hover:text-ink"
             >
               <svg

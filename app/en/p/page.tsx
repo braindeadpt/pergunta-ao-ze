@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { TEMAS } from "@/lib/data/temas";
-import { TEMAS_EN } from "@/lib/data/temas.en";
+import { temPaginaEn } from "@/lib/i18n";
 import {
   TITULOS_EN,
   TEMAS_TITULO_EN,
@@ -25,9 +25,7 @@ export const metadata: Metadata = {
 export default function IndicePerguntasEn() {
   const porBalcao = new Map<number, typeof TEMAS>();
   for (const t of TEMAS) {
-    const perguntasEn = t.perguntas.filter(
-      (p) => TEMAS_EN[p.id] && !TEMAS_EN[p.id].revisao && TITULOS_EN[p.id]
-    );
+    const perguntasEn = t.perguntas.filter((p) => temPaginaEn(p.id));
     if (!perguntasEn.length) continue;
     const bi = balcaoDeTema(t.id);
     const chave = bi >= 0 ? bi : BALCOES_DEF.length - 1;
@@ -37,9 +35,18 @@ export default function IndicePerguntasEn() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10">
-      <p aria-hidden className="font-mono text-sm font-bold uppercase tracking-[0.25em] text-carimbo-tinta">
-        ▸ Answer archive
-      </p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p aria-hidden className="font-mono text-sm font-bold uppercase tracking-[0.25em] text-carimbo-tinta">
+          ▸ Answer archive
+        </p>
+        <Link
+          href="/p"
+          hrefLang="pt-PT"
+          className="rounded border-2 border-ink/40 bg-white px-2.5 py-1 font-mono text-xs font-bold uppercase tracking-wider text-ink transition-colors hover:border-ink hover:bg-form-amarelo/35"
+        >
+          PT · Ler em português →
+        </Link>
+      </div>
       <h1 className="mt-2 font-display text-3xl uppercase leading-tight tracking-tight sm:text-4xl">
         All questions
       </h1>

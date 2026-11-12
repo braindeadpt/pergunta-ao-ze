@@ -1,3 +1,6 @@
+import { TEMAS_EN } from "./data/temas.en.ts";
+import { TITULOS_EN } from "./data/titulos.en.ts";
+
 /**
  * Deteção de língua da pergunta — heurística barata por palavras-função.
  * Devolve "pt" | "en" ou null quando é ambíguo/demasiado curto —
@@ -74,4 +77,12 @@ export function formatarMesAno(iso: string, lang: Lang): string | null {
     }).format(new Date(`${iso}T00:00:00Z`));
   }
   return `${MESES_PT[mes - 1]} ${ano}`;
+}
+
+/**
+ * Guarda única para validar se uma pergunta tem página publicada em inglês.
+ * Exige entrada em TEMAS_EN sem marca de revisão e entrada não vazia em TITULOS_EN.
+ */
+export function temPaginaEn(id: string): boolean {
+  return Boolean(TEMAS_EN[id] && !TEMAS_EN[id].revisao && TITULOS_EN[id]);
 }

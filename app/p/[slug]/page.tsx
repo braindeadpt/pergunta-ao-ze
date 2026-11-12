@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { TEMAS } from "@/lib/data/temas";
-import { TEMAS_EN } from "@/lib/data/temas.en";
+import { temPaginaEn } from "@/lib/i18n";
 import { prazoDaPergunta } from "@/lib/data/prazos";
 import { contactosDeFontes, segmentarNota } from "@/lib/contactos";
 import { SITE_URL } from "@/lib/site";
@@ -37,7 +37,7 @@ export async function generateMetadata({
     pergunta.resposta.passos[0]?.slice(0, 150) ??
     `${tema.titulo} — ${tema.entidade}`;
   // hreflang só aponta para EN se a versão inglesa existir (revisao → PT-only)
-  const temEn = !!TEMAS_EN[slug] && !TEMAS_EN[slug].revisao;
+  const temEn = temPaginaEn(slug);
   return {
     title: pergunta.texto,
     description: descricao,
@@ -117,18 +117,29 @@ export default async function PaginaPergunta({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
       />
 
-      {/* Breadcrumb — Início > Tema > Pergunta */}
-      <nav aria-label="Caminho" className="font-mono text-sm text-stone-600">
-        <Link href="/" className="underline decoration-stone-300 underline-offset-2 hover:text-ink">
-          Início
-        </Link>
-        <span aria-hidden> › </span>
-        <Link href="/#temas" className="underline decoration-stone-300 underline-offset-2 hover:text-ink">
-          {tema.titulo}
-        </Link>
-        <span aria-hidden> › </span>
-        <span className="text-ink">{pergunta.texto}</span>
-      </nav>
+      {/* Breadcrumb — Início > Tema > Pergunta + comutador de idioma */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <nav aria-label="Caminho" className="font-mono text-sm text-stone-600">
+          <Link href="/" className="underline decoration-stone-300 underline-offset-2 hover:text-ink">
+            Início
+          </Link>
+          <span aria-hidden> › </span>
+          <Link href="/#temas" className="underline decoration-stone-300 underline-offset-2 hover:text-ink">
+            {tema.titulo}
+          </Link>
+          <span aria-hidden> › </span>
+          <span className="text-ink">{pergunta.texto}</span>
+        </nav>
+        {temPaginaEn(slug) && (
+          <Link
+            href={`/en/p/${slug}`}
+            hrefLang="en"
+            className="rounded border-2 border-ink/40 bg-white px-2.5 py-1 font-mono text-xs font-bold uppercase tracking-wider text-ink transition-colors hover:border-ink hover:bg-form-amarelo/35"
+          >
+            EN · Read in English →
+          </Link>
+        )}
+      </div>
 
       {/* Senha da página — a moldura é a piada, a resposta é séria */}
       <div className="mt-6 flex items-start gap-4">

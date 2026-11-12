@@ -1,6 +1,9 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { detetarIdioma } from "../lib/i18n.ts";
+import { detetarIdioma, temPaginaEn } from "../lib/i18n.ts";
+import { TEMAS } from "../lib/data/temas.ts";
+import { TEMAS_EN } from "../lib/data/temas.en.ts";
+import { TITULOS_EN } from "../lib/data/titulos.en.ts";
 
 test("perguntas claramente em inglês → en", () => {
   for (const q of [
@@ -33,4 +36,32 @@ test("nomes próprios / demasiado curtas → ambíguo (null)", () => {
   for (const q of ["NIF?", "SNS", "ePortugal", "AIMA"]) {
     assert.equal(detetarIdioma(q), null, q);
   }
+});
+
+test("temPaginaEn: devolve false para entradas com revisao: true e IDs desconhecidos", () => {
+  assert.equal(temPaginaEn("at-nif"), false);
+  assert.equal(temPaginaEn("at-certidao-domicilio"), false);
+  assert.equal(temPaginaEn("id-desconhecido"), false);
+  assert.equal(temPaginaEn(""), false);
+});
+
+test("temPaginaEn: garante que páginas válidas têm TEMAS_EN sem revisão e TITULOS_EN preenchido", () => {
+  assert.equal(temPaginaEn("cc-renovar"), true);
+  let totalEn = 0;
+  for (const tema of TEMAS) {
+    for (const p of tema.perguntas) {
+      if (temPaginaEn(p.id)) {
+        totalEn++;
+        const en = TEMAS_EN[p.id];
+        assert.ok(en, `TEMAS_EN deve existir para ${p.id}`);
+        assert.equal(Boolean(en.revisao), false, `revisao deve ser false para ${p.id}`);
+        const titulo = TITULOS_EN[p.id];
+        assert.ok(
+          typeof titulo === "string" && titulo.trim().length > 0,
+          `TITULOS_EN deve ser string não vazia para ${p.id}`
+        );
+      }
+    }
+  }
+  assert.ok(totalEn > 0, "devem existir perguntas publicadas em EN");
 });

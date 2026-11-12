@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { TEMAS } from "@/lib/data/temas";
-import { TEMAS_EN } from "@/lib/data/temas.en";
+import { temPaginaEn } from "@/lib/i18n";
 import { SITE_URL } from "@/lib/site";
 
 const BASE = SITE_URL;
@@ -28,8 +28,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
         changeFrequency: "monthly",
         priority: 0.6,
       });
-      const en = TEMAS_EN[p.id];
-      if (en && !en.revisao) {
+      if (temPaginaEn(p.id)) {
         paginas.push({
           url: `${BASE}/en/p/${p.id}`,
           lastModified: agora,

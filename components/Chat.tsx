@@ -9,6 +9,9 @@ import { detetarIdioma, idiomaDoNavegador, type Lang } from "@/lib/i18n";
 import { contactosDeFontes, segmentarNota } from "@/lib/contactos";
 import { prazoDaPergunta } from "@/lib/data/prazos";
 import { TEMAS } from "@/lib/data/temas";
+import { TEMAS_EN } from "@/lib/data/temas.en";
+import { TITULOS_EN } from "@/lib/data/titulos.en";
+import { SITE_URL } from "@/lib/site";
 import ZePersonagem from "@/components/ZePersonagem";
 import SenhaTema from "@/components/SenhaTema";
 import VerificadoEm from "@/components/VerificadoEm";
@@ -52,6 +55,11 @@ const TXT = {
     prazoAte: "até",
     prazoCal: "Adicionar ao calendário (.ics)",
     prazoTodos: "Todos os prazos →",
+    paginaResposta: "Página desta resposta ↗",
+    copiar: "Copiar",
+    copiado: "Copiado ✓",
+    partilharWa: "Partilhar no WhatsApp",
+    novaSenha: "Nova senha (limpar)",
     anuncioOk: "Resposta recebida.",
     anuncioLimite: "Limite de pedidos. Tenta de novo mais tarde.",
     anuncioErro: "Falha ao obter resposta.",
@@ -77,6 +85,11 @@ const TXT = {
     prazoAte: "by",
     prazoCal: "Add to calendar (.ics)",
     prazoTodos: "All deadlines →",
+    paginaResposta: "Answer page ↗",
+    copiar: "Copy",
+    copiado: "Copied ✓",
+    partilharWa: "Share on WhatsApp",
+    novaSenha: "New ticket (clear)",
     anuncioOk: "Response received.",
     anuncioLimite: "Request limit reached. Try again later.",
     anuncioErro: "Failed to get an answer.",
@@ -130,6 +143,7 @@ export default function Chat() {
   const [batendo, setBatendo] = useState(false);
   const [movel, setMovel] = useState(false);
   const [tick, setTick] = useState(0);
+  const [copiadoIdx, setCopiadoIdx] = useState<number | null>(null);
   // "auto" = deteção por pergunta; PT/EN fixa a escolha e prevalece sempre
   const [langSel, setLangSel] = useState<"auto" | Lang>("auto");
   const ultimaLang = useRef<Lang>("pt");
@@ -137,6 +151,7 @@ export default function Chat() {
   const senhaN = useRef(0);
   const ocupadoRef = useRef(false);
   const carimboTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const copiadoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const ultimaRespostaRef = useRef<HTMLDivElement>(null);
   const loadingRef = useRef<HTMLDivElement>(null);
@@ -146,13 +161,17 @@ export default function Chat() {
   const enviado = useRef(false);
   const anuncio = useRef<HTMLParagraphElement>(null);
 
-  // Limpa timeout pendente do carimbo se desmontar a meio da animação
+  // Limpa timeouts pendentes se desmontar a meio da animação
   useEffect(() => {
     return () => {
       if (carimboTimerRef.current !== null) {
         clearTimeout(carimboTimerRef.current);
         carimboTimerRef.current = null;
         ocupadoRef.current = false;
+      }
+      if (copiadoTimerRef.current !== null) {
+        clearTimeout(copiadoTimerRef.current);
+        copiadoTimerRef.current = null;
       }
     };
   }, []);
@@ -311,12 +330,57 @@ export default function Chat() {
 
   useEffect(() => {
     const q = params.get("q");
-    if (q && !enviado.current) {
+    if (q !== null && !enviado.current) {
       enviado.current = true;
-      perguntar(q);
+      window.history.replaceState(null, "", "/chat");
+      if (q.trim()) {
+        perguntar(q);
+      }
+    } else if (q === null) {
+      enviado.current = false;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params]);
+
+  async function copiarResposta(texto: string, idx: number) {
+    try {
+      await navigator.clipboard.writeText(texto);
+    } catch {
+      const ta = document.createElement("textarea");
+      ta.value = texto;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+    }
+    setCopiadoIdx(idx);
+    if (copiadoTimerRef.current !== null) {
+      clearTimeout(copiadoTimerRef.current);
+    }
+    copiadoTimerRef.current = setTimeout(() => {
+      copiadoTimerRef.current = null;
+      setCopiadoIdx(null);
+    }, 2000);
+  }
+
+  function limparConversa() {
+    if (ocupadoRef.current) return;
+    if (copiadoTimerRef.current !== null) {
+      clearTimeout(copiadoTimerRef.current);
+      copiadoTimerRef.current = null;
+    }
+    setCopiadoIdx(null);
+    senhaN.current = 0;
+    prevMensagensLenRef.current = 0;
+    ultimaPergunta.current = "";
+    enviado.current = false;
+    if (anuncio.current) anuncio.current.textContent = "";
+    setMensagens([]);
+    window.history.replaceState(null, "", "/chat");
+    textareaRef.current?.focus();
+  }
 
   let senhaVisivel = 0;
   let ultimaZeIdx = -1;
@@ -327,6 +391,12 @@ export default function Chat() {
     }
   }
   const ocupadoUI = batendo || aCarregar;
+  const langBarra: Lang =
+    langSel !== "auto"
+      ? langSel
+      : mensagens.length > 0
+        ? ultimaLang.current
+        : "pt";
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-4">
@@ -606,6 +676,92 @@ export default function Chat() {
                         </div>
                       );
                     })()}
+                    {(() => {
+                      const idPergunta = m.pergunta.id;
+                      const temPaginaEn = Boolean(
+                        idPergunta &&
+                          TEMAS_EN[idPergunta] &&
+                          !TEMAS_EN[idPergunta].revisao &&
+                          TITULOS_EN[idPergunta]
+                      );
+                      const usarEnCanonico =
+                        (m.idioma === "en" || (m.langUsada === "en" && !m.soEmPt)) &&
+                        temPaginaEn;
+                      const pathCanonico = idPergunta
+                        ? usarEnCanonico
+                          ? `/en/p/${idPergunta}`
+                          : `/p/${idPergunta}`
+                        : "/p";
+                      const urlCanonico = `${SITE_URL}${pathCanonico}`;
+                      const tituloPartilha =
+                        usarEnCanonico && idPergunta && TITULOS_EN[idPergunta]
+                          ? TITULOS_EN[idPergunta]
+                          : m.pergunta.texto;
+                      const textoCopiar = [
+                        tituloPartilha,
+                        "",
+                        ...m.pergunta.resposta.passos.map(
+                          (p, idx) => `${idx + 1}. ${p}`
+                        ),
+                        ...(m.pergunta.resposta.nota
+                          ? ["", m.pergunta.resposta.nota]
+                          : []),
+                        ...(m.pergunta.resposta.fontes.length > 0
+                          ? [
+                              "",
+                              `${T.fontes}:`,
+                              ...m.pergunta.resposta.fontes.map(
+                                (f) => `- ${f.titulo}: ${f.url}`
+                              ),
+                            ]
+                          : []),
+                        ...(idPergunta ? ["", urlCanonico] : []),
+                      ].join("\n");
+                      const hrefWhatsapp = `https://wa.me/?text=${encodeURIComponent(
+                        `${tituloPartilha}\n${urlCanonico}`
+                      )}`;
+                      const foiCopiado = copiadoIdx === i;
+
+                      return (
+                        <div className="mt-4 flex flex-wrap items-center gap-2.5 border-t-2 border-dashed border-ink/15 pt-3">
+                          <button
+                            type="button"
+                            onClick={() => void copiarResposta(textoCopiar, i)}
+                            className={`inline-flex items-center gap-1.5 rounded-md border-2 px-2.5 py-1 text-xs font-semibold transition-colors ${
+                              foiCopiado
+                                ? "border-band-verde bg-ok-suave text-band-verde-escuro"
+                                : "border-ink/50 bg-white text-ink hover:border-ink hover:bg-form-amarelo/30"
+                            }`}
+                          >
+                            {foiCopiado ? T.copiado : T.copiar}
+                          </button>
+                          <a
+                            href={hrefWhatsapp}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 rounded-md border-2 border-ink/50 bg-white px-2.5 py-1 text-xs font-semibold text-ink transition-colors hover:border-ink hover:bg-form-amarelo/30"
+                          >
+                            <svg
+                              aria-hidden="true"
+                              viewBox="0 0 24 24"
+                              className="size-3.5 fill-current"
+                              focusable="false"
+                            >
+                              <path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2Zm0 1.8a8.2 8.2 0 1 1-4.2 15.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 0 1 12 3.8Zm-3 3.6c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.1s.9 2.4 1 2.6c.1.2 1.8 2.8 4.4 3.8 2.2.9 2.6.7 3.1.7.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.6-.3l-2-.9c-.3-.1-.5-.2-.7.1l-1 1.1c-.2.2-.3.2-.6.1a7.5 7.5 0 0 1-2.2-1.4 8.3 8.3 0 0 1-1.5-1.9c-.2-.3 0-.4.1-.6l.5-.6c.1-.2.2-.4.3-.6.1-.2 0-.4 0-.6l-.9-2.1c-.2-.5-.4-.5-.7-.5h-.6Z" />
+                            </svg>
+                            {T.partilharWa}
+                          </a>
+                          {idPergunta && (
+                            <Link
+                              href={pathCanonico}
+                              className="font-mono text-xs font-medium text-azulejo underline decoration-azulejo/40 underline-offset-2 hover:decoration-azulejo sm:ml-auto"
+                            >
+                              {T.paginaResposta}
+                            </Link>
+                          )}
+                        </div>
+                      );
+                    })()}
                   </>
                 ) : (
                   <>
@@ -686,9 +842,19 @@ export default function Chat() {
       {/* FORMULÁRIO Z-01 — a mesma família visual da home */}
       <div ref={barra} className="sticky bottom-0 border-t-2 border-ink bg-paper py-4">
         <div className="rounded-lg border-2 border-ink bg-white shadow-[4px_4px_0_#1b1d22] focus-within:shadow-[5px_5px_0_#1b1d22] has-[textarea:focus-visible]:outline-2 has-[textarea:focus-visible]:outline-offset-2 has-[textarea:focus-visible]:outline-band-verde">
-          <div className="flex items-center justify-between border-b-2 border-dashed border-ink/20 px-4 py-1.5 font-mono text-xs font-bold uppercase tracking-widest text-stone-600">
+          <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5 border-b-2 border-dashed border-ink/20 px-4 py-1.5 font-mono text-xs font-bold uppercase tracking-widest text-stone-600">
             <span aria-hidden>Formulário Z-01</span>
-            <div className="flex items-center gap-1.5 normal-case tracking-normal">
+            <div className="flex flex-wrap items-center gap-1.5 normal-case tracking-normal">
+              {mensagens.length > 0 && (
+                <button
+                  type="button"
+                  onClick={limparConversa}
+                  disabled={ocupadoUI}
+                  className="mr-1 rounded border-2 border-ink/40 bg-paper px-2 py-0.5 font-mono text-xs font-bold uppercase tracking-wider text-stone-700 transition-colors hover:border-ink hover:bg-form-amarelo/35 hover:text-ink disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {TXT[langBarra].novaSenha}
+                </button>
+              )}
               {/* Seletor PT|EN — fixa a língua das respostas; "auto" deteta por pergunta */}
               <span className="sr-only">Idioma das respostas</span>
               {(["pt", "en"] as const).map((l) => (

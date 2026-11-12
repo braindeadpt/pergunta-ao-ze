@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { TEMAS } from "@/lib/data/temas";
 import { TEMAS_EN } from "@/lib/data/temas.en";
 import { TITULOS_EN, TEMAS_TITULO_EN } from "@/lib/data/titulos.en";
+import { temPaginaEn } from "@/lib/i18n";
 import { prazoDaPergunta } from "@/lib/data/prazos";
 import { contactosDeFontes, segmentarNota } from "@/lib/contactos";
 import { SITE_URL } from "@/lib/site";
@@ -15,11 +16,11 @@ import VerificadoEm from "@/components/VerificadoEm";
    Entries kept for review (revisao: true) stay PT-only → 404 here. */
 
 function encontrar(slug: string) {
+  if (!temPaginaEn(slug)) return null;
   for (const tema of TEMAS) {
     const pergunta = tema.perguntas.find((p) => p.id === slug);
     if (pergunta) {
       const en = TEMAS_EN[slug];
-      if (!en || en.revisao || !TITULOS_EN[slug]) return null;
       return { tema, pergunta, en };
     }
   }
@@ -28,9 +29,7 @@ function encontrar(slug: string) {
 
 export function generateStaticParams() {
   return TEMAS.flatMap((t) =>
-    t.perguntas
-      .filter((p) => TEMAS_EN[p.id] && !TEMAS_EN[p.id].revisao && TITULOS_EN[p.id])
-      .map((p) => ({ slug: p.id }))
+    t.perguntas.filter((p) => temPaginaEn(p.id)).map((p) => ({ slug: p.id }))
   );
 }
 
@@ -80,9 +79,7 @@ export default async function PaginaPerguntaEn({
   const temaTitulo = TEMAS_TITULO_EN[tema.id] ?? tema.titulo;
 
   const relacionadas = tema.perguntas
-    .filter(
-      (p) => p.id !== slug && TEMAS_EN[p.id] && !TEMAS_EN[p.id].revisao && TITULOS_EN[p.id]
-    )
+    .filter((p) => p.id !== slug && temPaginaEn(p.id))
     .slice(0, 3);
   const contactos = contactosDeFontes(pergunta.resposta.fontes);
   const prazo = prazoDaPergunta(slug);
@@ -121,18 +118,27 @@ export default async function PaginaPerguntaEn({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
       />
 
-      {/* Breadcrumb — Home > Topic > Question */}
-      <nav aria-label="Breadcrumb" className="font-mono text-sm text-stone-600">
-        <Link href="/" className="underline decoration-stone-300 underline-offset-2 hover:text-ink">
-          Home
+      {/* Breadcrumb — Home > Topic > Question + language switcher */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <nav aria-label="Breadcrumb" className="font-mono text-sm text-stone-600">
+          <Link href="/" className="underline decoration-stone-300 underline-offset-2 hover:text-ink">
+            Home
+          </Link>
+          <span aria-hidden> › </span>
+          <Link href="/en/p" className="underline decoration-stone-300 underline-offset-2 hover:text-ink">
+            {temaTitulo}
+          </Link>
+          <span aria-hidden> › </span>
+          <span className="text-ink">{titulo}</span>
+        </nav>
+        <Link
+          href={`/p/${slug}`}
+          hrefLang="pt-PT"
+          className="rounded border-2 border-ink/40 bg-white px-2.5 py-1 font-mono text-xs font-bold uppercase tracking-wider text-ink transition-colors hover:border-ink hover:bg-form-amarelo/35"
+        >
+          PT · Ler em português →
         </Link>
-        <span aria-hidden> › </span>
-        <Link href="/en/p" className="underline decoration-stone-300 underline-offset-2 hover:text-ink">
-          {temaTitulo}
-        </Link>
-        <span aria-hidden> › </span>
-        <span className="text-ink">{titulo}</span>
-      </nav>
+      </div>
 
       <div className="mt-6 flex items-start gap-4">
         <div className="min-w-0 flex-1">

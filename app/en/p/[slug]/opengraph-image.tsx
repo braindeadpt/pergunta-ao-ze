@@ -2,6 +2,7 @@ import { ImageResponse } from "next/og";
 import { TEMAS } from "@/lib/data/temas";
 import { TEMAS_EN } from "@/lib/data/temas.en";
 import { TITULOS_EN } from "@/lib/data/titulos.en";
+import { temPaginaEn } from "@/lib/i18n";
 import {
   OG_CORES,
   carregarFontes,
@@ -18,11 +19,11 @@ export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 function encontrar(slug: string) {
+  if (!temPaginaEn(slug)) return null;
   for (const tema of TEMAS) {
     const pergunta = tema.perguntas.find((p) => p.id === slug);
     if (pergunta) {
       const en = TEMAS_EN[slug];
-      if (!en || en.revisao || !TITULOS_EN[slug]) return null;
       return { tema, pergunta, en };
     }
   }
@@ -31,9 +32,7 @@ function encontrar(slug: string) {
 
 export function generateStaticParams() {
   return TEMAS.flatMap((t) =>
-    t.perguntas
-      .filter((p) => TEMAS_EN[p.id] && !TEMAS_EN[p.id].revisao && TITULOS_EN[p.id])
-      .map((p) => ({ slug: p.id }))
+    t.perguntas.filter((p) => temPaginaEn(p.id)).map((p) => ({ slug: p.id }))
   );
 }
 

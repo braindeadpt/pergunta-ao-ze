@@ -25,9 +25,18 @@ export default function IndicePerguntas() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10">
-      <p aria-hidden className="font-mono text-sm font-bold uppercase tracking-[0.25em] text-carimbo-tinta">
-        ▸ Arquivo de respostas
-      </p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p aria-hidden className="font-mono text-sm font-bold uppercase tracking-[0.25em] text-carimbo-tinta">
+          ▸ Arquivo de respostas
+        </p>
+        <Link
+          href="/en/p"
+          hrefLang="en"
+          className="rounded border-2 border-ink/40 bg-white px-2.5 py-1 font-mono text-xs font-bold uppercase tracking-wider text-ink transition-colors hover:border-ink hover:bg-form-amarelo/35"
+        >
+          EN · Read in English →
+        </Link>
+      </div>
       <h1 className="mt-2 font-display text-3xl uppercase leading-tight tracking-tight sm:text-4xl">
         Todas as perguntas
       </h1>
