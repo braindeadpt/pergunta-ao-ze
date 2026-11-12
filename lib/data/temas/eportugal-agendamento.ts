@@ -37,7 +37,7 @@ const tema: Tema = {
       ],
       resposta: {
         passos: [
-          "No siga.gov.pt ou na app SigaApp agendes atendimento para a maioria dos serviços do Estado — IRN, Finanças, IMT, Segurança Social e outros.",
+          "No portal Siga (siga.marcacaodeatendimento.pt) ou na app SigaApp agendas atendimento para a maioria dos serviços do Estado — IRN, Finanças, IMT, Segurança Social e outros.",
           "Escolhes entidade, serviço, local, dia e hora; recebes a confirmação e a senha digital.",
           "Há serviços com agendamento próprio (consulados, AIMA, centros de saúde) — nesses casos usa o portal da entidade.",
         ],

@@ -10,7 +10,7 @@ const tema: Tema = {
       id: "cmd-ativar",
       texto: "Como ativo a Chave Móvel Digital?",
       palavras: [
-        "chave", "movel", "digital", "cmd", "ativar", "ativaçao",
+        "chave", "movel", "digital", "cmd", "ativar", "ativacao",
         "autenticacao", "login", "senha", "telemovel", "sms",
       ],
       resposta: {

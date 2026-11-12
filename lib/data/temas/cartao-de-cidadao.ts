@@ -16,7 +16,7 @@ const tema: Tema = {
       resposta: {
         passos: [
           "Online, no ePortugal — se tens 25 anos ou mais, a Chave Móvel Digital ou leitor de cartão, e não precisas de alterar dados nem foto.",
-          "Presencial — agenda no Siga (siga.gov.pt ou app SigaApp) e vai a um Espaço de Registos, Loja do Cidadão ou consulado.",
+          "Presencial — agenda no Siga (siga.marcacaodeatendimento.pt ou app SigaApp) e vai a um Espaço de Registos, Loja do Cidadão ou consulado.",
           "Leva o Cartão de Cidadão atual. No atendimento presencial tiram a foto e recolhem a assinatura na hora.",
           "O preço depende do prazo e do local; a renovação online é mais barata. Confirma o valor atual na fonte.",
         ],

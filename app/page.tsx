@@ -36,7 +36,7 @@ const porId = (id: string) => TEMAS.find((t) => t.id === id)!;
 const BALCOES: Balcao[] = BALCOES_DEF.map((b) => ({
   rotulo: b.rotulo,
   letra: b.letra,
-  temas: b.temas.map(porId),
+  temas: b.temas.filter((id) => id !== "cartao-de-cidadao").map(porId),
 }));
 
 export default function Home() {

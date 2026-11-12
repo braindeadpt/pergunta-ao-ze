@@ -1,11 +1,11 @@
-import { TEMAS } from "@/lib/data/temas";
+import { TEMAS } from "./data/temas.ts";
 
 /**
  * Os balcões do atendimento — agrupamento dos temas.
  * Fonte única para a home (senhas) e para /fontes (arquivo).
  */
 export const BALCOES_DEF: { rotulo: string; letra: string; temas: string[] }[] = [
-  { rotulo: "Identificação", letra: "I", temas: ["passaporte", "chave-movel-digital", "certidoes"] },
+  { rotulo: "Identificação", letra: "I", temas: ["cartao-de-cidadao", "passaporte", "chave-movel-digital", "certidoes"] },
   { rotulo: "Dinheiro", letra: "D", temas: ["irs-financas", "seguranca-social", "pensoes-reforma"] },
   { rotulo: "Trabalho e empresa", letra: "T", temas: ["desemprego-iefp", "empresa-atividade"] },
   { rotulo: "Saúde e família", letra: "S", temas: ["sns", "familia"] },

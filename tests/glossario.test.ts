@@ -1,5 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { TEMAS_EN } from "../lib/data/temas.en.ts";
 import { TEMAS } from "../lib/data/temas.ts";
 import { KeywordEngine } from "../lib/engine.ts";
@@ -204,4 +205,91 @@ test("números, URLs e € intactos após normalização", () => {
   assert.match(r.passos[0], /217 115 000/);
   assert.match(r.passos[0], /aima\.gov\.pt/);
   assert.match(r.passos[0], /€25/);
+});
+
+test("sns-24: 'self-declaration download' é proibido e reescrito para 'self-declared sick leave'", () => {
+  for (const [id, r] of Object.entries(TEMAS_EN)) {
+    assert.doesNotMatch(
+      textoDe(r),
+      /self[‑-]?declaration\s+download/i,
+      `${id}: contém tradução errada 'self-declaration download'`
+    );
+  }
+  assert.match(textoDe(TEMAS_EN["sns-24"]), /self-declared sick leave/);
+
+  // Garante que uma futura regeneração (--forcar) com hífen ASCII ou U+2011 é corrigida
+  for (const variante of [
+    "request a self-declaration download (up to 3 days)",
+    "request a self‑declaration download (up to 3 days)",
+  ]) {
+    const norm = normalizarRespostaEn(
+      { passos: [variante], palavras: [] },
+      "sns-24"
+    );
+    assert.equal(norm.passos[0], "request a self-declared sick leave (up to 3 days)");
+    assert.deepEqual(normalizarRespostaEn(norm, "sns-24"), norm);
+  }
+});
+
+test("TEMAS_EN: hashOrigem e invariantes PT↔EN (números, URLs e €) sincronizados", () => {
+  function hashOrigem(p: (typeof TEMAS)[number]["perguntas"][number]): string {
+    const canon = JSON.stringify({
+      t: p.texto,
+      s: p.resposta.passos,
+      n: p.resposta.nota ?? null,
+      w: p.palavras,
+    });
+    return createHash("sha256").update(canon).digest("hex").slice(0, 16);
+  }
+
+  function invariantes(texto: string) {
+    const nums = (texto.match(/\d[\d .:,]*\d|\d/g) ?? []).map((s) =>
+      s.replace(/[ .:,]/g, "")
+    );
+    const urls =
+      texto.match(/https?:\/\/[^\s)"']+|[\w-]+\.(?:gov\.pt|pt|eu)\b/g) ?? [];
+    const euros = (texto.match(/€|\beuros?\b/gi) ?? []).length;
+    return {
+      nums: nums.sort(),
+      urls: urls.map((u) => u.toLowerCase()).sort(),
+      euros,
+    };
+  }
+
+  const problemas: string[] = [];
+  for (const tema of TEMAS) {
+    for (const p of tema.perguntas) {
+      const en = TEMAS_EN[p.id];
+      if (!en) continue;
+      const h = hashOrigem(p);
+      if (en.hashOrigem !== h) {
+        problemas.push(`${p.id}: hashOrigem EN (${en.hashOrigem}) !== PT (${h})`);
+      }
+      if (en.passos.length !== p.resposta.passos.length) {
+        problemas.push(
+          `${p.id}: nº de passos diverge (PT=${p.resposta.passos.length}, EN=${en.passos.length})`
+        );
+        continue;
+      }
+      p.resposta.passos.forEach((pt, i) => {
+        const a = invariantes(pt);
+        const b = invariantes(en.passos[i]);
+        if (JSON.stringify(a) !== JSON.stringify(b)) {
+          problemas.push(
+            `${p.id} passo ${i + 1}: invariantes divergem PT=${JSON.stringify(a)} EN=${JSON.stringify(b)}`
+          );
+        }
+      });
+      if (p.resposta.nota || en.nota) {
+        const a = invariantes(p.resposta.nota ?? "");
+        const b = invariantes(en.nota ?? "");
+        if (JSON.stringify(a) !== JSON.stringify(b)) {
+          problemas.push(
+            `${p.id} nota: invariantes divergem PT=${JSON.stringify(a)} EN=${JSON.stringify(b)}`
+          );
+        }
+      }
+    }
+  }
+  assert.deepEqual(problemas, []);
 });

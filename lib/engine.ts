@@ -1,5 +1,7 @@
 import { TEMAS } from "./data/temas.ts";
 import { TEMAS_EN } from "./data/temas.en.ts";
+import { TITULOS_EN, TEMAS_TITULO_EN } from "./data/titulos.en.ts";
+import { normalizarRespostaEn } from "./glossario-en.ts";
 import type { Fonte, Pergunta, Tema } from "./types";
 import type { Lang } from "./i18n";
 
@@ -33,17 +35,157 @@ export interface AnswerEngine {
   responder(pergunta: string, lang?: Lang): Promise<ResultadoResposta>;
 }
 
+const SIGLAS_CURTAS = new Set([
+  "cc", "bi", "d7", "d8", "d2", "ue", "24", "65", "tv", "cp", "at", "ss",
+]);
+
 const STOPWORDS = new Set([
   "a", "o", "e", "de", "do", "da", "dos", "das", "em", "no", "na", "nos",
   "nas", "um", "uma", "uns", "umas", "para", "por", "com", "sem", "que",
   "como", "qual", "quais", "onde", "quando", "quanto", "quanta", "me",
   "te", "se", "lhe", "eu", "tu", "ele", "ela", "meu", "minha", "teu",
   "tua", "seu", "sua", "ao", "aos", "à", "às", "ou", "mas", "é",
-  "ser", "ter", "fazer", "posso", "pode", "quero", "queria", "preciso",
+  "ser", "ter", "posso", "pode", "quero", "queria", "preciso",
   "tenho", "tens", "isto", "isso", "este", "esta", "esse",
   "essa", "muito", "mais", "ja", "já", "ainda", "so", "só", "la", "lá",
   "ca", "cá", "oi", "ola", "olá", "boas", "obrigado", "obrigada",
 ]);
+
+/**
+ * Lematização determinística para flexões verbais curtas/irregulares e
+ * equivalentes frequentes que teriam prefixo comum < 6 letras em mesmaRaiz().
+ */
+const LEMAS: Record<string, string> = {
+  peco: "pedir",
+  pedi: "pedir",
+  pede: "pedir",
+  pedem: "pedir",
+  pediu: "pedir",
+  pedimos: "pedir",
+  faco: "fazer",
+  fiz: "fazer",
+  fez: "fazer",
+  faz: "fazer",
+  fazem: "fazer",
+  faca: "fazer",
+  renovo: "renovar",
+  renovei: "renovar",
+  renova: "renovar",
+  renovou: "renovar",
+  caducou: "caducado",
+  caducar: "caducado",
+  caducada: "caducado",
+  caducados: "caducado",
+  caducadas: "caducado",
+  expirou: "expirado",
+  expirar: "expirado",
+  expirada: "expirado",
+  expirados: "expirado",
+  expiradas: "expirado",
+  roubaram: "roubado",
+  roubou: "roubado",
+  roubar: "roubado",
+  roubada: "roubado",
+  roubo: "roubado",
+  furtaram: "furtado",
+  furtou: "furtado",
+  furtar: "furtado",
+  furtada: "furtado",
+  furto: "furtado",
+  perco: "perdido",
+  perdi: "perdido",
+  perdeu: "perdido",
+  perder: "perdido",
+  perdida: "perdido",
+  tiro: "tirar",
+  tirei: "tirar",
+  tira: "tirar",
+  tirou: "tirar",
+  cancelo: "cancelar",
+  cancelei: "cancelar",
+  cancela: "cancelar",
+  cancelou: "cancelar",
+  rescindo: "rescindir",
+  rescindi: "rescindir",
+  voto: "votar",
+  votei: "votar",
+  vota: "votar",
+  votou: "votar",
+  mudo: "mudar",
+  mudei: "mudar",
+  mudou: "mudar",
+  abro: "abrir",
+  abri: "abrir",
+  abriu: "abrir",
+  marco: "marcar",
+  marquei: "marcar",
+  marcou: "marcar",
+  agendo: "agendar",
+  agendei: "agendar",
+  agendou: "agendar",
+  ativo: "ativar",
+  ativei: "ativar",
+  adiro: "aderir",
+  aderi: "aderir",
+  entrego: "entregar",
+  entreguei: "entregar",
+  pago: "pagar",
+  paguei: "pagar",
+  pagou: "pagar",
+  consulto: "consultar",
+  consultei: "consultar",
+  troco: "trocar",
+  troquei: "trocar",
+  troca: "trocar",
+  gratis: "gratuito",
+  gratuita: "gratuito",
+  gratuitos: "gratuito",
+  gratuitas: "gratuito",
+  estrangeira: "estrangeiro",
+  estrangeiros: "estrangeiro",
+  estrangeiras: "estrangeiro",
+  queixas: "queixa",
+  queixar: "queixa",
+  reclamar: "reclamacao",
+  reclamacoes: "reclamacao",
+};
+
+/** Verbos de ação genéricos: desempatam dentro de um tema, mas não pontuam sozinhos. */
+const VERBOS_AUXILIARES = new Set([
+  "pedir", "fazer", "tirar", "consultar", "abrir", "pagar",
+  "entregar", "submeter", "receber", "validar", "aderir", "escolher",
+]);
+
+/** Expansão semântica de siglas oficiais para os termos dos temas curados. */
+const EXPANSAO_SIGLAS: Record<string, string[]> = {
+  cc: ["cartao", "cidadao"],
+  bi: ["cartao", "cidadao"],
+  cmd: ["chave", "movel", "digital"],
+  cesd: ["cartao", "europeu", "seguro", "doenca"],
+  ehic: ["cartao", "europeu", "seguro", "doenca"],
+  d7: ["visto"],
+  d8: ["visto", "nomada", "digital"],
+  d2: ["visto"],
+  ss: ["seguranca", "social"],
+  cp: ["comboio", "transportes"],
+};
+
+const PAISES_UE_DESTINO = new Set([
+  "espanha", "franca", "alemanha", "italia", "irlanda", "belgica",
+  "holanda", "luxemburgo", "austria", "dinamarca", "suecia", "polonia", "grecia",
+]);
+
+/** Modificadores que alteram o procedimento legal — se ausentes do candidato, evita falso positivo. */
+const QUALIFICADORES_FORTES = new Set([
+  "trocar", "estrangeiro", "internacional", "divorcio", "obito",
+  "falecimento", "heranca", "inspecao", "alfandega", "importar",
+  "legalizar", "exchange", "foreign",
+]);
+
+const SETORES_REGULADOR = [
+  "regulador", "regulator", "anacom", "erse", "banco", "operadora",
+  "telecom", "telecomunicacoes", "energia", "arbitragem", "provedor",
+];
 
 function normalizar(texto: string): string[] {
   return texto
@@ -52,20 +194,52 @@ function normalizar(texto: string): string[] {
     .replace(/\p{M}/gu, "")
     .replace(/[^a-z0-9\s]/g, " ")
     .split(/\s+/)
-    .filter((t) => t.length > 2 && !STOPWORDS.has(t));
+    .filter((t) => (t.length > 2 || SIGLAS_CURTAS.has(t)) && !STOPWORDS.has(t))
+    .map((t) => LEMAS[t] ?? t);
+}
+
+function normalizarFraseExata(texto: string): string {
+  return texto
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "")
+    .replace(/[^a-z0-9\s]/g, " ")
+    .trim()
+    .replace(/\s+/g, " ");
+}
+
+function ehTituloCuradoExato(fraseNorm: string, p: Pergunta): boolean {
+  if (!fraseNorm) return false;
+  if (fraseNorm === normalizarFraseExata(p.texto)) return true;
+  const titEn = TITULOS_EN[p.id];
+  return titEn !== undefined && fraseNorm === normalizarFraseExata(titEn);
 }
 
 /**
- * Compara duas palavras por radical: iguais, uma é prefixo da outra,
+ * Compara duas palavras por radical: iguais, equivalentes diretas,
  * ou partilham um prefixo de >=5 caracteres que cubra >=60% da menor.
  * ("desemprego"/"desempregado", "renovar"/"renovacao")
  */
 function mesmaRaiz(a: string, b: string): boolean {
-  if (a === b) return true;
-  const n = Math.min(a.length, b.length);
+  const la = LEMAS[a] ?? a;
+  const lb = LEMAS[b] ?? b;
+  if (la === lb) return true;
+  if (
+    (la === "carta" && lb.startsWith("cartao")) ||
+    (lb === "carta" && la.startsWith("cartao"))
+  ) {
+    return false;
+  }
+  if (
+    (la === "queixa" && lb === "reclamacao") ||
+    (la === "reclamacao" && lb === "queixa")
+  ) {
+    return true;
+  }
+  const n = Math.min(la.length, lb.length);
   if (n < 5) return false;
   let i = 0;
-  while (i < n && a[i] === b[i]) i++;
+  while (i < n && la[i] === lb[i]) i++;
   return i >= Math.min(6, n) && i / n >= 0.6;
 }
 
@@ -77,6 +251,9 @@ interface Candidato {
 
 function pontuar(
   tokens: Set<string>,
+  tokensBase: Set<string>,
+  fraseNorm: string,
+  intencaoDefinicao: boolean,
   pergunta: Pergunta,
   tema: Tema,
   cache: Map<string, string[]>,
@@ -87,24 +264,143 @@ function pontuar(
     return cache.get(s)!;
   };
 
-  let score = 0;
+  let scoreDominio = 0;
+  let scoreAux = 0;
+
   const soma = (peso: number, alvo: string[]) => {
     for (const t of tokens) {
-      if (alvo.some((p) => mesmaRaiz(t, p))) score += peso;
+      if (alvo.some((p) => mesmaRaiz(t, p))) {
+        if (VERBOS_AUXILIARES.has(t)) scoreAux += peso;
+        else scoreDominio += peso;
+      }
     }
   };
 
-  soma(3, pergunta.palavras);
-  // Palavras-chave EN geradas — entram no ranking quando o pedido é em inglês.
-  // Podem ser frases ("citizen card"), por isso passam pelo mesmo normalizar.
+  soma(3, norm(pergunta.palavras.join(" ")));
+  // Palavras-chave e títulos EN — entram no ranking quando o pedido é em inglês.
   if (lang === "en") {
     const en = TEMAS_EN[pergunta.id];
-    if (en) soma(3, en.palavras.flatMap((w) => norm(w)));
+    if (en) soma(3, norm(en.palavras.join(" ")));
+    const titEn = TITULOS_EN[pergunta.id];
+    if (titEn) soma(2, norm(titEn));
+    const temaTitEn = TEMAS_TITULO_EN[tema.id];
+    if (temaTitEn) soma(1.5, norm(temaTitEn));
   }
   soma(2, norm(pergunta.texto));
   soma(1.5, norm(tema.titulo));
   soma(1.5, norm(tema.entidade));
   soma(0.5, norm(tema.descricao));
+
+  const tituloExato = ehTituloCuradoExato(fraseNorm, pergunta);
+  if (!tituloExato && scoreDominio === 0) return 0;
+
+  let score = scoreDominio + scoreAux;
+  if (tituloExato) score += 50;
+
+  // Perguntas definicionais ("o que é a CMD?", "para que serve o CESD?")
+  if (
+    intencaoDefinicao &&
+    scoreDominio > 0 &&
+    (pergunta.id.endsWith("-o-que-e") ||
+      pergunta.id.endsWith("-para-que-serve") ||
+      /^(o que e|para que serve)\b/.test(normalizarFraseExata(pergunta.texto)))
+  ) {
+    score += 3;
+  }
+
+  // Perda/furto do CC vs perda da carta PIN/PUK ou renovação normal
+  if (
+    pergunta.id === "cc-perdido" &&
+    tokens.has("cartao") &&
+    (tokens.has("perdido") ||
+      tokens.has("roubado") ||
+      tokens.has("furtado") ||
+      tokens.has("lost") ||
+      tokens.has("stolen") ||
+      tokens.has("theft")) &&
+    !tokens.has("pin") &&
+    !tokens.has("puk") &&
+    !tokens.has("carta") &&
+    !tokens.has("codigo") &&
+    !tokens.has("codigos") &&
+    !tokens.has("code") &&
+    !tokens.has("letter")
+  ) {
+    score += 4;
+  }
+
+  // Linha SNS 24 vs número de utente do SNS
+  if (
+    pergunta.id === "sns-24" &&
+    tokens.has("sns") &&
+    tokens.has("24") &&
+    !tokens.has("utente")
+  ) {
+    score += 4;
+  }
+
+  // Emigrar/viver num país concreto da UE (ex.: Espanha) reforça noutro-pais-ue
+  if (tema.id === "noutro-pais-ue" && scoreDominio > 0) {
+    for (const t of tokensBase) {
+      if (PAISES_UE_DESTINO.has(t)) {
+        score += 3;
+        break;
+      }
+    }
+  }
+
+  // Marcação genérica (Loja do Cidadão / Siga) vs marcação específica de passaporte
+  if (
+    pergunta.id === "pep-agendar" &&
+    !tokens.has("passaporte") &&
+    !tokens.has("pep") &&
+    !tokens.has("passport")
+  ) {
+    score = Math.max(0, score - 1);
+  }
+
+  // Queixa genérica de consumo (Livro de Reclamações) vs regulador setorial
+  if (
+    pergunta.id === "rec-regulador" &&
+    !SETORES_REGULADOR.some((s) => tokens.has(s))
+  ) {
+    score = Math.max(0, score - 1);
+  }
+
+  // Guarda contra falsos positivos quando há qualificadores fortes ausentes da resposta
+  if (!tituloExato && score > 2) {
+    let qualificadoresEmFalta = false;
+    for (const q of tokensBase) {
+      if (!QUALIFICADORES_FORTES.has(q)) continue;
+      const chaveVocab = `__vocab_${lang}_${pergunta.id}`;
+      if (!cache.has(chaveVocab)) {
+        const en = lang === "en" ? TEMAS_EN[pergunta.id] : undefined;
+        const textoTotal = [
+          pergunta.palavras.join(" "),
+          pergunta.texto,
+          ...pergunta.resposta.passos,
+          pergunta.resposta.nota ?? "",
+          ...(en ? [en.palavras.join(" "), ...en.passos, en.nota ?? ""] : []),
+          lang === "en" ? (TITULOS_EN[pergunta.id] ?? "") : "",
+        ].join(" ");
+        cache.set(chaveVocab, normalizar(textoTotal));
+      }
+      const vocab = cache.get(chaveVocab)!;
+      const coberto =
+        vocab.some((v) => mesmaRaiz(q, v)) ||
+        (q === "trocar" &&
+          vocab.some(
+            (v) => v === "mudar" || v === "alterar" || v === "escolher"
+          ));
+      if (!coberto) {
+        qualificadoresEmFalta = true;
+        break;
+      }
+    }
+    if (qualificadoresEmFalta) {
+      score = 2 + Math.min(1.9, score / 15);
+    }
+  }
 
   return score;
 }
@@ -112,35 +408,90 @@ function pontuar(
 /** Ranking partilhado pelos dois motores: devolve os candidatos por score.
  *  Exportado para os testes medirem top-1/top-3 e experimentarem limiares. */
 export function rankear(pergunta: string, lang: Lang = "pt"): Candidato[] {
-  const tokens = new Set(normalizar(pergunta));
-  if (tokens.size === 0) return [];
+  const fraseNorm = normalizarFraseExata(pergunta);
+  const listaBase = normalizar(pergunta);
+  const tokensBase = new Set(listaBase);
+  if (tokensBase.size === 0 && !fraseNorm) return [];
+
+  const tokens = new Set(tokensBase);
+  for (const t of tokensBase) {
+    const exp = EXPANSAO_SIGLAS[t];
+    if (exp) for (const e of exp) tokens.add(e);
+    if (t === "at" && lang === "pt") {
+      tokens.add("financas");
+      tokens.add("tributaria");
+    }
+  }
+
+  const intencaoDefinicao = /\b(o que e|para que serve|que significa|what is)\b/.test(
+    fraseNorm
+  );
 
   const cache = new Map<string, string[]>();
   const candidatos: Candidato[] = [];
   for (const tema of TEMAS) {
     for (const p of tema.perguntas) {
-      const score = pontuar(tokens, p, tema, cache, lang);
+      const score = pontuar(
+        tokens,
+        tokensBase,
+        fraseNorm,
+        intencaoDefinicao,
+        p,
+        tema,
+        cache,
+        lang
+      );
       if (score > 0) candidatos.push({ p, tema, score });
     }
   }
   return candidatos.sort((a, b) => b.score - a.score);
 }
 
-function paraSugestao(c: Candidato): Sugestao {
+function paraSugestao(c: Candidato, lang: Lang = "pt"): Sugestao {
+  if (lang === "en") {
+    return {
+      id: c.p.id,
+      texto: TITULOS_EN[c.p.id] ?? c.p.texto,
+      tema: TEMAS_TITULO_EN[c.tema.id] ?? c.tema.titulo,
+    };
+  }
   return { id: c.p.id, texto: c.p.texto, tema: c.tema.titulo };
 }
 
-function populares(): Sugestao[] {
+function elegivelSugestao(id: string, lang: Lang): boolean {
+  return lang !== "en" || TEMAS_EN[id]?.revisao !== true;
+}
+
+function populares(lang: Lang = "pt"): Sugestao[] {
   const ids = ["cc-renovar", "irs-entregar", "ss-direta", "sns-consulta"];
   return ids
+    .filter((id) => elegivelSugestao(id, lang))
     .map((id) => {
       for (const tema of TEMAS) {
         const p = tema.perguntas.find((x) => x.id === id);
-        if (p) return { id: p.id, texto: p.texto, tema: tema.titulo };
+        if (p) return paraSugestao({ p, tema, score: 0 }, lang);
       }
       return null;
     })
     .filter((s): s is Sugestao => s !== null);
+}
+
+function sugestoesDe(
+  candidatos: Candidato[],
+  lang: Lang,
+  limite: number,
+  minScore = 0,
+  excluirId?: string
+): Sugestao[] {
+  return candidatos
+    .filter(
+      (c) =>
+        c.p.id !== excluirId &&
+        c.score >= minScore &&
+        elegivelSugestao(c.p.id, lang)
+    )
+    .slice(0, limite)
+    .map((c) => paraSugestao(c, lang));
 }
 
 export class KeywordEngine implements AnswerEngine {
@@ -152,10 +503,13 @@ export class KeywordEngine implements AnswerEngine {
     const melhor = candidatos[0];
 
     if (melhor && melhor.score >= 4) {
-      const outras = candidatos
-        .slice(1, 4)
-        .filter((c) => c.p.id !== melhor.p.id && c.score >= 2)
-        .map(paraSugestao);
+      const outras = sugestoesDe(
+        candidatos.slice(1),
+        lang,
+        3,
+        2,
+        melhor.p.id
+      );
 
       // Tradução EN curada — só é servida depois de revista (revisao !== true)
       const en = lang === "en" ? TEMAS_EN[melhor.p.id] : undefined;
@@ -182,12 +536,10 @@ export class KeywordEngine implements AnswerEngine {
       };
     }
 
+    const sugs = sugestoesDe(candidatos, lang, 4);
     return {
       tipo: "sugestoes",
-      sugestoes:
-        candidatos.length > 0
-          ? candidatos.slice(0, 4).map(paraSugestao)
-          : populares(),
+      sugestoes: sugs.length > 0 ? sugs : populares(lang),
       via: "keyword",
       idioma: lang,
     };
@@ -204,6 +556,11 @@ interface LlmConfig {
   models: string[];
   timeoutMs: number;
 }
+
+type AnaliseRespostaLlm =
+  | { estado: "ok"; resposta: ResultadoResposta }
+  | { estado: "recusa" }
+  | { estado: "rejeitado" };
 
 const SYSTEM_PROMPT = `És o Zé, o assistente do Pergunta ao Zé — um projeto independente que ajuda cidadãos a orientarem-se nos serviços públicos portugueses. Não és um site do Estado.
 
@@ -233,16 +590,62 @@ export class LlmEngine implements AnswerEngine {
     // Só vale a pena chamar o LLM se houver contexto minimamente relevante;
     // abaixo de 2 o match é um único token fraco — não há nada para fundamentar.
     if (candidatos.length === 0 || candidatos[0].score < 2) {
-      return { tipo: "sugestoes", sugestoes: populares(), via: "llm", idioma: lang };
+      return {
+        tipo: "sugestoes",
+        sugestoes: populares(lang),
+        via: "keyword",
+        idioma: lang,
+      };
     }
 
-    const { contexto, fontes } = montarContexto(candidatos.slice(0, 6));
+    // F-11: curto-circuito instantâneo para pergunta curada exata (senhas/sugestões)
+    const fraseNorm = normalizarFraseExata(pergunta);
+    if (ehTituloCuradoExato(fraseNorm, candidatos[0].p)) {
+      const direto = await this.fallback.responder(pergunta, lang);
+      return { ...direto, via: "keyword" };
+    }
+
+    // F-03: em EN nunca traduz via LLM respostas sensíveis sem revisão humana
+    if (lang === "en") {
+      const enTop = TEMAS_EN[candidatos[0].p.id];
+      if (!enTop || enTop.revisao === true) {
+        const seguro = await this.fallback.responder(pergunta, lang);
+        return { ...seguro, via: "keyword" };
+      }
+    }
+
+    const candidatosContexto = (
+      lang === "en"
+        ? candidatos.filter((c) => {
+            const en = TEMAS_EN[c.p.id];
+            return Boolean(en && en.revisao !== true);
+          })
+        : candidatos
+    ).slice(0, 6);
+    const { contexto, fontes } = montarContexto(candidatosContexto);
 
     for (const model of this.cfg.models) {
       try {
         const bruto = await this.chamarModelo(model, pergunta, contexto, lang);
-        const resposta = this.parseResposta(bruto, contexto, fontes, candidatos);
-        if (resposta) return { ...resposta, idioma: lang };
+        const analise = this.parseResposta(
+          bruto,
+          contexto,
+          fontes,
+          candidatos,
+          lang
+        );
+        if (analise.estado === "ok") {
+          return { ...analise.resposta, idioma: lang };
+        }
+        if (analise.estado === "recusa") {
+          const sugs = sugestoesDe(candidatos, lang, 4);
+          return {
+            tipo: "sugestoes",
+            sugestoes: sugs.length > 0 ? sugs : populares(lang),
+            via: "llm",
+            idioma: lang,
+          };
+        }
       } catch (err) {
         console.error(`[LlmEngine] modelo ${model} falhou:`, err);
       }
@@ -299,26 +702,42 @@ export class LlmEngine implements AnswerEngine {
     bruto: string,
     contexto: string,
     fontes: FonteIndexada[],
-    candidatos: Candidato[]
-  ): ResultadoResposta | null {
+    candidatos: Candidato[],
+    lang: Lang
+  ): AnaliseRespostaLlm {
     const melhorCandidato = candidatos[0];
     const inicio = bruto.indexOf("{");
     const fim = bruto.lastIndexOf("}");
-    if (inicio < 0 || fim <= inicio) return null;
+    if (inicio < 0 || fim <= inicio) return { estado: "rejeitado" };
 
     let parsed: { passos?: unknown; nota?: unknown; fontes?: unknown };
     try {
       parsed = JSON.parse(bruto.slice(inicio, fim + 1));
     } catch {
-      return null;
+      return { estado: "rejeitado" };
     }
 
-    if (!Array.isArray(parsed.passos)) return null;
-    const passos = parsed.passos.filter(
+    if (!Array.isArray(parsed.passos)) return { estado: "rejeitado" };
+    let passos = parsed.passos.filter(
       (p): p is string => typeof p === "string" && p.trim().length > 0
     );
-    if (passos.length === 0) return null;
-    const nota = typeof parsed.nota === "string" ? parsed.nota : undefined;
+    // F-27: recusa explícita fundamentada (passos: []) — não desperdiça 2.º modelo
+    if (passos.length === 0) return { estado: "recusa" };
+
+    let nota =
+      typeof parsed.nota === "string" && parsed.nota.trim().length > 0
+        ? parsed.nota
+        : undefined;
+
+    // F-03: aplica o glossário canónico EN antes do check de invariantes e retorno
+    if (lang === "en") {
+      const normEn = normalizarRespostaEn(
+        { passos, nota, palavras: [] },
+        melhorCandidato.p.id
+      );
+      passos = normEn.passos;
+      nota = normEn.nota;
+    }
 
     // Grounding: cada número, telefone, data, valor € ou URL do output tem
     // de existir no contexto enviado — se inventou, descarta e cai no
@@ -329,7 +748,7 @@ export class LlmEngine implements AnswerEngine {
       console.error(
         `[LlmEngine] resposta descartada — inventou ${foraDoContexto.join(", ")}`
       );
-      return null;
+      return { estado: "rejeitado" };
     }
 
     const refs = new Set(
@@ -353,14 +772,20 @@ export class LlmEngine implements AnswerEngine {
     };
 
     return {
-      tipo: "resposta",
-      pergunta,
-      tema: melhorCandidato.tema,
-      sugestoes: candidatos
-        .slice(1, 4)
-        .filter((c) => c.score >= 2)
-        .map(paraSugestao),
-      via: "llm",
+      estado: "ok",
+      resposta: {
+        tipo: "resposta",
+        pergunta,
+        tema: melhorCandidato.tema,
+        sugestoes: sugestoesDe(
+          candidatos.slice(1),
+          lang,
+          3,
+          2,
+          melhorCandidato.p.id
+        ),
+        via: "llm",
+      },
     };
   }
 }

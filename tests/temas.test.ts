@@ -2,6 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { TEMAS } from "../lib/data/temas.ts";
 import { ENTIDADES } from "../lib/data/fontes.ts";
+import { BALCOES_DEF, balcaoDeTema } from "../lib/balcoes.ts";
 
 /**
  * Validação estrutural da base curada — corre em cada build/CI.
@@ -51,4 +52,47 @@ test("temas: o domínio de cada fonte existe em fontes.ts (ENTIDADES)", () => {
       }
     }
   }
+});
+
+test("temas: palavras-chave normalizadas (minúsculas, sem espaços nem diacríticos)", () => {
+  const problemas: string[] = [];
+  for (const t of TEMAS) {
+    for (const p of t.perguntas) {
+      for (const w of p.palavras) {
+        const normalizada = w
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/\p{M}/gu, "");
+        if (w !== normalizada || /\s/.test(w)) {
+          problemas.push(`${p.id}: keyword inválida "${w}" (esperado "${normalizada}")`);
+        }
+      }
+    }
+  }
+  assert.deepEqual(problemas, []);
+});
+
+test("temas: todos os temas de TEMAS existem exatamente uma vez em BALCOES_DEF", () => {
+  const todosEmBalcoes = BALCOES_DEF.flatMap((b) => b.temas);
+  assert.equal(
+    new Set(todosEmBalcoes).size,
+    todosEmBalcoes.length,
+    "BALCOES_DEF tem ids de tema duplicados"
+  );
+
+  const idsTemas = new Set(TEMAS.map((t) => t.id));
+  for (const id of todosEmBalcoes) {
+    assert.ok(idsTemas.has(id), `BALCOES_DEF referencia tema inexistente "${id}"`);
+  }
+  for (const t of TEMAS) {
+    assert.ok(
+      balcaoDeTema(t.id) >= 0,
+      `tema "${t.id}" não está atribuído a nenhum balcão em BALCOES_DEF`
+    );
+  }
+  assert.equal(
+    balcaoDeTema("cartao-de-cidadao"),
+    0,
+    "cartao-de-cidadao deve pertencer ao Balcão 1 (Identificação)"
+  );
 });

@@ -1,5 +1,7 @@
 [
   { "pergunta": "o meu cc caducou como renovo", "idEsperado": "cc-renovar" },
+  { "pergunta": "como renovo o cc", "idEsperado": "cc-renovar" },
+  { "pergunta": "renovar o bi", "idEsperado": "cc-renovar" },
   { "pergunta": "renovar cartao de cidadao online", "idEsperado": "cc-renovar" },
   { "pergunta": "o cc expirou tenho de tirar novo", "idEsperado": "cc-renovar" },
   { "pergunta": "perdi a carta com o pin e o puk do cc", "idEsperado": "cc-pin-puk" },
@@ -7,6 +9,8 @@
   { "pergunta": "quero mudar a morada do cartao de cidadao", "idEsperado": "cc-morada" },
   { "pergunta": "alterar morada fiscal no cc", "idEsperado": "cc-morada" },
   { "pergunta": "perdi a carteira com o cc dentro", "idEsperado": "cc-perdido" },
+  { "pergunta": "perdi o cc", "idEsperado": "cc-perdido" },
+  { "pergunta": "roubaram me o cc", "idEsperado": "cc-perdido" },
   { "pergunta": "roubaram me o cartao de cidadao", "idEsperado": "cc-perdido" },
 
   { "pergunta": "preciso de passaporte para viajar para fora", "idEsperado": "pep-pedir" },
@@ -31,6 +35,7 @@
   { "pergunta": "como peco o niss", "idEsperado": "ss-niss" },
   { "pergunta": "preciso do numero da seguranca social para trabalhar", "idEsperado": "ss-niss" },
   { "pergunta": "aderir a seguranca social direta", "idEsperado": "ss-direta" },
+  { "pergunta": "aderir a ss direta", "idEsperado": "ss-direta" },
   { "pergunta": "estou doente como meto baixa", "idEsperado": "ss-baixa" },
   { "pergunta": "baixa medica como funciona", "idEsperado": "ss-baixa" },
 
@@ -76,6 +81,7 @@
   { "pergunta": "emigrar para espanha o que preciso", "idEsperado": "ue-mudar" },
   { "pergunta": "cartao europeu de saude para as ferias", "idEsperado": "ue-cesd" },
   { "pergunta": "como peco o cesd", "idEsperado": "ue-cesd" },
+  { "pergunta": "o que e o cesd", "idEsperado": "ue-cesd" },
 
   { "pergunta": "como peco a reforma", "idEsperado": "pen-pedir" },
   { "pergunta": "com que idade me posso reformar", "idEsperado": "pen-pedir" },
@@ -109,6 +115,7 @@
 
   { "pergunta": "que visto preciso para viver em portugal", "idEsperado": "vis-tipos" },
   { "pergunta": "visto d7 requisitos", "idEsperado": "vis-tipos" },
+  { "pergunta": "como peco o d7", "idEsperado": "vis-tipos" },
   { "pergunta": "agendar atendimento na aima para renovar o titulo", "idEsperado": "vis-agendar-aima" },
 
   { "pergunta": "livro de reclamacoes online", "idEsperado": "rec-livro" },
@@ -116,6 +123,7 @@
   { "pergunta": "fazer queixa a anacom da operadora", "idEsperado": "rec-regulador" },
   { "pergunta": "como cancelo o contrato da operadora com fidelizacao", "idEsperado": "rec-cancelar-contrato" },
   { "pergunta": "rescindir contrato de telecomunicacoes", "idEsperado": "rec-cancelar-contrato" },
+  { "pergunta": "cancelei o contrato da tv e net", "idEsperado": "rec-cancelar-contrato" },
 
   { "pergunta": "como carrego o passe navegante", "idEsperado": "tra-navegante" },
   { "pergunta": "passe mensal do metro", "idEsperado": "tra-navegante" },
@@ -131,5 +139,6 @@
   { "pergunta": "previsao do tempo para o fim de semana", "idEsperado": null },
   { "pergunta": "a que horas fecha o continente", "idEsperado": null },
   { "pergunta": "conversor de euros para dolares", "idEsperado": null },
-  { "pergunta": "quanto ganha um eletricista", "idEsperado": null }
+  { "pergunta": "quanto ganha um eletricista", "idEsperado": null },
+  { "pergunta": "trocar carta de conducao estrangeira", "idEsperado": null }
 ]

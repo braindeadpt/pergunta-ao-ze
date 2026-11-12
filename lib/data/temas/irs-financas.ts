@@ -39,7 +39,7 @@ const tema: Tema = {
       id: "irs-reembolso",
       texto: "Como sei se tenho reembolso de IRS?",
       palavras: [
-        "irs", "reembolso", "receber", "estado", "liquidaçao",
+        "irs", "reembolso", "receber", "estado", "liquidacao",
         "reembolsavel", "pagar", "devolver", "financas",
       ],
       resposta: {

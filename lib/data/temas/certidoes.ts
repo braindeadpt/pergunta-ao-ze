@@ -15,7 +15,7 @@ const tema: Tema = {
       ],
       resposta: {
         passos: [
-          "No Civil Online (registos IRN) pedes a certidão permanente de nascimento, casamento ou óbito — o acesso online é gratuito.",
+          "No Civil Online (registos IRN) pedes a certidão permanente de nascimento, casamento ou óbito (pedido online: 10 €, válido por 6 meses; consultar com o código é gratuito).",
           "Recebes um código de acesso para consultar a certidão durante 6 meses — é esse código que entregas a quem a pede.",
           "A certidão em papel continua disponível nos balcões de registo, paga.",
         ],

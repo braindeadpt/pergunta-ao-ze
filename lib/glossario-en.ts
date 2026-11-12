@@ -54,6 +54,11 @@ const CORRECOES: { re: RegExp; para: string }[] = [
     re: /\bthe portal and mission structure\b/gi,
     para: "the AIMA online portal and its dedicated task force (estrutura de missão)",
   },
+  // "baixa" traduzida à letra pelo modelo como "download" em vez de "sick leave".
+  {
+    re: /\bself[‑-]?declaration\s+download\b/gi,
+    para: "self-declared sick leave",
+  },
   // Estados do Portal das Finanças: termo PT mantém-se + gloss EN.
   { re: /'Recebida'(?!\s*\()/g, para: "'Recebida' (Received)" },
   {

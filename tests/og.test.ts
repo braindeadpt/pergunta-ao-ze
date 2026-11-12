@@ -1,6 +1,13 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { codigoSenha, letraTema, tamanhoLetra, textoSelo } from "../lib/og.ts";
+import {
+  ZE_SVG,
+  codigoSenha,
+  letraTema,
+  tamanhoLetra,
+  textoSelo,
+  zeUri,
+} from "../lib/og.ts";
 import { TEMAS } from "../lib/data/temas.ts";
 
 test("og: código de senha — único, estável e no formato L-NN", () => {
@@ -50,4 +57,71 @@ test("og: selo — verificadoEm formata como VerificadoEm; sem data, selo por l�
   assert.equal(textoSelo(undefined, "pt"), "Grátis. Sem registo.");
   assert.equal(textoSelo(undefined, "en"), "Free. No sign-up.");
   assert.equal(textoSelo("lixo", "en"), "Free. No sign-up.");
+});
+
+test("og: ZE_SVG é SVG bem formado, sem <text>, com paths vetoriais e camadas separadas", () => {
+  assert.match(ZE_SVG, /^<svg\b[^>]*xmlns="http:\/\/www\.w3\.org\/2000\/svg"/);
+  assert.match(ZE_SVG, /viewBox="0 0 340 300"/);
+  assert.match(ZE_SVG, /<\/svg>$/);
+
+  // Zero tags <text> ou <tspan>: o Resvg num <img> data-uri não tem fontes embebidas
+  assert.ok(!/<text\b/i.test(ZE_SVG), "ZE_SVG não pode conter tags <text>");
+  assert.ok(!/<tspan\b/i.test(ZE_SVG), "ZE_SVG não pode conter tags <tspan>");
+
+  // Validação estrutural XML/SVG: todas as tags abertas fecham pela ordem certa
+  const pilha: string[] = [];
+  const tagRe = /<\/?([a-zA-Z][\w-]*)(\s[^>]*)?>/g;
+  let m: RegExpExecArray | null;
+  let pos = 0;
+  while ((m = tagRe.exec(ZE_SVG)) !== null) {
+    const entre = ZE_SVG.slice(pos, m.index).trim();
+    assert.equal(entre, "", `texto solto inesperado no SVG: "${entre}"`);
+    pos = m.index + m[0].length;
+
+    const token = m[0];
+    const nome = m[1];
+    const attrs = m[2] ?? "";
+    // Aspas balanceadas nos atributos
+    const aspas = (attrs.match(/"/g) ?? []).length;
+    assert.equal(aspas % 2, 0, `aspas desbalanceadas em ${token}`);
+
+    if (token.startsWith("</")) {
+      const aberta = pilha.pop();
+      assert.equal(aberta, nome, `fecho </${nome}> não corresponde a <${aberta}>`);
+    } else if (!token.endsWith("/>")) {
+      pilha.push(nome);
+    }
+  }
+  assert.equal(ZE_SVG.slice(pos).trim(), "");
+  assert.deepEqual(pilha, [], `tags SVG por fechar: ${pilha.join(", ")}`);
+
+  // Crachá (182,176 30x18) e placa do balcão (136,238 68x24) têm paths vetoriais
+  assert.match(
+    ZE_SVG,
+    /<rect x="182" y="176" width="30" height="18"[^/]*\/>\s*<path d="M[^"]+"/,
+    "crachá ZÉ deve ter <path> vetorial"
+  );
+  assert.match(
+    ZE_SVG,
+    /<rect x="136" y="238" width="68" height="24"[^/]*\/>\s*<path d="M[^"]+"/,
+    "placa BALCÃO deve ter <path> vetorial"
+  );
+
+  // Carimbo na mão direita vem depois da cabeça verde e fora da zona da cabeça/caneta (x >= 260)
+  const idxCabeca = ZE_SVG.indexOf('transform="translate(92,6) scale(3.5)"');
+  const idxCarimbo = ZE_SVG.indexOf('fill="#d5232f"');
+  assert.ok(idxCabeca > 0 && idxCarimbo > idxCabeca, "carimbo deve estar numa camada à frente da cabeça");
+  const carimboRect = ZE_SVG.match(/<rect x="(\d+(?:\.\d+)?)"[^>]*fill="#d5232f"/);
+  assert.ok(carimboRect && Number(carimboRect[1]) >= 260, "carimbo deve estar separado à direita da cabeça/caneta");
+});
+
+test("og: zeUri() gera data-URI base64 válido e reversível", () => {
+  const uri = zeUri();
+  const prefixo = "data:image/svg+xml;base64,";
+  assert.ok(uri.startsWith(prefixo));
+  const b64 = uri.slice(prefixo.length);
+  assert.match(b64, /^[A-Za-z0-9+/]+=*$/);
+  const descodificado = Buffer.from(b64, "base64").toString("utf8");
+  assert.equal(descodificado, ZE_SVG);
+  assert.ok(!/<text\b/i.test(descodificado));
 });

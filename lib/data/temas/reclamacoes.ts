@@ -3,7 +3,7 @@ import type { Tema } from "@/lib/types";
 const tema: Tema = {
   id: "reclamacoes",
   titulo: "Reclamações",
-  entidade: "DGE · reguladores",
+  entidade: "DGC · reguladores",
   descricao: "Livro de Reclamações online e queixas a entidades",
   perguntas: [
     {

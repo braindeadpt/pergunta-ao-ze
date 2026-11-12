@@ -61,7 +61,7 @@ const tema: Tema = {
       texto: "Como registo um veículo em meu nome?",
       palavras: [
         "registo", "veiculo", "carro", "comprar", "usado", "dua",
-        "documento", "unico", "automvel", "transferir", "propriedade",
+        "documento", "unico", "automovel", "transferir", "propriedade",
       ],
       resposta: {
         passos: [
