@@ -119,6 +119,15 @@ export const ENTIDADES: Record<string, MetaEntidade> = {
   "vistos.mne.gov.pt": { nome: "Portal de Vistos — MNE", ambito: "Nacional" },
   "livroreclamacoes.pt": { nome: "Livro de Reclamações Eletrónico", ambito: "Nacional" },
   "navegante.pt": { nome: "Portal Navegante", ambito: "Nacional" },
+  "andante.pt": {
+    nome: "Andante — Transportes Metropolitanos do Porto",
+    ambito: "Nacional",
+    contacto: { telefone: "226 158 151" },
+  },
+  "portaldasmatriculas.edu.gov.pt": {
+    nome: "Portal das Matrículas (Educação)",
+    ambito: "Nacional",
+  },
   "cp.pt": {
     nome: "CP — Comboios de Portugal",
     ambito: "Nacional",

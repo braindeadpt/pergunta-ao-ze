@@ -11,13 +11,13 @@ const tema: Tema = {
       texto: "Onde voto e que documentos preciso?",
       palavras: [
         "votar", "voto", "eleicoes", "mesa", "assembleia", "onde",
-        "eleitor", "urna", "eleicao",
+        "eleitor", "urna", "eleicao", "3838", "sms",
       ],
       resposta: {
         passos: [
-          "Votas na mesa de voto da freguesia onde estás recenseado — descobre qual é no Portal do Eleitor ou por SMS (serviço anunciado em cada eleição).",
-          "Leva um documento de identificação com foto — o Cartão de Cidadão chega; não precisas de cartão de eleitor.",
-          "Se estiveres fora da tua área no dia, há modalidades como voto antecipado — anunciadas em cada eleição.",
+          "Votas na mesa de voto da freguesia onde estás recenseado — descobre qual é em recenseamento.pt ou envia um SMS grátis para o 3838 com «RE <n.º de identificação civil sem check-digit> <data de nascimento AAAAMMDD>».",
+          "Leva um documento de identificação com foto — o Cartão de Cidadão chega; já não precisas de número nem de cartão de eleitor.",
+          "Se estiveres fora da tua área no dia, há modalidades como o voto antecipado em mobilidade — anunciadas antes de cada eleição.",
         ],
         fontes: [
           {

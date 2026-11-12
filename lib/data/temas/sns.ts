@@ -108,6 +108,30 @@ const tema: Tema = {
         verificadoEm: "2026-11-12",
       },
     },
+    {
+      id: "sns-atestado-multiuso",
+      texto: "Como peço o Atestado Médico de Incapacidade Multiuso?",
+      palavras: [
+        "atestado", "multiuso", "incapacidade", "amim", "deficiencia",
+        "junta", "medica", "grau", "oncologico", "beneficios", "sns",
+        "centro", "saude",
+      ],
+      resposta: {
+        passos: [
+          "O Atestado Médico de Incapacidade Multiuso (AMIM) comprova a percentagem de incapacidade (física ou mental) para acesso a benefícios fiscais, sociais e económicos (como no IRS, IUC ou Prestação Social para a Inclusão).",
+          "Pedes presencialmente no centro de saúde da tua área de residência, entregando requerimento dirigido ao presidente da Junta Médica de Avaliação de Incapacidade (JMAI) acompanhado de todos os relatórios médicos e exames.",
+          "Doentes oncológicos recém-diagnosticados pedem o atestado diretamente no hospital onde foi feito o diagnóstico; há também patologias com emissão direta por médico do SNS e dispensa de junta médica.",
+        ],
+        fontes: [
+          {
+            titulo: "Atestado Médico de Incapacidade Multiuso — SNS 24",
+            url: "https://www.sns24.gov.pt/pt/servico/atestado-multiuso/",
+            dominio: "sns24.gov.pt",
+          },
+        ],
+        verificadoEm: "2026-11-12",
+      },
+    },
   ],
 };
 

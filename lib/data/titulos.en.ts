@@ -18,6 +18,8 @@ export const TITULOS_EN: Record<string, string> = {
   "cmd-para-que-serve": "What is the Digital Mobile Key (Chave Móvel Digital) for?",
   "irs-entregar": "How do I file my IRS (income tax) return?",
   "irs-reembolso": "How do I check my IRS refund?",
+  "at-nif": "How do I apply for a NIF (Portuguese tax number)?",
+  "at-certidao-domicilio": "How do I get a tax domicile certificate?",
   "ss-niss": "How do I get a NISS (Social Security number)?",
   "ss-direta": "How do I sign up for Segurança Social Direta?",
   "ss-baixa": "How does sick leave (CIT) work?",
@@ -66,6 +68,13 @@ export const TITULOS_EN: Record<string, string> = {
   "cert-nascimento": "A baby was born: how do I register the birth?",
   "hab-imi": "How do I check and pay the IMI (property tax)?",
   "rec-cancelar-contrato": "How do I cancel a telecoms contract?",
+  "imt-inspecao": "When do I have to take my car for its periodic inspection (IPO)?",
+  "imt-trocar-carta": "How do I exchange a foreign driving licence for a Portuguese one?",
+  "edu-matriculas": "How do I enrol a child in school (pre-school, primary and secondary)?",
+  "fam-casamento-uniao": "How do I start the marriage process or prove a civil partnership (união de facto)?",
+  "cert-obito-heranca": "A family member passed away: what do I need to handle (Espaço Óbito and inheritance)?",
+  "pen-csi": "How do I apply for the Solidarity Supplement for the Elderly (CSI)?",
+  "sns-atestado-multiuso": "How do I apply for the Multipurpose Medical Certificate of Incapacity?",
 };
 
 /** Título do tema em EN para breadcrumbs e índice (tema.id → título). */
@@ -88,7 +97,7 @@ export const TEMAS_TITULO_EN: Record<string, string> = {
   "familia": "Family",
   "justica-multas": "Justice & fines",
   "eleicoes-voto": "Elections & voting",
-  "educacao": "Higher education",
+  "educacao": "Education & higher education",
   "vistos-entrada": "Moving to Portugal",
   "reclamacoes": "Complaints",
   "transportes": "Transport & passes",

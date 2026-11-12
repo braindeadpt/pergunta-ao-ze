@@ -54,6 +54,34 @@ const tema: Tema = {
         verificadoEm: "2026-11-12",
       },
     },
+    {
+      id: "pen-csi",
+      texto: "Como peço o Complemento Solidário para Idosos (CSI)?",
+      palavras: [
+        "csi", "complemento", "solidario", "idosos", "idoso", "apoio",
+        "pensao", "reforma", "medicamentos", "seguranca", "social", "recursos",
+      ],
+      resposta: {
+        passos: [
+          "Destina-se a pensionistas com idade igual ou superior à idade normal de acesso à pensão de velhice, residentes em Portugal há pelo menos 6 anos e com rendimentos anuais abaixo dos limites legais.",
+          "Pedes online na Segurança Social Direta ou presencialmente nos balcões da Segurança Social, entregando o requerimento (Mod. CSI 1-DGSS), o anexo de rendimentos do agregado e os documentos de identificação.",
+          "Para além do apoio mensal em dinheiro, quem recebe o CSI tem direito a benefícios adicionais de saúde — incluindo medicamentos comparticipados gratuitos na farmácia mediante receita médica.",
+        ],
+        fontes: [
+          {
+            titulo: "Pedir o Complemento Solidário para Idosos — gov.pt",
+            url: "https://www.gov.pt/servicos/pedir-o-complemento-solidario-para-idosos",
+            dominio: "gov.pt",
+          },
+          {
+            titulo: "Segurança Social Direta",
+            url: "https://www.seg-social.pt/seguranca-social-direta",
+            dominio: "seg-social.pt",
+          },
+        ],
+        verificadoEm: "2026-11-12",
+      },
+    },
   ],
 };
 

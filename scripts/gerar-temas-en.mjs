@@ -58,12 +58,10 @@ try {
 }
 
 /** Respostas administrativamente sensíveis — geradas mas retidas até revisão.
- *  2026-10: libertadas 8 após revisão do mantenedor. Ficam retidas apenas
- *  as duas que dependem das lacunas em docs/lacunas-conteudo.md. */
-const SENSIVEIS = new Set([
-  "at-nif",
-  "at-certidao-domicilio",
-]);
+ *  2026-10: libertadas 8 após revisão do mantenedor.
+ *  2026-11: fechadas as lacunas de `at-nif` e `at-certidao-domicilio` nas fontes
+ *  oficiais (`gov.pt` e `info.portaldasfinancas.gov.pt`) e libertadas todas as entradas. */
+const SENSIVEIS = new Set([]);
 
 const GLOSSARIO = `Glossário fixo (não variar entre respostas):
 Cartão de Cidadão = Citizen Card; NIF = NIF (Portuguese tax identification number);

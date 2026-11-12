@@ -1,41 +1,30 @@
 # Lacunas de conteúdo detetadas na revisão EN
 
-Registadas durante a revisão das 10 traduções sensíveis (`revisao: true`).
-São decisões de conteúdo para o mantenedor — **não foram escritas respostas
-novas** e `lib/data/temas.ts` não foi alterado.
+Registadas durante a revisão das 10 traduções sensíveis (`revisao: true`) e
+**resolvidas em 2026-11-12** após confirmação nas fontes oficiais (`gov.pt`,
+`info.portaldasfinancas.gov.pt` e `aima.gov.pt`).
 
-## 1. `at-certidao-domicilio` — residente estrangeiro sem Cartão de Cidadão
+## 1. `at-certidao-domicilio` — residente estrangeiro sem Cartão de Cidadão (Resolvido)
 
-A resposta diz que a certidão de domicílio fiscal "espelha a morada registada
-no Cartão de Cidadão". Um estrangeiro residente não tem Cartão de Cidadão
-(tem título de residência da AIMA). Falta indicar o que acontece nesse caso
-— provavelmente a morada fiscal segue a do título/declaração, mas é preciso
-confirmar na fonte.
+Confirmado em `info.portaldasfinancas.gov.pt` (secção «Dados pessoais → Morada»):
+- A certidão de domicílio fiscal é emitida gratuitamente em PDF no Portal das Finanças (disponível em português e inglês).
+- Para titulares de Cartão de Cidadão, reflete a morada do CC (alterada em `gov.pt` ou balcão IRN).
+- Cidadãos estrangeiros sem Cartão de Cidadão atualizam a morada diretamente no Portal das Finanças (`Dados Cadastrais → Morada → Entregar Pedido de Alteração`, ou via `e-balcão` com título de residência quando alteram o estatuto de não residente para residente) ou num Serviço de Finanças com agendamento prévio.
+- Entrada atualizada em PT e EN e libertada (`revisao: true` removido).
 
-- Fonte a consultar: https://www.portaldasfinancas.gov.pt
-  (secção de alteração de morada / certidão de domicílio fiscal)
+## 2. `at-nif` — canais para cidadãos estrangeiros e representante fiscal (Resolvido)
 
-## 2. `at-nif` — apenas pedido presencial para estrangeiros
+Confirmado em `gov.pt/servicos/pedir-o-numero-de-identificacao-fiscal-para-pessoa-singular`, `gov.pt/servicos/nomear-representante-fiscal` e `info.portaldasfinancas.gov.pt`:
+- Pedido presencial num Serviço de Finanças ou Loja do Cidadão mediante agendamento prévio, com passaporte/documento de identificação civil e comprovativo de morada.
+- Pedido online no Portal das Finanças através do `e-balcão` (`Registo Contribuinte → Identific → Atrib/Alter NIF-Singulares`) submetido por representante legal ou mandatário com procuração.
+- Residentes fora da UE, Noruega, Islândia ou Liechtenstein têm de nomear representante fiscal em Portugal ou aderir às notificações eletrónicas no Portal das Finanças (dispensado se não tiverem relação jurídica tributária em Portugal).
+- Entrada atualizada em PT e EN e libertada (`revisao: true` removido).
 
-A resposta descreve só o pedido presencial (Loja do Cidadão / balcão das
-Finanças). Falta verificar se existe via online (pedido por e-mail/balcão
-eletrónico) ou por representante fiscal — relevante para quem ainda não está
-em Portugal, que é precisamente o público das respostas em inglês.
+## 3. `aima-residencia` / `vis-agendar-aima` — nomes dos canais da AIMA (Verificado)
 
-- Fontes a consultar:
-  - https://www.gov.pt/servicos/pedir-o-numero-de-identificacao-fiscal-para-pessoa-singular
-  - https://www.portaldasfinancas.gov.pt
-
-## 3. `aima-residencia` / `vis-agendar-aima` — nomes dos canais da AIMA
-
-As respostas falam de "área pessoal da AIMA", "portal" e "agendamento".
-A AIMA muda estes nomes e canais com frequência (substituiu a estrutura de
-missão, os formulários de pedido já mudaram várias vezes). Convém confirmar
-os nomes atuais no portal antes de publicar as traduções.
-
-- Fonte a consultar: https://aima.gov.pt
+Confirmado em `aima.gov.pt` e `aima.gov.pt/pt/viver` em 2026-11-12:
+- As referências ao Portal de Serviços / área reservada da AIMA e à estrutura de missão (traduzida em EN com o gloss `the AIMA online portal and its dedicated task force (estrutura de missão)`) mantêm-se atuais e corretas.
 
 ---
 
-_Gerado durante a revisão assistida das traduções; decisões de conteúdo
-pendentes do mantenedor._
+_Todas as 10 entradas sensíveis inicialmente retidas encontram-se agora revistas e publicadas em EN (`SENSIVEIS = new Set([])`)._

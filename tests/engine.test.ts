@@ -103,19 +103,27 @@ test("sugestões em EN usam TITULOS_EN/TEMAS_TITULO_EN e filtram revisao: true",
     assert.equal(s.tema, TEMAS_TITULO_EN[tema.id]);
   }
 
-  // Mesmo no tema IRS/Finanças (onde at-nif e at-certidao-domicilio têm revisao: true),
-  // as sugestões relacionadas em EN nunca expõem entradas por rever.
-  const rIrs = await engine.responder("How do I file my IRS return?", "en");
-  assert.equal(rIrs.tipo, "resposta");
-  for (const s of rIrs.sugestoes) {
-    assert.notEqual(TEMAS_EN[s.id]?.revisao, true);
-    assert.equal(s.texto, TITULOS_EN[s.id]);
+  // Quando uma entrada está marcada com revisao: true, as sugestões relacionadas em EN nunca a expõem.
+  (TEMAS_EN["at-nif"] as { revisao?: boolean }).revisao = true;
+  try {
+    const rIrs = await engine.responder("How do I file my IRS return?", "en");
+    assert.equal(rIrs.tipo, "resposta");
+    for (const s of rIrs.sugestoes) {
+      assert.notEqual(TEMAS_EN[s.id]?.revisao, true);
+      assert.equal(s.texto, TITULOS_EN[s.id]);
+    }
+  } finally {
+    delete (TEMAS_EN["at-nif"] as { revisao?: boolean }).revisao;
   }
 });
 
 test("qualificador forte ausente evita falso positivo mas preserva sugestão útil", async () => {
   const engine = new KeywordEngine();
-  const r = await engine.responder("trocar carta de conducao estrangeira", "pt");
+  const r = await engine.responder("importar e legalizar carro na alfandega", "pt");
   assert.equal(r.tipo, "sugestoes");
-  assert.ok(r.sugestoes.some((s) => s.id === "imt-renovar-carta"));
+  assert.ok(r.sugestoes.some((s) => s.id === "imt-registo-veiculo"));
+
+  const rCarta = await engine.responder("trocar carta de conducao estrangeira", "pt");
+  assert.equal(rCarta.tipo, "resposta");
+  assert.equal(rCarta.pergunta?.id, "imt-trocar-carta");
 });

@@ -34,24 +34,29 @@ const tema: Tema = {
       texto: "Que descontos existem nos transportes públicos?",
       palavras: [
         "desconto", "passe", "social", "estudante", "jovem",
-        "idoso", "65", "transportes", "gratuito", "escola",
+        "idoso", "65", "23", "transportes", "gratuito", "escola", "andante",
       ],
       resposta: {
         passos: [
-          "Há passes sociais para agregados com rendimentos mais baixos, passes para estudantes, e condições especiais para maiores de 65 e menores — variam por região e operador.",
-          "O passe social pede-se com comprovativo de rendimentos, normalmente junto do operador ou portal da rede de transportes da região.",
-          "Consulta a página do operador da tua zona (Navegante em Lisboa, Andante no Porto, CP para comboios) para os descontos em vigor.",
+          "O passe gratuito para jovens abrange crianças e jovens até aos 23 anos inclusive — basta pedir ou ativar a modalidade gratuita no cartão Navegante, Andante ou operador da tua região.",
+          "Há também passes sociais para agregados com rendimentos mais baixos e descontos para maiores de 65 anos e reformados — variam por região e operador.",
+          "Consulta a página do operador da tua zona (Navegante em Lisboa, Andante no Porto, CP para comboios) para os documentos e descontos em vigor.",
         ],
         fontes: [
-          {
-            titulo: "CP — Comboios de Portugal",
-            url: "https://www.cp.pt",
-            dominio: "cp.pt",
-          },
           {
             titulo: "Descontos Navegante — Portal Navegante",
             url: "https://www.navegante.pt/descontos",
             dominio: "navegante.pt",
+          },
+          {
+            titulo: "Andante — Transportes Metropolitanos do Porto",
+            url: "https://andante.pt",
+            dominio: "andante.pt",
+          },
+          {
+            titulo: "CP — Comboios de Portugal",
+            url: "https://www.cp.pt",
+            dominio: "cp.pt",
           },
         ],
         verificadoEm: "2026-11-12",

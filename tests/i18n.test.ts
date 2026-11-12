@@ -39,8 +39,14 @@ test("nomes próprios / demasiado curtas → ambíguo (null)", () => {
 });
 
 test("temPaginaEn: devolve false para entradas com revisao: true e IDs desconhecidos", () => {
-  assert.equal(temPaginaEn("at-nif"), false);
-  assert.equal(temPaginaEn("at-certidao-domicilio"), false);
+  assert.equal(temPaginaEn("at-nif"), true);
+  assert.equal(temPaginaEn("at-certidao-domicilio"), true);
+  (TEMAS_EN["at-nif"] as { revisao?: boolean }).revisao = true;
+  try {
+    assert.equal(temPaginaEn("at-nif"), false);
+  } finally {
+    delete (TEMAS_EN["at-nif"] as { revisao?: boolean }).revisao;
+  }
   assert.equal(temPaginaEn("id-desconhecido"), false);
   assert.equal(temPaginaEn(""), false);
 });

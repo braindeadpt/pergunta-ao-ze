@@ -2,10 +2,40 @@ import type { Tema } from "@/lib/types";
 
 const tema: Tema = {
   id: "educacao",
-  titulo: "Ensino superior",
-  entidade: "IES (antiga DGES)",
-  descricao: "Candidatura ao superior e bolsas de estudo",
+  titulo: "Educação e ensino superior",
+  entidade: "Educação · IES",
+  descricao: "Matrículas escolares, candidatura ao superior e bolsas",
   perguntas: [
+    {
+      id: "edu-matriculas",
+      texto: "Como faço a matrícula escolar (pré-escolar, básico e secundário)?",
+      palavras: [
+        "matricula", "matriculas", "escola", "escolar", "pre", "basico",
+        "secundario", "portal", "aluno", "filho", "ano", "letivo",
+        "transferencia", "renovar",
+      ],
+      resposta: {
+        passos: [
+          "O pedido faz-se online no Portal das Matrículas (portaldasmatriculas.edu.gov.pt), entrando com Chave Móvel Digital, Cartão de Cidadão ou senha do Portal das Finanças do encarregado de educação.",
+          "É obrigatório matricular pela primeira vez no pré-escolar e no 1.º ano (habitualmente entre abril e junho) e renovar nos 5.º, 7.º, 10.º e 12.º anos nos prazos fixados para cada ano letivo.",
+          "Na passagem para os 2.º, 3.º, 4.º, 6.º, 8.º, 9.º e 11.º anos a renovação é automática, salvo se houver transferência de escola, mudança de encarregado de educação, de curso ou escolha de disciplinas.",
+          "Indicas por ordem de preferência até 5 estabelecimentos de ensino e juntas os dados de identificação, NIF, NISS e comprovativo de morada fiscal.",
+        ],
+        fontes: [
+          {
+            titulo: "Portal das Matrículas",
+            url: "https://www.portaldasmatriculas.edu.gov.pt/",
+            dominio: "portaldasmatriculas.edu.gov.pt",
+          },
+          {
+            titulo: "Matrícula e renovação nos ensinos pré-escolar, básico e secundário — gov.pt",
+            url: "https://www.gov.pt/servicos/fazer-pedidos-de-matricula-e-renovacao-de-matricula-nos-ensinos-pre-escolar-basico-e-secundario",
+            dominio: "gov.pt",
+          },
+        ],
+        verificadoEm: "2026-11-12",
+      },
+    },
     {
       id: "edu-candidatura",
       texto: "Como me candidato ao ensino superior?",

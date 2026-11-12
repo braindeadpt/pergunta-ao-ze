@@ -84,7 +84,10 @@ async function verificar(url) {
       // HEAD primeiro; qualquer falha/erro >=400 cai em GET — muitos WAFs
       // aceitam GET e recusam HEAD (ou devolvem 4xx/5xx falsos).
       let res = await tentar(url, "HEAD").catch(() => null);
-      if (!res || res.status >= 400) res = await tentar(url, "GET");
+      if (!res || res.status >= 400) {
+        await new Promise((r) => setTimeout(r, 350));
+        res = await tentar(url, "GET");
+      }
 
       const final = dominio(res.url);
       if (res.status >= 400) {

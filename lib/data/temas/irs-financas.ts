@@ -70,13 +70,14 @@ const tema: Tema = {
       palavras: [
         "nif", "numero", "contribuinte", "fiscal", "pedir",
         "atribuicao", "estrangeiro", "financas", "identificacao",
+        "representante",
       ],
       resposta: {
         passos: [
-          "Cidadãos portugueses: o NIF já vem no Cartão de Cidadão — não precisas de pedir nada.",
-          "Cidadãos estrangeiros: pedes num balcão das Finanças ou Loja do Cidadão, com documento de identificação e comprovativo de morada.",
-          "Se não fores residente na UE, podes ser obrigado a nomear um representante fiscal — verifica se é o teu caso.",
-          "Também é possível tratar por procurador ou através dos serviços online da AT em casos específicos.",
+          "Cidadãos portugueses com Cartão de Cidadão já têm o NIF atribuído automaticamente no cartão — não precisas de pedir nada.",
+          "Cidadãos estrangeiros: pedes num Serviço de Finanças ou Loja do Cidadão (com agendamento prévio), levando passaporte ou documento de identificação civil e comprovativo de morada.",
+          "Também pode ser pedido online no Portal das Finanças (no e-balcão: Registo Contribuinte → Identific → Atrib/Alter NIF-Singulares) através de um representante legal ou mandatário com procuração.",
+          "Se residires fora da UE, Noruega, Islândia ou Liechtenstein, tens de nomear um representante fiscal em Portugal ou aderir às notificações eletrónicas no Portal das Finanças (dispensado se não tiveres relação jurídica tributária em Portugal).",
         ],
         fontes: [
           {
@@ -89,6 +90,11 @@ const tema: Tema = {
             url: "https://info.portaldasfinancas.gov.pt/pt/apoio_ao_contribuinte/Cidadaos/Dados_pessoais_familia/Dados_pessoais/NIF/Paginas/default.aspx",
             dominio: "portaldasfinancas.gov.pt",
           },
+          {
+            titulo: "Nomear representante fiscal — gov.pt",
+            url: "https://www.gov.pt/servicos/nomear-representante-fiscal",
+            dominio: "gov.pt",
+          },
         ],
         verificadoEm: "2026-11-12",
       },
@@ -98,17 +104,23 @@ const tema: Tema = {
       texto: "Como peço a certidão de domicílio fiscal?",
       palavras: [
         "certidao", "domicilio", "fiscal", "financas", "residencia",
-        "documento", "comprovativo", "morada",
+        "documento", "comprovativo", "morada", "estrangeiro",
       ],
       resposta: {
         passos: [
-          "No Portal das Finanças, na área 'Todos os Serviços' ou em 'Cidadãos', pede a certidão de domicílio fiscal — é emitida em PDF com código de verificação.",
-          "A certidão espelha a morada registada no Cartão de Cidadão; se mudaste de casa, atualiza primeiro a morada do CC.",
+          "No Portal das Finanças, em 'Todos os Serviços' ou 'Cidadãos' → 'Certidões', pedes a certidão de domicílio fiscal — é emitida gratuitamente em PDF (disponível em português e inglês) com código de validação.",
+          "Se tens Cartão de Cidadão, a certidão reflete a morada do CC: se mudaste de casa, altera primeiro a morada do Cartão de Cidadão no portal gov.pt ou num balcão do IRN.",
+          "Cidadãos estrangeiros sem Cartão de Cidadão atualizam a morada diretamente no Portal das Finanças ('Dados Cadastrais' → 'Morada' → 'Entregar Pedido de Alteração', ou no e-balcão com título de residência se mudarem o estatuto de não residente para residente) ou num Serviço de Finanças com agendamento.",
         ],
         fontes: [
           {
             titulo: "Certidões e comprovativos — apoio do Portal das Finanças",
             url: "https://info.portaldasfinancas.gov.pt/pt/apoio_ao_contribuinte/Cidadaos/Casa_e_propriedades/Certidoes_e_comprovativos/Paginas/default.aspx",
+            dominio: "portaldasfinancas.gov.pt",
+          },
+          {
+            titulo: "Morada fiscal — apoio do Portal das Finanças",
+            url: "https://info.portaldasfinancas.gov.pt/pt/apoio_ao_contribuinte/Cidadaos/Dados_pessoais_familia/Dados_pessoais/Morada/Paginas/default.aspx",
             dominio: "portaldasfinancas.gov.pt",
           },
         ],

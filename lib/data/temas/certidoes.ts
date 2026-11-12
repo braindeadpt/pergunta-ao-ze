@@ -4,7 +4,7 @@ const tema: Tema = {
   id: "certidoes",
   titulo: "Certidões",
   entidade: "IRN",
-  descricao: "Nascimento, casamento e registo predial online",
+  descricao: "Nascimento, casamento, óbito, heranças e registo predial",
   perguntas: [
     {
       id: "cert-online",
@@ -82,6 +82,42 @@ const tema: Tema = {
             titulo: "Declaração de nascimento online",
             url: "https://nascimento.justica.gov.pt/nascimento",
             dominio: "nascimento.justica.gov.pt",
+          },
+        ],
+        verificadoEm: "2026-11-12",
+      },
+    },
+    {
+      id: "cert-obito-heranca",
+      texto: "Faleceu um familiar: o que tenho de tratar (Espaço Óbito e herança)?",
+      palavras: [
+        "obito", "falecimento", "faleceu", "morte", "morreu", "heranca",
+        "herdeiros", "habilitacao", "partilha", "cabeca", "casal",
+        "imposto", "selo", "funeral",
+      ],
+      resposta: {
+        passos: [
+          "O registo do óbito é feito até 48 horas numa conservatória ou no Espaço Óbito (com o certificado médico de óbito) — normalmente a agência funerária trata logo deste passo.",
+          "O cabeça-de-casal tem até ao final do 3.º mês seguinte ao falecimento para pedir o NIF da herança indivisa e entregar a participação do Imposto do Selo (Modelo 1) no Portal das Finanças ou num Serviço de Finanças.",
+          "No Espaço Óbito tratas num só local de comunicar o falecimento às Finanças, Segurança Social, Caixa Geral de Aposentações e ADSE, e de pedir subsídios ou prestações por morte.",
+          "Para identificar oficialmente os herdeiros e registar ou dividir os bens (imóveis, veículos, quotas), o cabeça-de-casal pede a habilitação de herdeiros e a partilha num Balcão Heranças (IRN).",
+        ],
+        nota: "Cônjuge ou unido de facto, filhos, netos, pais e avós estão isentos de Imposto do Selo sobre a herança, mas a participação às Finanças continua a ser obrigatória quando existem bens.",
+        fontes: [
+          {
+            titulo: "Espaço Óbito — Justiça.gov.pt",
+            url: "https://justica.gov.pt/Servicos/Espaco-Obito",
+            dominio: "justica.gov.pt",
+          },
+          {
+            titulo: "Balcão Heranças — Justiça.gov.pt",
+            url: "https://justica.gov.pt/Servicos/Balcao-Herancas",
+            dominio: "justica.gov.pt",
+          },
+          {
+            titulo: "Óbito e participação de herança — apoio do Portal das Finanças",
+            url: "https://info.portaldasfinancas.gov.pt/pt/apoio_ao_contribuinte/Cidadaos/Dados_pessoais_familia/Familia/Obito/Paginas/default.aspx",
+            dominio: "portaldasfinancas.gov.pt",
           },
         ],
         verificadoEm: "2026-11-12",

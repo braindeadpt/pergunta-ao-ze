@@ -3,8 +3,8 @@ import type { Tema } from "@/lib/types";
 const tema: Tema = {
   id: "familia",
   titulo: "Família",
-  entidade: "Segurança Social",
-  descricao: "Abono de família e licenças de parentalidade",
+  entidade: "Segurança Social · IRN",
+  descricao: "Abono, parentalidade, casamento e união de facto",
   perguntas: [
     {
       id: "fam-abono",
@@ -48,6 +48,40 @@ const tema: Tema = {
             titulo: "Parentalidade — Segurança Social",
             url: "https://www.seg-social.pt/parentalidade",
             dominio: "seg-social.pt",
+          },
+        ],
+        verificadoEm: "2026-11-12",
+      },
+    },
+    {
+      id: "fam-casamento-uniao",
+      texto: "Como inicio o processo de casamento ou provo união de facto?",
+      palavras: [
+        "casamento", "casar", "uniao", "facto", "civil", "conservatoria",
+        "noivos", "junta", "freguesia", "regime", "bens", "companheiro",
+      ],
+      resposta: {
+        passos: [
+          "Para casar (civil, católico ou civil sob forma religiosa), inicias o processo no Civil Online (com Chave Móvel Digital ou Cartão de Cidadão) ou presencialmente numa conservatória do registo civil, com pelo menos 1 mês de antecedência.",
+          "No pedido indicas a modalidade, o local, a data e o regime de bens; depois de a conservatória confirmar que não há impedimentos, o casamento tem de realizar-se nos 6 meses seguintes.",
+          "A união de facto não se regista na conservatória: aplica-se a quem vive em condições análogas às dos cônjuges há mais de 2 anos e prova-se com declaração emitida pela Junta de Freguesia.",
+          "Para pedir a declaração na Junta de Freguesia, ambos apresentam declaração sob compromisso de honra de que vivem juntos há mais de 2 anos e certidões de cópia integral do registo de nascimento.",
+        ],
+        fontes: [
+          {
+            titulo: "Iniciar processo de casamento — Justiça.gov.pt",
+            url: "https://justica.gov.pt/Servicos/Iniciar-processo-de-casamento",
+            dominio: "justica.gov.pt",
+          },
+          {
+            titulo: "Iniciar o processo de casamento — gov.pt",
+            url: "https://www.gov.pt/servicos/iniciar-o-processo-de-casamento",
+            dominio: "gov.pt",
+          },
+          {
+            titulo: "Civil Online — Registos IRN",
+            url: "https://www.civilonline.mj.pt/CivilOnline/",
+            dominio: "civilonline.mj.pt",
           },
         ],
         verificadoEm: "2026-11-12",

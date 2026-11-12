@@ -129,6 +129,22 @@
   { "pergunta": "passe mensal do metro", "idEsperado": "tra-navegante" },
   { "pergunta": "desconto de passe para estudante", "idEsperado": "tra-descontos" },
   { "pergunta": "passe gratis para maiores de 65", "idEsperado": "tra-descontos" },
+  { "pergunta": "passe gratuito jovem ate aos 23 anos", "idEsperado": "tra-descontos" },
+
+  { "pergunta": "quando tenho de levar o carro a inspecao", "idEsperado": "imt-inspecao" },
+  { "pergunta": "inspecao periodica obrigatoria ipo do automovel", "idEsperado": "imt-inspecao" },
+  { "pergunta": "trocar carta de conducao estrangeira", "idEsperado": "imt-trocar-carta" },
+  { "pergunta": "conduzir em portugal com carta brasileira da cplp", "idEsperado": "imt-trocar-carta" },
+  { "pergunta": "como faco a matricula escolar no portal das matriculas", "idEsperado": "edu-matriculas" },
+  { "pergunta": "renovar matricula no ensino basico e secundario", "idEsperado": "edu-matriculas" },
+  { "pergunta": "como inicio o processo de casamento civil", "idEsperado": "fam-casamento-uniao" },
+  { "pergunta": "provar uniao de facto na junta de freguesia", "idEsperado": "fam-casamento-uniao" },
+  { "pergunta": "faleceu um familiar o que tenho de tratar espaco obito", "idEsperado": "cert-obito-heranca" },
+  { "pergunta": "habilitacao de herdeiros e imposto do selo heranca", "idEsperado": "cert-obito-heranca" },
+  { "pergunta": "como peco o complemento solidario para idosos", "idEsperado": "pen-csi" },
+  { "pergunta": "apoio csi para pensionistas e medicamentos gratuitos", "idEsperado": "pen-csi" },
+  { "pergunta": "como peco o atestado medico de incapacidade multiuso", "idEsperado": "sns-atestado-multiuso" },
+  { "pergunta": "junta medica para atestado multiuso no centro de saude", "idEsperado": "sns-atestado-multiuso" },
 
   { "pergunta": "qual e a capital da franca", "idEsperado": null },
   { "pergunta": "receita de bacalhau a bras", "idEsperado": null },
@@ -140,5 +156,5 @@
   { "pergunta": "a que horas fecha o continente", "idEsperado": null },
   { "pergunta": "conversor de euros para dolares", "idEsperado": null },
   { "pergunta": "quanto ganha um eletricista", "idEsperado": null },
-  { "pergunta": "trocar carta de conducao estrangeira", "idEsperado": null }
+  { "pergunta": "importar e legalizar carro na alfandega", "idEsperado": null }
 ]

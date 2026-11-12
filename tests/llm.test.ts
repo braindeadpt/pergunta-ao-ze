@@ -157,22 +157,27 @@ test("llm (F-11): pergunta curada exata em PT e EN faz curto-circuito sem fetch"
   assert.deepEqual(rEn.pergunta?.resposta.passos, TEMAS_EN["cc-renovar"].passos);
 });
 
-test("llm (F-03): entrada revisao: true (at-nif) em EN nunca é traduzida pelo LLM", async () => {
+test("llm (F-03): entrada revisao: true em EN nunca é traduzida pelo LLM", async () => {
   globalThis.fetch = fetchCom({
     passos: ["Foreigners can get a NIF at any counter."],
     nota: null,
     fontes: ["F1"],
   });
-  const r = await engine().responder(
-    "I am a foreign citizen moving to Portugal, how do I get a NIF tax number?",
-    "en"
-  );
-  assert.equal(chamadas, 0);
-  assert.equal(r.tipo, "resposta");
-  assert.equal(r.via, "keyword");
-  assert.equal(r.pergunta?.id, "at-nif");
-  assert.equal(r.idioma, "pt");
-  assert.equal(r.soEmPt, true);
+  (TEMAS_EN["at-nif"] as { revisao?: boolean }).revisao = true;
+  try {
+    const r = await engine().responder(
+      "I am a foreign citizen moving to Portugal, how do I get a NIF tax number?",
+      "en"
+    );
+    assert.equal(chamadas, 0);
+    assert.equal(r.tipo, "resposta");
+    assert.equal(r.via, "keyword");
+    assert.equal(r.pergunta?.id, "at-nif");
+    assert.equal(r.idioma, "pt");
+    assert.equal(r.soEmPt, true);
+  } finally {
+    delete (TEMAS_EN["at-nif"] as { revisao?: boolean }).revisao;
+  }
 });
 
 test("llm (F-03 + F-12): resposta EN gerada por LLM aplica normalizarRespostaEn e sugestões EN", async () => {
