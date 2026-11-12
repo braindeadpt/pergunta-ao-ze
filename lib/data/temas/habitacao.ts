@@ -27,6 +27,7 @@ const tema: Tema = {
             dominio: "portaldahabitacao.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
     {
@@ -44,11 +45,12 @@ const tema: Tema = {
         ],
         fontes: [
           {
-            titulo: "Arrendamento — Portal das Finanças",
-            url: "https://www.portaldasfinancas.gov.pt",
+            titulo: "Arrendamento — apoio do Portal das Finanças",
+            url: "https://info.portaldasfinancas.gov.pt/pt/apoio_ao_contribuinte/Cidadaos/Casa_e_propriedades/Arrendamento/Paginas/default.aspx",
             dominio: "portaldasfinancas.gov.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
     {
@@ -73,11 +75,12 @@ const tema: Tema = {
             dominio: "gov.pt",
           },
           {
-            titulo: "Portal das Finanças — Imóveis",
-            url: "https://www.portaldasfinancas.gov.pt",
+            titulo: "IMI — apoio do Portal das Finanças",
+            url: "https://info.portaldasfinancas.gov.pt/pt/apoio_ao_contribuinte/Cidadaos/Casa_e_propriedades/Imposto_anual/Paginas/default.aspx",
             dominio: "portaldasfinancas.gov.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
   ],

@@ -66,6 +66,38 @@ test("anonimizar: emails", () => {
   );
 });
 
+test("anonimizar: IBAN (PT50 e internacional, com e sem espaços)", () => {
+  const ibans = [
+    "PT50 1234 5678 9012 3456 7890 1",
+    "PT50123456789012345678901",
+    "pt50 0035 0123 4567 8901 2345 6",
+    "ES91 2100 0418 4502 0005 1332",
+  ];
+  for (const iban of ibans) {
+    const out = anonimizar(`o meu iban é ${iban} para devolução`);
+    assert.ok(!/PT50|ES91|1234|2100/i.test(out), `${iban} ficou exposto em "${out}"`);
+    assert.equal(out, "o meu iban é [removido] para devolução");
+  }
+});
+
+test("anonimizar: matrículas automóveis portuguesas", () => {
+  const matriculas = [
+    "AA-12-BB",
+    "12-AB-34",
+    "12-34-AB",
+    "AB-12-34",
+    "aa-12-bb",
+    "12-ab-34",
+    "AA 12 BB",
+    "12 AB 34",
+  ];
+  for (const mat of matriculas) {
+    const out = anonimizar(`o meu carro com matricula ${mat} precisa de inspecao`);
+    assert.ok(!/AA|12|34|BB|AB/i.test(out), `${mat} ficou exposto em "${out}"`);
+    assert.equal(out, "o meu carro com matricula [removido] precisa de inspecao");
+  }
+});
+
 test("anonimizar: NIF, NISS e nº documento (9 dígitos) e CC", () => {
   for (const seq of ["215780432", "11987654321", "123456789"]) {
     assert.ok(
@@ -92,6 +124,8 @@ test("anonimizar: qualquer sequência de 6+ dígitos", () => {
 test("anonimizar: texto normal fica intacto", () => {
   const q = "como marco uma consulta no centro de saude?";
   assert.equal(anonimizar(q), q);
+  const q2 = "demora 15 ou 20 dias e renova de 12 em 12 meses";
+  assert.equal(anonimizar(q2), q2);
 });
 
 // --- guardar / ler ------------------------------------------------------------

@@ -27,6 +27,7 @@ const tema: Tema = {
             dominio: "seg-social.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
     {
@@ -49,6 +50,7 @@ const tema: Tema = {
             dominio: "seg-social.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
   ],

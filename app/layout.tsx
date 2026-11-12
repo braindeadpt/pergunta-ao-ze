@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Archivo_Black, Inter, Newsreader, Space_Mono } from "next/font/google";
+import { Archivo_Black, Inter, Space_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import Header from "@/components/Header";
@@ -9,13 +9,6 @@ import { SITE_URL } from "@/lib/site";
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
-  display: "optional",
-});
-
-const newsreader = Newsreader({
-  subsets: ["latin"],
-  variable: "--font-newsreader",
-  style: ["normal", "italic"],
   display: "optional",
 });
 
@@ -56,7 +49,7 @@ export default function RootLayout({
   return (
     <html lang="pt-PT">
       <body
-        className={`${inter.variable} ${newsreader.variable} ${display.variable} ${mono.variable} flex min-h-screen flex-col`}
+        className={`${inter.variable} ${display.variable} ${mono.variable} flex min-h-screen flex-col`}
       >
         <Header />
         <main className="flex-1">{children}</main>

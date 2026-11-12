@@ -23,15 +23,16 @@ const tema: Tema = {
         fontes: [
           {
             titulo: "Portal de Vistos — MNE",
-            url: "https://vistos.mne.gov.pt",
+            url: "https://vistos.mne.gov.pt/pt/",
             dominio: "vistos.mne.gov.pt",
           },
           {
-            titulo: "AIMA",
-            url: "https://aima.gov.pt",
+            titulo: "Viver em Portugal — AIMA",
+            url: "https://aima.gov.pt/pt/viver",
             dominio: "aima.gov.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
     {
@@ -54,6 +55,7 @@ const tema: Tema = {
             dominio: "aima.gov.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
   ],

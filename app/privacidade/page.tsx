@@ -81,10 +81,13 @@ export default function PrivacidadePage() {
           >
             Groq
           </a>{" "}
-          (fornecedor externo, tier gratuito). O modelo só recebe a tua
-          pergunta mais excertos das nossas respostas curadas — nunca te pede
-          nem deve receber dados pessoais. Se a IA falhar, a resposta vem do
-          motor de pesquisa local, sem envio a terceiros.
+          (fornecedor externo, tier gratuito). Atenção: nos tiers gratuitos de
+          fornecedores externos, os pedidos enviados ao modelo podem ser retidos
+          ou usados segundo a política desse fornecedor — mais uma razão para
+          nunca escreveres dados pessoais. O modelo só recebe a tua pergunta mais
+          excertos das nossas respostas curadas — nunca te pede nem deve
+          receber dados pessoais. Se a IA falhar ou esgotar a quota diária, a
+          resposta vem do motor de pesquisa local, sem qualquer envio a terceiros.
         </p>
         <h2
           id="nao-guardamos"
@@ -98,11 +101,13 @@ export default function PrivacidadePage() {
           <li>Não usamos cookies de rastreamento nem publicidade.</li>
         </ul>
         <p>
-          Exceção: se a tua pergunta ficar <em>sem resposta</em>, guardamos o
-          texto durante 30 dias — depois de retirarmos automaticamente dados
-          pessoais (emails, telefones, NIF/NISS e números de documentos são
-          substituídos por «[removido]»). Serve só para sabermos que temas
-          faltam à base; nunca é associado a quem perguntou.
+          Exceção: se a tua pergunta ficar <em>sem resposta</em> (sugestões sem
+          correspondência exata), guardamos o texto durante 30 dias em base de
+          dados segura (Upstash Redis / Vercel KV) — depois de retirarmos
+          automaticamente dados pessoais (emails, IBAN, matrículas de veículos,
+          telefones, NIF/NISS e números de documentos são substituídos por
+          «[removido]»). Serve apenas para sabermos que temas faltam à base;
+          nunca é associado ao teu IP nem a quem perguntou.
         </p>
         <p>
           Usamos Vercel Analytics — métricas de visitas agregadas e anónimas,
@@ -115,15 +120,25 @@ export default function PrivacidadePage() {
           Dados técnicos
         </h2>
         <p>
-          Como em qualquer site, o alojamento pode registar dados técnicos dos
-          pedidos (endereço IP, data, página pedida) por razões de segurança e
-          operação.
+          O site está alojado na plataforma <strong>Vercel</strong>. Como em
+          qualquer site na Web, a infraestrutura pode registar dados técnicos dos
+          pedidos HTTP (endereço IP, data e hora, página pedida, user-agent) por
+          razões operacionais e de proteção contra ataques.
         </p>
         <p>
-          Para limitar o abuso do chat, contamos pedidos por endereço IP
-          usando apenas uma <em>hash</em> (resumo criptográfico) do endereço,
-          guardada em memória durante ~10 minutos e depois apagada. Nunca
-          guardamos o IP em claro nem o associamos às perguntas.
+          Para limitar o abuso do chat e proteger o serviço, contamos os pedidos
+          por endereço IP usando apenas uma <em>hash</em> criptográfica com sal
+          (resumo irreversível) do teu endereço IP. Em produção, este contador
+          é guardado de forma temporária em base de dados (Upstash Redis / Vercel
+          KV) durante ~10 minutos e depois expira automaticamente. Nunca
+          guardamos o IP em claro nem o associamos às perguntas ou respostas.
+        </p>
+        <p>
+          Para sabermos como o serviço está a ser usado e melhorar as respostas,
+          mantemos contadores diários estritamente agregados durante 90 dias
+          (total de perguntas por dia, proporção respondida por IA vs. pesquisa
+          local, língua PT vs. EN). Estes contadores são números puros, sem
+          qualquer dado pessoal nem registo individual de utilizadores.
         </p>
         <h2
           id="regra"

@@ -31,6 +31,7 @@ const tema: Tema = {
             dominio: "irn.justica.gov.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
     {
@@ -53,6 +54,7 @@ const tema: Tema = {
             dominio: "predialonline.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
     {
@@ -82,6 +84,7 @@ const tema: Tema = {
             dominio: "nascimento.justica.gov.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
   ],

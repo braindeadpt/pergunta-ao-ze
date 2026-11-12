@@ -55,11 +55,6 @@ export async function generateMetadata({
   };
 }
 
-const geradoEm = new Intl.DateTimeFormat("pt-PT", {
-  month: "long",
-  year: "numeric",
-}).format(new Date());
-
 function formatarDataPt(iso: string) {
   return new Intl.DateTimeFormat("pt-PT", {
     day: "numeric",
@@ -151,16 +146,12 @@ export default async function PaginaPergunta({
             {pergunta.texto}
           </h1>
           <p className="mt-3 text-base text-stone-600">
-            Resposta curada do tema «{tema.titulo}».{" "}
-            <span className="font-mono text-sm">
-              Gerado a partir da base curada em {geradoEm}
-              <VerificadoEm
-                iso={pergunta.resposta.verificadoEm}
-                lang="pt"
-                className="before:content-['_·_']"
-              />
-              .
-            </span>
+            Resposta curada do tema «{tema.titulo}».
+            <VerificadoEm
+              iso={pergunta.resposta.verificadoEm}
+              lang="pt"
+              className="font-mono text-sm before:content-['_']"
+            />
           </p>
         </div>
         <ZePersonagem estado="normal" className="hidden w-24 shrink-0 self-start sm:block" />

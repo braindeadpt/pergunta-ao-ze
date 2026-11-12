@@ -26,6 +26,7 @@ const tema: Tema = {
             dominio: "seg-social.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
     {
@@ -44,10 +45,11 @@ const tema: Tema = {
         fontes: [
           {
             titulo: "Segurança Social Direta",
-            url: "https://www.seg-social.pt",
+            url: "https://www.seg-social.pt/seguranca-social-direta",
             dominio: "seg-social.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
     {
@@ -70,11 +72,12 @@ const tema: Tema = {
             dominio: "seg-social.pt",
           },
           {
-            titulo: "Baixa médica — gov.pt",
-            url: "https://www.gov.pt",
-            dominio: "gov.pt",
+            titulo: "Autodeclaração de doença — SNS 24",
+            url: "https://www.sns24.gov.pt/pt/servico/autodeclaracao-de-doenca/",
+            dominio: "sns24.gov.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
   ],

@@ -42,8 +42,9 @@ for (const tema of TEMAS) {
 // verificar a raiz confirma que o serviço está no ar.
 const fontesSrc = readFileSync(join(RAIZ, "lib/data/fontes.ts"), "utf8");
 for (const m of fontesSrc.matchAll(/^\s*"([a-z0-9-]+(?:\.[a-z0-9-]+)+)"\s*:/gim)) {
+  const jaCoberto = [...urls.keys()].some((u) => dominio(u) === m[1]);
   const raizEntidade = `https://${m[1]}`;
-  if (!urls.has(raizEntidade)) urls.set(raizEntidade, "entidade (fontes.ts)");
+  if (!jaCoberto && !urls.has(raizEntidade)) urls.set(raizEntidade, "entidade (fontes.ts)");
 }
 
 // --- verificação -------------------------------------------------------------

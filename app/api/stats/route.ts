@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
+import { createHash, timingSafeEqual } from "node:crypto";
 import { redisCliente, MAX_LLM_CALLS_PER_DAY } from "@/lib/ratelimit";
 import { StatsDiarias } from "@/lib/stats";
 import { lerSemResposta } from "@/lib/semresposta";
 
 /**
  * GET /api/stats — contadores diários de uso do /api/responder.
- * Requer STATS_TOKEN (Bearer ou ?token=). Sem Redis → 503.
+ * Requer STATS_TOKEN via header Authorization: Bearer <token>. Sem Redis → 503.
  *
  *   GET /api/stats                       → hoje (UTC)
  *   GET /api/stats?ultimos=7             → últimos 7 dias (máx 30)
@@ -19,13 +20,18 @@ export async function GET(request: Request) {
     // Esconde a existência do endpoint quando não está configurado.
     return NextResponse.json({ erro: "Not found" }, { status: 404 });
   }
-  const url = new URL(request.url);
   const auth = request.headers.get("authorization");
-  const ok =
-    auth === `Bearer ${token}` || url.searchParams.get("token") === token;
-  if (!ok) {
+  let authorized = false;
+  if (auth && auth.startsWith("Bearer ")) {
+    const provided = auth.slice(7).trim();
+    const hashEsperada = createHash("sha256").update(token).digest();
+    const hashRecebida = createHash("sha256").update(provided).digest();
+    authorized = timingSafeEqual(hashEsperada, hashRecebida);
+  }
+  if (!authorized) {
     return NextResponse.json({ erro: "Não autorizado." }, { status: 401 });
   }
+  const url = new URL(request.url);
   if (!redisCliente) {
     return NextResponse.json(
       { erro: "Sem backend Redis — stats desligadas (falta Upstash/Vercel KV)." },

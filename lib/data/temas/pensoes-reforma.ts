@@ -27,6 +27,7 @@ const tema: Tema = {
             dominio: "seg-social.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
     {
@@ -45,11 +46,12 @@ const tema: Tema = {
         ],
         fontes: [
           {
-            titulo: "Segurança Social Direta — Remunerações",
-            url: "https://www.seg-social.pt",
+            titulo: "Simulador de pensões e carreira contributiva — Segurança Social",
+            url: "https://www.seg-social.pt/simulador-de-pensoes",
             dominio: "seg-social.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
   ],

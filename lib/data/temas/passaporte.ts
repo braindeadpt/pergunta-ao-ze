@@ -33,6 +33,7 @@ const tema: Tema = {
             dominio: "justica.gov.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
     {
@@ -56,6 +57,7 @@ const tema: Tema = {
             dominio: "justica.gov.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
     {
@@ -73,11 +75,12 @@ const tema: Tema = {
         ],
         fontes: [
           {
-            titulo: "Siga — agendamento de atendimento",
+            titulo: "Siga — Agendamento de atendimento",
             url: "https://siga.marcacaodeatendimento.pt",
             dominio: "siga.marcacaodeatendimento.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
   ],

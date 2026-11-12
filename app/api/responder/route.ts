@@ -16,13 +16,18 @@ const MAX_BODY_BYTES = 8 * 1024;
 const keywordFallback = new KeywordEngine();
 
 export async function POST(request: Request) {
+  const acceptLang = request.headers.get("accept-language")?.toLowerCase() ?? "";
+  const isEnPre = acceptLang.startsWith("en");
+
   // Rate limit por IP — corre antes de ler o corpo.
   const chave = hashIp(ipDoPedido(request));
   const limite = await limiter.check(chave, LIMITE_POR_IP, JANELA_MS);
   if (!limite.ok) {
     return NextResponse.json(
       {
-        erro: "Demasiados pedidos seguidos. Espera um momento e tenta de novo.",
+        erro: isEnPre
+          ? "Too many requests. Please wait a moment and try again."
+          : "Demasiados pedidos seguidos. Espera um momento e tenta de novo.",
         retryAfter: limite.retryAfterSec,
       },
       {
@@ -35,28 +40,52 @@ export async function POST(request: Request) {
   const len = Number(request.headers.get("content-length") ?? 0);
   if (len > MAX_BODY_BYTES) {
     return NextResponse.json(
-      { erro: "Pedido demasiado grande." },
+      { erro: isEnPre ? "Request is too large." : "Pedido demasiado grande." },
       { status: 400 }
     );
   }
 
-  let pergunta: unknown;
-  let lang: "pt" | "en" = "pt";
+  let raw = "";
   try {
-    const body = await request.json();
-    pergunta = body?.pergunta;
-    if (body?.lang === "en") lang = "en";
+    raw = await request.text();
   } catch {
-    return NextResponse.json({ erro: "Pedido inválido." }, { status: 400 });
+    return NextResponse.json(
+      { erro: isEnPre ? "Invalid request." : "Pedido inválido." },
+      { status: 400 }
+    );
   }
 
+  if (Buffer.byteLength(raw, "utf8") > MAX_BODY_BYTES) {
+    return NextResponse.json(
+      { erro: isEnPre ? "Request is too large." : "Pedido demasiado grande." },
+      { status: 400 }
+    );
+  }
+
+  let body: { pergunta?: unknown; lang?: string } | null = null;
+  try {
+    body = JSON.parse(raw);
+  } catch {
+    return NextResponse.json(
+      { erro: isEnPre ? "Invalid request." : "Pedido inválido." },
+      { status: 400 }
+    );
+  }
+
+  const lang: "pt" | "en" = body?.lang === "en" ? "en" : "pt";
+  const isEn = lang === "en" || (body?.lang === undefined && isEnPre);
+  const pergunta = body?.pergunta;
+
   if (typeof pergunta !== "string" || pergunta.trim().length === 0) {
-    return NextResponse.json({ erro: "Escreve a tua pergunta." }, { status: 400 });
+    return NextResponse.json(
+      { erro: isEn ? "Please write your question." : "Escreve a tua pergunta." },
+      { status: 400 }
+    );
   }
 
   if (pergunta.length > 500) {
     return NextResponse.json(
-      { erro: "A pergunta é demasiado longa." },
+      { erro: isEn ? "Question is too long." : "A pergunta é demasiado longa." },
       { status: 400 }
     );
   }

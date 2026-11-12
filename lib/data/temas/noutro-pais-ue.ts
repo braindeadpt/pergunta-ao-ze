@@ -3,7 +3,7 @@ import type { Tema } from "@/lib/types";
 const tema: Tema = {
   id: "noutro-pais-ue",
   titulo: "Viver noutro país da UE",
-  entidade: "ePortugal · UE",
+  entidade: "gov.pt · UE",
   descricao: "Residência, trabalho e saúde no espaço europeu",
   perguntas: [
     {
@@ -22,8 +22,8 @@ const tema: Tema = {
         ],
         fontes: [
           {
-            titulo: "Viver, trabalhar e viajar na UE — gov.pt",
-            url: "https://www.gov.pt",
+            titulo: "Viver e trabalhar na União Europeia — gov.pt",
+            url: "https://www.gov.pt/guias/viver-e-trabalhar-na-uniao-europeia",
             dominio: "gov.pt",
           },
           {
@@ -32,6 +32,7 @@ const tema: Tema = {
             dominio: "europa.eu",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
     {
@@ -50,10 +51,11 @@ const tema: Tema = {
         fontes: [
           {
             titulo: "Cartão Europeu de Seguro de Doença — Segurança Social",
-            url: "https://www.seg-social.pt",
+            url: "https://www.seg-social.pt/pedido-cartao-europeu-seguro-doenca",
             dominio: "seg-social.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
   ],

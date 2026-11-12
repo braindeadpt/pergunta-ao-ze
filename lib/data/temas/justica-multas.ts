@@ -21,11 +21,17 @@ const tema: Tema = {
         ],
         fontes: [
           {
+            titulo: "Portal de Contraordenações Rodoviárias — ANSR",
+            url: "https://portalcontraordenacoes.ansr.pt/",
+            dominio: "portalcontraordenacoes.ansr.pt",
+          },
+          {
             titulo: "Contraordenações — ANSR",
-            url: "https://www.ansr.pt",
+            url: "https://ansr.pt/contraordenacoes",
             dominio: "ansr.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
     {
@@ -48,11 +54,12 @@ const tema: Tema = {
             dominio: "registocriminal.justica.gov.pt",
           },
           {
-            titulo: "Certificado do registo criminal — gov.pt",
-            url: "https://www.gov.pt",
+            titulo: "Pedir o certificado de registo criminal — gov.pt",
+            url: "https://www.gov.pt/servicos/pedir-o-certificado-de-registo-criminal-de-pessoas-singulares",
             dominio: "gov.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
   ],

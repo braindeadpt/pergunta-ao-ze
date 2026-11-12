@@ -57,9 +57,9 @@ export default function PainelLED({
   }, []);
 
   const linhas: [string, number][] = [
-    ["BALCÕES", stats.entidades],
-    ["SENHAS SERVIDAS", stats.perguntas],
-    ["IMPRESSOS LIDOS", stats.paginas],
+    ["REPARTIÇÕES LIDAS", stats.entidades],
+    ["RESPOSTAS PRONTAS", stats.perguntas],
+    ["PÁGINAS OFICIAIS", stats.paginas],
   ];
 
   return (

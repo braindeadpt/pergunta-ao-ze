@@ -22,8 +22,13 @@ const tema: Tema = {
         ],
         fontes: [
           {
-            titulo: "Revalidar o título de condução — IMT",
-            url: "https://www.imt-ip.pt",
+            titulo: "Revalidar a carta de condução — gov.pt",
+            url: "https://www.gov.pt/servicos/revalidar-a-carta-de-conducao",
+            dominio: "gov.pt",
+          },
+          {
+            titulo: "Revalidação da carta de condução — IMT",
+            url: "https://www.imt-ip.pt/condutores/informacoes-gerais/quero-ser-condutor/revalidacao-da-carta-de-conducao/",
             dominio: "imt-ip.pt",
           },
           {
@@ -32,6 +37,7 @@ const tema: Tema = {
             dominio: "servicos.imt-ip.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
     {
@@ -49,11 +55,17 @@ const tema: Tema = {
         ],
         fontes: [
           {
-            titulo: "IUC — Portal das Finanças",
-            url: "https://www.portaldasfinancas.gov.pt",
+            titulo: "Pagar o IUC — gov.pt",
+            url: "https://www.gov.pt/servicos/pagar-o-imposto-unico-de-circulacao-iuc-",
+            dominio: "gov.pt",
+          },
+          {
+            titulo: "IUC — apoio do Portal das Finanças",
+            url: "https://info.portaldasfinancas.gov.pt/pt/apoio_ao_contribuinte/Cidadaos/Veiculos/IUC/Paginas/default.aspx",
             dominio: "portaldasfinancas.gov.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
     {
@@ -81,6 +93,7 @@ const tema: Tema = {
             dominio: "automovelonline.mj.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
     {
@@ -109,6 +122,7 @@ const tema: Tema = {
             dominio: "gov.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
   ],

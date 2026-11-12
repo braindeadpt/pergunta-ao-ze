@@ -23,8 +23,8 @@ const tema: Tema = {
         ],
         fontes: [
           {
-            titulo: "IRS — Portal das Finanças",
-            url: "https://www.portaldasfinancas.gov.pt",
+            titulo: "Declaração de IRS — apoio do Portal das Finanças",
+            url: "https://info.portaldasfinancas.gov.pt/pt/apoio_ao_contribuinte/Cidadaos/Rendimentos/Declaracao/Paginas/default.aspx",
             dominio: "portaldasfinancas.gov.pt",
           },
           {
@@ -33,6 +33,7 @@ const tema: Tema = {
             dominio: "gov.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
     {
@@ -50,11 +51,17 @@ const tema: Tema = {
         ],
         fontes: [
           {
-            titulo: "Consultar declaração de IRS — Portal das Finanças",
+            titulo: "Pagamentos e reembolsos — apoio do Portal das Finanças",
+            url: "https://info.portaldasfinancas.gov.pt/pt/apoio_ao_contribuinte/pagamentos_e_reembolsos/Pages/default.aspx",
+            dominio: "portaldasfinancas.gov.pt",
+          },
+          {
+            titulo: "Portal das Finanças",
             url: "https://www.portaldasfinancas.gov.pt",
             dominio: "portaldasfinancas.gov.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
     {
@@ -78,11 +85,12 @@ const tema: Tema = {
             dominio: "gov.pt",
           },
           {
-            titulo: "Portal das Finanças",
-            url: "https://www.portaldasfinancas.gov.pt",
+            titulo: "NIF — apoio do Portal das Finanças",
+            url: "https://info.portaldasfinancas.gov.pt/pt/apoio_ao_contribuinte/Cidadaos/Dados_pessoais_familia/Dados_pessoais/NIF/Paginas/default.aspx",
             dominio: "portaldasfinancas.gov.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
     {
@@ -99,11 +107,12 @@ const tema: Tema = {
         ],
         fontes: [
           {
-            titulo: "Portal das Finanças — Serviços Tributários",
-            url: "https://www.portaldasfinancas.gov.pt",
+            titulo: "Certidões e comprovativos — apoio do Portal das Finanças",
+            url: "https://info.portaldasfinancas.gov.pt/pt/apoio_ao_contribuinte/Cidadaos/Casa_e_propriedades/Certidoes_e_comprovativos/Paginas/default.aspx",
             dominio: "portaldasfinancas.gov.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
     {
@@ -133,6 +142,7 @@ const tema: Tema = {
             dominio: "portaldasfinancas.gov.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
   ],

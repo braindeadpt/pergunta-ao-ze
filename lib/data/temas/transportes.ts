@@ -21,11 +21,12 @@ const tema: Tema = {
         ],
         fontes: [
           {
-            titulo: "Portal Navegante",
-            url: "https://www.navegante.pt",
+            titulo: "Cartões Navegante — Portal Navegante",
+            url: "https://www.navegante.pt/viajar/cartoes-navegante",
             dominio: "navegante.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
     {
@@ -48,11 +49,12 @@ const tema: Tema = {
             dominio: "cp.pt",
           },
           {
-            titulo: "Portal Navegante",
-            url: "https://www.navegante.pt",
+            titulo: "Descontos Navegante — Portal Navegante",
+            url: "https://www.navegante.pt/descontos",
             dominio: "navegante.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
   ],

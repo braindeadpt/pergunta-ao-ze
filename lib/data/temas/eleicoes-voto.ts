@@ -21,11 +21,17 @@ const tema: Tema = {
         ],
         fontes: [
           {
-            titulo: "Portal do Eleitor — SG MAI",
-            url: "https://www.sg.mai.gov.pt",
+            titulo: "Portal do Recenseamento — Onde votar",
+            url: "https://www.recenseamento.pt/",
+            dominio: "recenseamento.pt",
+          },
+          {
+            titulo: "Eleições e Referendos — SG MAI",
+            url: "https://www.sg.mai.gov.pt/AdministracaoEleitoral/EleicoesReferendos/Paginas/default.aspx",
             dominio: "sg.mai.gov.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
     {
@@ -43,11 +49,17 @@ const tema: Tema = {
         ],
         fontes: [
           {
+            titulo: "Portal do Recenseamento Eleitoral",
+            url: "https://www.recenseamento.pt/",
+            dominio: "recenseamento.pt",
+          },
+          {
             titulo: "Recenseamento eleitoral — SG MAI",
-            url: "https://www.sg.mai.gov.pt",
+            url: "https://www.sg.mai.gov.pt/AdministracaoEleitoral/RecenseamentoEleitoral/Paginas/default.aspx",
             dominio: "sg.mai.gov.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
   ],

@@ -23,16 +23,17 @@ const tema: Tema = {
         nota: "Podes renovar antes de caducar — não precisas de esperar que expire.",
         fontes: [
           {
-            titulo: "Renovar o Cartão de Cidadão",
+            titulo: "Renovar o Cartão de Cidadão — gov.pt",
             url: "https://www.gov.pt/servicos/renovar-o-cartao-de-cidadao",
             dominio: "gov.pt",
           },
           {
-            titulo: "Instituto dos Registos e do Notariado",
-            url: "https://irn.justica.gov.pt",
+            titulo: "Cartão de Cidadão — IRN",
+            url: "https://irn.justica.gov.pt/Documentos-de-Identificacao/Cartao-de-Cidadao",
             dominio: "irn.justica.gov.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
     {
@@ -55,6 +56,7 @@ const tema: Tema = {
             dominio: "autenticacao.gov.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
     {
@@ -78,6 +80,7 @@ const tema: Tema = {
             dominio: "gov.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
     {
@@ -107,6 +110,7 @@ const tema: Tema = {
             dominio: "gov.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
   ],

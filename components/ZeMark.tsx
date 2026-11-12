@@ -24,7 +24,7 @@ export default function ZeMark({
       <text
         x="14"
         y="14.5"
-        fontFamily="Georgia, serif"
+        fontFamily="var(--font-display), sans-serif"
         fontWeight="700"
         fontSize="10.5"
         fill="#ffffff"

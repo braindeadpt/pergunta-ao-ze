@@ -20,7 +20,6 @@ const LINHA_REGISTOS: ContactoEntidade = {
 };
 
 export const ENTIDADES: Record<string, MetaEntidade> = {
-  "eportugal.gov.pt": { nome: "ePortugal — Portal dos Serviços Públicos", ambito: "Nacional", contacto: LINHA_CIDADAO },
   "irn.justica.gov.pt": {
     nome: "Instituto dos Registos e do Notariado",
     ambito: "Nacional",
@@ -88,7 +87,7 @@ export const ENTIDADES: Record<string, MetaEntidade> = {
     ambito: "Nacional",
     contacto: { telefone: "213 126 000" },
   },
-  "gov.pt": { nome: "gov.pt — Portal do Governo", ambito: "Nacional", contacto: LINHA_CIDADAO },
+  "gov.pt": { nome: "gov.pt (antigo ePortugal) — Portal dos Serviços Públicos", ambito: "Nacional", contacto: LINHA_CIDADAO },
   "justica.gov.pt": { nome: "Justiça.gov.pt", ambito: "Nacional", contacto: LINHA_REGISTOS },
   "siga.marcacaodeatendimento.pt": { nome: "Siga — Agendamento de Atendimento", ambito: "Nacional", contacto: LINHA_CIDADAO },
   "civilonline.mj.pt": { nome: "Civil Online — Registos IRN", ambito: "Nacional", contacto: LINHA_REGISTOS },
@@ -116,6 +115,7 @@ export const ENTIDADES: Record<string, MetaEntidade> = {
   "anacom.pt": { nome: "ANACOM", ambito: "Nacional" },
   "registocriminal.justica.gov.pt": { nome: "Registo Criminal Online", ambito: "Nacional", contacto: LINHA_REGISTOS },
   "sg.mai.gov.pt": { nome: "Secretaria-Geral do MAI — Eleições", ambito: "Nacional" },
+  "recenseamento.pt": { nome: "Portal do Recenseamento Eleitoral (SG MAI)", ambito: "Nacional" },
   "vistos.mne.gov.pt": { nome: "Portal de Vistos — MNE", ambito: "Nacional" },
   "livroreclamacoes.pt": { nome: "Livro de Reclamações Eletrónico", ambito: "Nacional" },
   "navegante.pt": { nome: "Portal Navegante", ambito: "Nacional" },
@@ -135,29 +135,50 @@ export const ENTIDADES: Record<string, MetaEntidade> = {
   },
 };
 
+export function normalizarUrlFonte(raw: string): string {
+  try {
+    const u = new URL(raw.trim());
+    if (u.pathname === "/" && !u.search && !u.hash) {
+      return `${u.protocol}//${u.host}`;
+    }
+    if (u.pathname.length > 1 && u.pathname.endsWith("/")) {
+      u.pathname = u.pathname.replace(/\/+$/, "");
+    }
+    return u.toString();
+  } catch {
+    return raw.trim().replace(/\/+$/, "");
+  }
+}
+
 export function getFontes(): { entidade: EntidadeFonte; fontes: Fonte[] }[] {
-  const porDominio = new Map<string, Set<string>>();
+  const porDominio = new Map<string, Map<string, Fonte>>();
 
   for (const tema of TEMAS) {
     for (const pergunta of tema.perguntas) {
       for (const fonte of pergunta.resposta.fontes) {
         if (!porDominio.has(fonte.dominio)) {
-          porDominio.set(fonte.dominio, new Set());
+          porDominio.set(fonte.dominio, new Map());
         }
-        porDominio.get(fonte.dominio)!.add(`${fonte.titulo}|||${fonte.url}`);
+        const mapaUrls = porDominio.get(fonte.dominio)!;
+        const chaveUrl = normalizarUrlFonte(fonte.url);
+        const existente = mapaUrls.get(chaveUrl);
+        if (!existente || fonte.titulo.length > existente.titulo.length) {
+          mapaUrls.set(chaveUrl, {
+            titulo: fonte.titulo,
+            url: fonte.url,
+            dominio: fonte.dominio,
+          });
+        }
       }
     }
   }
 
   return [...porDominio.entries()]
-    .map(([dominio, set]) => {
+    .map(([dominio, mapaUrls]) => {
       const meta = ENTIDADES[dominio] ?? { nome: dominio, ambito: "Nacional" as Ambito };
       return {
         entidade: { dominio, nome: meta.nome, ambito: meta.ambito, contacto: meta.contacto },
-        fontes: [...set].map((s) => {
-          const [titulo, url] = s.split("|||");
-          return { titulo, url, dominio };
-        }),
+        fontes: [...mapaUrls.values()],
       };
     })
     .sort((a, b) => a.entidade.nome.localeCompare(b.entidade.nome, "pt"));

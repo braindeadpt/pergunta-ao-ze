@@ -26,6 +26,7 @@ const tema: Tema = {
             dominio: "livroreclamacoes.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
     {
@@ -43,11 +44,12 @@ const tema: Tema = {
         ],
         fontes: [
           {
-            titulo: "Reclamações — gov.pt",
-            url: "https://www.gov.pt",
+            titulo: "Direitos do consumidor e resolução de litígios — gov.pt",
+            url: "https://www.gov.pt/guias/direitos-do-consumidor",
             dominio: "gov.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
     {
@@ -77,6 +79,7 @@ const tema: Tema = {
             dominio: "anacom.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
   ],

@@ -27,6 +27,7 @@ const tema: Tema = {
             dominio: "autenticacao.gov.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
     {
@@ -49,6 +50,7 @@ const tema: Tema = {
             dominio: "autenticacao.gov.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
   ],

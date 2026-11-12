@@ -22,11 +22,12 @@ const tema: Tema = {
         ],
         fontes: [
           {
-            titulo: "AIMA — Agência para a Integração, Migrações e Asilo",
-            url: "https://aima.gov.pt",
+            titulo: "Viver em Portugal — AIMA",
+            url: "https://aima.gov.pt/pt/viver",
             dominio: "aima.gov.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
     {
@@ -45,16 +46,17 @@ const tema: Tema = {
         ],
         fontes: [
           {
-            titulo: "Nacionalidade portuguesa — IRN",
-            url: "https://irn.justica.gov.pt",
-            dominio: "irn.justica.gov.pt",
+            titulo: "Submeter pedido de nacionalidade — Justiça.gov.pt",
+            url: "https://justica.gov.pt/Servicos/Submeter-pedido-de-nacionalidade",
+            dominio: "justica.gov.pt",
           },
           {
-            titulo: "Nacionalidade — gov.pt",
-            url: "https://www.gov.pt",
+            titulo: "Pedir a nacionalidade portuguesa — gov.pt",
+            url: "https://www.gov.pt/servicos/pedir-a-nacionalidade-portuguesa",
             dominio: "gov.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
   ],

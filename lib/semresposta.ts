@@ -18,14 +18,24 @@ export const TTL_SEM_MS = 30 * 24 * 60 * 60 * 1000;
 export const MAX_SEM_POR_DIA = 500;
 
 /**
- * Retira dados pessoais de um texto livre: emails, sequências de 6+
- * dígitos (com ou sem separadores — cobre NIF, NISS, nº de documento e
- * telefones) e devolve "[removido]" no lugar.
+ * Retira dados pessoais de um texto livre: emails, IBANs, matrículas
+ * portuguesas, sequências de 6+ dígitos (com ou sem separadores — cobre NIF,
+ * NISS, nº de documento e telefones) e devolve "[removido]" no lugar.
  */
 export function anonimizar(texto: string): string {
   let out = texto;
   // emails
   out = out.replace(/[\w.+-]+@[\w-]+\.[\w.-]+/g, "[removido]");
+  // IBAN (PT50 ou internacional, com ou sem espaços/hífens)
+  out = out.replace(
+    /\b(?:[pP][tT]\s*50(?:\s*\d){19,23}|[a-zA-Z]{2}\d{2}(?:\s*\d){11,30}|[A-Z]{2}\d{2}(?:\s*[A-Z0-9]{4}){2,7}(?:\s*[A-Z0-9]{1,4})?)\b/g,
+    "[removido]"
+  );
+  // matrículas automóveis portuguesas (com hífen case-insensitive; com espaços só maiúsculas para não apanhar "12 ou 34" / "de 12 em")
+  out = out.replace(
+    /\b(?:[a-zA-Z]{2}-\d{2}-[a-zA-Z]{2}|\d{2}-[a-zA-Z]{2}-\d{2}|[a-zA-Z]{2}-\d{2}-\d{2}|\d{2}-\d{2}-[a-zA-Z]{2}|[A-Z]{2}\s\d{2}\s[A-Z]{2}|\d{2}\s[A-Z]{2}\s\d{2}|[A-Z]{2}\s\d{2}\s\d{2}|\d{2}\s\d{2}\s[A-Z]{2})\b/g,
+    "[removido]"
+  );
   // números longos possivelmente com separadores (9 6 3   1 2 3   4 5 6,
   // 123.456.789, 211-950-500...) — só substitui se houver >=6 dígitos
   out = out.replace(/\d[\d\s./-]{4,}\d/g, (m) =>

@@ -22,10 +22,11 @@ const tema: Tema = {
         fontes: [
           {
             titulo: "IEFP — Inscrição para emprego",
-            url: "https://www.iefp.pt",
+            url: "https://www.iefp.pt/inscricao-para-emprego",
             dominio: "iefp.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
     {
@@ -48,6 +49,7 @@ const tema: Tema = {
             dominio: "seg-social.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
   ],

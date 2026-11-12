@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { TEMAS } from "../lib/data/temas.ts";
-import { ENTIDADES } from "../lib/data/fontes.ts";
+import { ENTIDADES, getFontes, normalizarUrlFonte } from "../lib/data/fontes.ts";
 import { BALCOES_DEF, balcaoDeTema } from "../lib/balcoes.ts";
 
 /**
@@ -95,4 +95,28 @@ test("temas: todos os temas de TEMAS existem exatamente uma vez em BALCOES_DEF",
     0,
     "cartao-de-cidadao deve pertencer ao Balcão 1 (Identificação)"
   );
+});
+
+test("temas: todas as respostas têm verificadoEm válido (AAAA-MM-DD)", () => {
+  for (const t of TEMAS) {
+    for (const p of t.perguntas) {
+      assert.match(
+        p.resposta.verificadoEm ?? "",
+        /^\d{4}-\d{2}-\d{2}$/,
+        `${p.id}: verificadoEm em falta ou formato inválido`
+      );
+    }
+  }
+});
+
+test("fontes: getFontes() não repete o mesmo URL canónico dentro da mesma entidade", () => {
+  const grupos = getFontes();
+  for (const g of grupos) {
+    const urls = g.fontes.map((f) => normalizarUrlFonte(f.url));
+    assert.equal(
+      new Set(urls).size,
+      urls.length,
+      `entidade "${g.entidade.dominio}" tem URLs duplicados em getFontes()`
+    );
+  }
 });

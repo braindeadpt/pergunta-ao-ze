@@ -160,7 +160,7 @@ export default function Home() {
             {fontes.map((g) => (
               <a
                 key={g.entidade.dominio}
-                href={`https://${g.entidade.dominio}`}
+                href={g.fontes[0] ? new URL(g.fontes[0].url).origin : `https://${g.entidade.dominio}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="rounded-md border border-white/30 px-3.5 py-1.5 font-mono text-sm tracking-wide text-blue-100 transition-colors hover:border-white hover:bg-white/10 hover:text-white"
@@ -208,7 +208,7 @@ export default function Home() {
                   </span>
                   <ul className="list-disc space-y-2 pl-5 text-[15px] text-stone-700">
                     <li>
-                      Online, no ePortugal — se tens 25 anos ou mais e não
+                      Online, no gov.pt (antigo ePortugal) — se tens 25 anos ou mais e não
                       precisas de alterar dados nem foto.
                     </li>
                     <li>
@@ -284,7 +284,7 @@ export default function Home() {
                   {[
                     "Marcar atendimentos por ti",
                     "Pagar o IUC ou o IRS por ti",
-                    "Guardar as tuas conversas",
+                    "Guardar as tuas conversas (exceto perguntas sem resposta, anónimas por 30 dias)",
                   ].map((t) => (
                     <li key={t} className="flex items-center gap-3.5 text-lg font-medium">
                       <XMao />
@@ -342,7 +342,7 @@ export default function Home() {
                   },
                   {
                     q: "Onde vai parar a minha pergunta?",
-                    a: "Pode ser processada por um modelo de IA (Groq, tier gratuito) que só recebe a pergunta e excertos das respostas curadas — nunca dados pessoais. Se a IA falhar, responde a pesquisa local. As conversas não são guardadas.",
+                    a: "Pode ser processada por um modelo de IA alojado na Groq (tier gratuito; nos tiers gratuitos os pedidos podem ser retidos segundo a política do fornecedor — mais uma razão para nunca escreveres dados pessoais). O modelo só recebe a pergunta e excertos das respostas curadas. Se a IA falhar, responde a pesquisa local. As conversas não são guardadas. Exceção: perguntas sem resposta são guardadas de forma anónima durante 30 dias, sem dados pessoais nem ligação a quem perguntou, só para sabermos que temas faltam à base.",
                   },
                   {
                     q: "Que serviços conhece?",

@@ -32,6 +32,7 @@ const tema: Tema = {
             dominio: "gov.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
     {
@@ -50,16 +51,22 @@ const tema: Tema = {
         ],
         fontes: [
           {
-            titulo: "Abrir atividade independente — Portal das Finanças",
-            url: "https://www.portaldasfinancas.gov.pt",
-            dominio: "portaldasfinancas.gov.pt",
-          },
-          {
-            titulo: "Trabalhador independente — gov.pt",
-            url: "https://www.gov.pt",
+            titulo: "Abrir atividade nas Finanças — gov.pt",
+            url: "https://www.gov.pt/servicos/abrir-atividade-nas-financas",
             dominio: "gov.pt",
           },
+          {
+            titulo: "Guia do trabalhador independente — gov.pt",
+            url: "https://www.gov.pt/guias/trabalhador-independente",
+            dominio: "gov.pt",
+          },
+          {
+            titulo: "Declarações de atividade — apoio do Portal das Finanças",
+            url: "https://info.portaldasfinancas.gov.pt/pt/apoio_ao_contribuinte/Cidadaos/Atividade_profissional/Declaracoes_de_atividade/Paginas/default.aspx",
+            dominio: "portaldasfinancas.gov.pt",
+          },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
   ],

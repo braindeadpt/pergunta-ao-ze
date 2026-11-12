@@ -26,11 +26,12 @@ const tema: Tema = {
             dominio: "sns24.gov.pt",
           },
           {
-            titulo: "Portal do SNS",
-            url: "https://www.sns.gov.pt",
+            titulo: "Cidadão — Portal do SNS",
+            url: "https://www.sns.gov.pt/cidadao/",
             dominio: "sns.gov.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
     {
@@ -53,6 +54,7 @@ const tema: Tema = {
             dominio: "sns.gov.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
     {
@@ -75,6 +77,7 @@ const tema: Tema = {
             dominio: "sns24.gov.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
     {
@@ -102,6 +105,7 @@ const tema: Tema = {
             dominio: "sns24.gov.pt",
           },
         ],
+        verificadoEm: "2026-11-12",
       },
     },
   ],
