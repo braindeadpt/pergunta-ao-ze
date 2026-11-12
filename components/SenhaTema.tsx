@@ -34,12 +34,14 @@ export default function SenhaTema({
   const rot = ROTACOES[i % ROTACOES.length];
   const [principal, ...resto] = tema.perguntas;
 
-  const transform = tombada ? "rotate(176deg) translateY(6px)" : `rotate(${rot}deg)`;
+  const estilo: CSSProperties = tombada
+    ? ({ "--fundo": fundo } as CSSProperties)
+    : ({ "--fundo": fundo, transform: `rotate(${rot}deg)` } as CSSProperties);
 
   return (
     <article
       className={`senha group ${tombada ? "senha-tombada" : ""} ${destaque ? "" : DESNIVAL[i % DESNIVAL.length]}`}
-      style={{ "--fundo": fundo, transform } as CSSProperties}
+      style={estilo}
     >
       {destaque && (
         <span aria-hidden="true" className="carimbo absolute -right-3 -top-3 z-10 rotate-6 bg-white text-[13px]">

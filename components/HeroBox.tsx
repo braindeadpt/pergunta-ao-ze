@@ -22,9 +22,21 @@ export default function HeroBox() {
   const [idx, setIdx] = useState(0);
   const [texto, setTexto] = useState("");
   const [batendo, setBatendo] = useState(false);
+  const ocupadoRef = useRef(false);
+  const carimboTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const char = useRef(0);
   const apagando = useRef(false);
   const router = useRouter();
+
+  useEffect(() => {
+    return () => {
+      if (carimboTimerRef.current !== null) {
+        clearTimeout(carimboTimerRef.current);
+        carimboTimerRef.current = null;
+      }
+      ocupadoRef.current = false;
+    };
+  }, []);
 
   useEffect(() => {
     // DESIGN.md §9 — com prefers-reduced-motion, placeholder estático
@@ -61,16 +73,34 @@ export default function HeroBox() {
     return () => clearTimeout(timer);
   }, [idx]);
 
-  const enviar = (q: string) => {
-    const trimmed = q.trim();
-    if (trimmed) router.push(`/chat?q=${encodeURIComponent(trimmed)}`);
+  const navegar = (trimmed: string) => {
+    router.push(`/chat?q=${encodeURIComponent(trimmed)}`);
   };
 
-  // O carimbo "bate" (~220ms) antes de navegar
+  const enviar = (q: string) => {
+    const trimmed = q.trim();
+    if (!trimmed || ocupadoRef.current) return;
+    ocupadoRef.current = true;
+    navegar(trimmed);
+  };
+
+  // O carimbo "bate" (~220ms) antes de navegar; com reduced-motion navega de imediato (0ms)
   const baterCarimbo = () => {
-    if (!pergunta.trim()) return;
+    const trimmed = pergunta.trim();
+    if (!trimmed || ocupadoRef.current) return;
+    ocupadoRef.current = true;
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setBatendo(true);
+      navegar(trimmed);
+      return;
+    }
+
     setBatendo(true);
-    setTimeout(() => enviar(pergunta), 220);
+    carimboTimerRef.current = setTimeout(() => {
+      carimboTimerRef.current = null;
+      navegar(trimmed);
+    }, 220);
   };
 
   const exemplo = EXEMPLOS[idx];
@@ -78,7 +108,7 @@ export default function HeroBox() {
   return (
     <div className="w-full">
       {/* FORMULÁRIO Z-01 — a caixa de pergunta */}
-      <div className="relative z-10 rounded-lg border-2 border-ink bg-white text-left shadow-[8px_8px_0_#1b1d22] transition-shadow focus-within:shadow-[10px_10px_0_#1b1d22]">
+      <div className="relative z-10 rounded-lg border-2 border-ink bg-white text-left shadow-[8px_8px_0_#1b1d22] transition-shadow focus-within:shadow-[10px_10px_0_#1b1d22] has-[textarea:focus-visible]:outline-2 has-[textarea:focus-visible]:outline-offset-2 has-[textarea:focus-visible]:outline-band-verde">
         <div className="flex items-center justify-between border-b-2 border-dashed border-ink/20 px-5 py-2.5">
           <p aria-hidden className="font-mono text-xs font-bold uppercase tracking-widest text-stone-700">
             Formulário Z-01 · via única
@@ -95,7 +125,7 @@ export default function HeroBox() {
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
-                enviar(pergunta);
+                baterCarimbo();
               }
             }}
             rows={3}
@@ -119,10 +149,10 @@ export default function HeroBox() {
           {/* O botão de submeter É um carimbo — bate antes de navegar */}
           <button
             onClick={baterCarimbo}
-            disabled={!pergunta.trim()}
+            disabled={!pergunta.trim() || batendo}
             className={`carimbo shrink-0 self-end px-4 py-2 text-sm sm:self-auto ${
               batendo ? "stamp-batendo" : ""
-            } bg-white disabled:opacity-30`}
+            } bg-white disabled:cursor-not-allowed disabled:border-stone-400 disabled:bg-stone-100 disabled:text-stone-500`}
             style={{ transform: "rotate(-7deg)" }}
           >
             Entregar →
@@ -149,7 +179,8 @@ export default function HeroBox() {
               </p>
               <button
                 onClick={() => enviar(exemplo.q)}
-                className="grid size-10 shrink-0 place-items-center rounded-lg border-2 border-ink bg-band-verde text-white shadow-[3px_3px_0_#1b1d22] transition-all hover:-translate-y-0.5 hover:bg-band-verde-escuro hover:shadow-[4px_4px_0_#1b1d22]"
+                disabled={batendo}
+                className="grid size-10 shrink-0 place-items-center rounded-lg border-2 border-ink bg-band-verde text-white shadow-[3px_3px_0_#1b1d22] transition-all hover:-translate-y-0.5 hover:bg-band-verde-escuro hover:shadow-[4px_4px_0_#1b1d22] disabled:cursor-not-allowed disabled:opacity-40"
                 aria-label="Usa esta pergunta"
               >
                 →

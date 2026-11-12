@@ -11,6 +11,7 @@
   --color-band-verde: #046a38;
   --color-band-verde-escuro: #035129;
   --color-band-vermelho: #d5232f;
+  --color-carimbo: #d5232f;
   --color-azulejo: #1d4f9c;
   --color-azulejo-suave: #eef3fb;
   --color-form-amarelo: #f5c518;
@@ -108,7 +109,7 @@ details[open] .faq-plus {
   /* Carimbo de tinta vermelha — sempre rotacionado. Objeto gráfico:
      o texto dentro dele é decoração, nunca informação única (§5). */
   .carimbo {
-    @apply inline-block border-2 border-band-vermelho px-2.5 py-1 font-mono text-xs font-bold uppercase tracking-widest text-band-vermelho;
+    @apply inline-block border-2 border-band-vermelho px-2.5 py-1 font-mono text-xs font-bold uppercase tracking-widest text-carimbo-tinta;
     transform: rotate(-6deg);
   }
   .carimbo-claro {
@@ -235,18 +236,26 @@ details[open] .faq-plus {
   }
 }
 
-/* Senha tombada — caiu do dispensador; endireita ao interagir */
-@media (prefers-reduced-motion: no-preference) {
+/* Senha tombada — caiu do dispensador; só inverte em dispositivos com rato/hover */
+.senha-tombada {
+  transform: rotate(-2deg);
+  box-shadow: 5px 5px 0 var(--color-ink);
+}
+@media (hover: hover) and (pointer: fine) {
   .senha-tombada {
-    transition: transform 0.3s ease;
+    transform: rotate(176deg) translateY(6px);
+    box-shadow: 5px -5px 0 var(--color-ink);
   }
   .senha-tombada:hover,
   .senha-tombada:focus-within {
     transform: rotate(-2deg) !important;
+    box-shadow: 5px 5px 0 var(--color-ink);
   }
 }
-.senha-tombada {
-  box-shadow: 5px -5px 0 var(--color-ink);
+@media (prefers-reduced-motion: no-preference) {
+  .senha-tombada {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
 }
 
 @keyframes typing-bounce {

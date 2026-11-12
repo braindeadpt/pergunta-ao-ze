@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
+import { extrairTelefones, segmentarNota } from "@/lib/contactos";
 import type { ContactoEntidade, Fonte } from "@/lib/types";
 
 export interface FichaFonte {
@@ -67,7 +68,7 @@ export default function FontesArquivo({ grupos }: { grupos: GrupoArquivo[] }) {
     <div ref={arquivo}>
       {/* Barra de ferramentas do arquivo */}
       <div className="flex flex-wrap items-center gap-3">
-        <label className="flex flex-1 min-w-56 items-center gap-2 rounded-lg border-2 border-ink bg-white px-3 py-2 shadow-[3px_3px_0_#1b1d22] focus-within:shadow-[4px_4px_0_#1b1d22]">
+        <label className="flex flex-1 min-w-56 items-center gap-2 rounded-lg border-2 border-ink bg-white px-3 py-2 shadow-[3px_3px_0_#1b1d22] focus-within:shadow-[4px_4px_0_#1b1d22] focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-band-verde">
           <span aria-hidden className="font-mono text-sm font-bold uppercase tracking-widest text-stone-600">
             ▸
           </span>
@@ -77,7 +78,7 @@ export default function FontesArquivo({ grupos }: { grupos: GrupoArquivo[] }) {
             onChange={(e) => setPesquisa(e.target.value)}
             placeholder="Procurar entidade ou domínio…"
             aria-label="Procurar entidade ou domínio no arquivo"
-            className="w-full bg-transparent text-sm outline-none placeholder:text-stone-400"
+            className="w-full bg-transparent text-sm outline-none placeholder:text-stone-500"
           />
         </label>
         <button
@@ -151,38 +152,62 @@ export default function FontesArquivo({ grupos }: { grupos: GrupoArquivo[] }) {
                       >
                         {f.contacto && (
                           <div className="mb-3 space-y-0.5 text-sm text-stone-700">
-                            {f.contacto.telefone && (
-                              <p>
-                                <span className="font-mono text-sm font-bold uppercase tracking-wider text-ink">
-                                  Ligar:
-                                </span>{" "}
-                                <a
-                                  href={`tel:${f.contacto.telefone.split(" ou ")[0].replace(/\s/g, "")}`}
-                                  className="font-medium text-ink"
-                                >
-                                  {f.contacto.telefone}
-                                </a>
-                                {f.contacto.horario && (
-                                  <span className="text-stone-600">
-                                    {" "}
-                                    · {f.contacto.horario}
-                                  </span>
-                                )}
-                              </p>
-                            )}
+                            {f.contacto.telefone &&
+                              (() => {
+                                const tels = extrairTelefones(f.contacto.telefone);
+                                if (tels.length === 0) return null;
+                                return (
+                                  <p>
+                                    <span className="font-semibold text-ink">
+                                      Ligar:
+                                    </span>{" "}
+                                    {tels.map((t, ti) => (
+                                      <span key={t.href}>
+                                        {ti > 0 && " ou "}
+                                        <a
+                                          href={t.href}
+                                          className="font-medium text-azulejo underline decoration-azulejo/30 underline-offset-2 hover:decoration-azulejo"
+                                        >
+                                          {t.visivel}
+                                        </a>
+                                      </span>
+                                    ))}
+                                    {f.contacto.horario && (
+                                      <span className="text-stone-600">
+                                        {" "}
+                                        · {f.contacto.horario}
+                                      </span>
+                                    )}
+                                  </p>
+                                );
+                              })()}
                             {f.contacto.email && (
-                              <p>
-                                <span className="text-stone-600">Email:</span>{" "}
+                              <p className="text-stone-600">
+                                <span>Email:</span>{" "}
                                 <a
                                   href={`mailto:${f.contacto.email}`}
-                                  className="font-medium text-ink underline decoration-stone-300 underline-offset-2 hover:decoration-ink"
+                                  className="font-medium text-azulejo underline decoration-azulejo/30 underline-offset-2 hover:decoration-azulejo"
                                 >
                                   {f.contacto.email}
                                 </a>
                               </p>
                             )}
                             {f.contacto.nota && (
-                              <p className="text-stone-600">{f.contacto.nota}</p>
+                              <p className="text-stone-600">
+                                {segmentarNota(f.contacto.nota).map((seg, si) =>
+                                  seg.tipo === "telefone" ? (
+                                    <a
+                                      key={si}
+                                      href={seg.href}
+                                      className="font-medium text-azulejo underline decoration-azulejo/30 underline-offset-2 hover:decoration-azulejo"
+                                    >
+                                      {seg.visivel}
+                                    </a>
+                                  ) : (
+                                    <span key={si}>{seg.texto}</span>
+                                  )
+                                )}
+                              </p>
                             )}
                           </div>
                         )}

@@ -53,21 +53,16 @@ export default function SenhasGrid({
         <span className="text-carimbo-tinta">— {b.rotulo}</span>
       </p>
       <div className="mt-6 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-        {b.temas.map((tema, j) => {
-          const ultimo =
-            bi === balcoes.length - 1 && j === b.temas.length - 1;
-          return (
-            <SenhaTema
-              key={tema.id}
-              tema={tema}
-              i={bi * 4 + j + 1}
-              fundo="#f5e27a"
-              numero={`${b.letra}-${String(j + 1).padStart(3, "0")}`}
-              balcao={`Balcão ${bi + 1}`}
-              tombada={ultimo}
-            />
-          );
-        })}
+        {b.temas.map((tema, j) => (
+          <SenhaTema
+            key={tema.id}
+            tema={tema}
+            i={bi * 4 + j + 1}
+            fundo="#f5e27a"
+            numero={`${b.letra}-${String(j + 1).padStart(3, "0")}`}
+            balcao={`Balcão ${bi + 1}`}
+          />
+        ))}
       </div>
     </div>
   );

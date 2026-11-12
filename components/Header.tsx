@@ -9,7 +9,7 @@ export default function Header() {
       </div>
       <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
         <Link href="/" className="flex items-center gap-2.5">
-          <ZeMark className="size-7" />
+          <ZeMark className="size-7" decorativo />
           <span className="font-display text-lg tracking-tight">
             Pergunta ao <span className="text-band-verde">Zé</span>
           </span>

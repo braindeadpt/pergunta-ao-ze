@@ -9,7 +9,7 @@ export default function Footer() {
         <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
           <div>
             <div className="flex items-center gap-2.5">
-              <ZeMark className="size-7" />
+              <ZeMark className="size-7" decorativo />
               <span className="font-display text-lg tracking-tight">
                 Pergunta ao <span className="text-band-verde">Zé</span>
               </span>

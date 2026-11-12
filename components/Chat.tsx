@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import type { Pergunta, Tema } from "@/lib/types";
 import type { Sugestao } from "@/lib/engine";
 import { detetarIdioma, idiomaDoNavegador, type Lang } from "@/lib/i18n";
-import { contactosDeFontes } from "@/lib/contactos";
+import { contactosDeFontes, segmentarNota } from "@/lib/contactos";
+import { prazoDaPergunta } from "@/lib/data/prazos";
 import { TEMAS } from "@/lib/data/temas";
 import ZePersonagem from "@/components/ZePersonagem";
 import SenhaTema from "@/components/SenhaTema";
@@ -43,7 +45,13 @@ const TXT = {
     relacionadas: "Perguntas relacionadas:",
     fontes: "Fontes oficiais",
     ligar: "Ligar",
+    ouTel: " ou ",
+    emailRotulo: "Email:",
     ia: "gerada por IA",
+    prazoRotulo: "▸ Prazo oficial",
+    prazoAte: "até",
+    prazoCal: "Adicionar ao calendário (.ics)",
+    prazoTodos: "Todos os prazos →",
     anuncioOk: "Resposta recebida.",
     anuncioLimite: "Limite de pedidos. Tenta de novo mais tarde.",
     anuncioErro: "Falha ao obter resposta.",
@@ -62,12 +70,27 @@ const TXT = {
     relacionadas: "Related questions:",
     fontes: "Official sources",
     ligar: "Call",
+    ouTel: " or ",
+    emailRotulo: "Email:",
     ia: "AI-generated",
+    prazoRotulo: "▸ Official deadline",
+    prazoAte: "by",
+    prazoCal: "Add to calendar (.ics)",
+    prazoTodos: "All deadlines →",
     anuncioOk: "Response received.",
     anuncioLimite: "Request limit reached. Try again later.",
     anuncioErro: "Failed to get an answer.",
   },
 } as const;
+
+function formatarDataPrazo(iso: string, lang: Lang) {
+  return new Intl.DateTimeFormat(lang === "en" ? "en-GB" : "pt-PT", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(`${iso}T00:00:00Z`));
+}
 
 /** Aviso sempre visível numa resposta traduzida — nunca escondido */
 const AVISO_TRADUCAO =
@@ -112,11 +135,27 @@ export default function Chat() {
   const ultimaLang = useRef<Lang>("pt");
   const ultimaPergunta = useRef("");
   const senhaN = useRef(0);
-  const fim = useRef<HTMLDivElement>(null);
+  const ocupadoRef = useRef(false);
+  const carimboTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const ultimaRespostaRef = useRef<HTMLDivElement>(null);
+  const loadingRef = useRef<HTMLDivElement>(null);
+  const prevMensagensLenRef = useRef(0);
   const barra = useRef<HTMLDivElement>(null);
   const [padBaixo, setPadBaixo] = useState(176);
   const enviado = useRef(false);
   const anuncio = useRef<HTMLParagraphElement>(null);
+
+  // Limpa timeout pendente do carimbo se desmontar a meio da animação
+  useEffect(() => {
+    return () => {
+      if (carimboTimerRef.current !== null) {
+        clearTimeout(carimboTimerRef.current);
+        carimboTimerRef.current = null;
+        ocupadoRef.current = false;
+      }
+    };
+  }, []);
 
   // Padding inferior = altura real da barra + 16px (a última senha nunca fica tapada)
   useEffect(() => {
@@ -140,8 +179,26 @@ export default function Chat() {
   }, [aCarregar]);
 
   useEffect(() => {
+    const total = mensagens.length;
+    const anterior = prevMensagensLenRef.current;
+    prevMensagensLenRef.current = total;
+
+    // Evita scroll desnecessário no render inicial sem ?q=
+    if (total === 0 && !aCarregar) return;
+    if (anterior === 0 && total <= 1 && !aCarregar) return;
+
     const suave = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    fim.current?.scrollIntoView({ behavior: suave ? "smooth" : "auto" });
+    const behavior: ScrollBehavior = suave ? "smooth" : "auto";
+
+    if (aCarregar) {
+      loadingRef.current?.scrollIntoView({ behavior, block: "nearest" });
+      return;
+    }
+
+    const ultima = mensagens[total - 1];
+    if (ultima?.papel === "ze" && total > anterior) {
+      ultimaRespostaRef.current?.scrollIntoView({ behavior, block: "start" });
+    }
   }, [mensagens, aCarregar]);
 
   // Countdown do 429 — só corre enquanto houver uma mensagem "limite" ativa
@@ -172,15 +229,16 @@ export default function Chat() {
     return detetada ?? ultimaLang.current;
   }
 
-  async function perguntar(texto: string) {
-    const q = texto.trim();
-    if (!q || aCarregar) return;
+  async function executarPergunta(q: string) {
     const lang = langDaPergunta(q);
     ultimaLang.current = lang;
     ultimaPergunta.current = q;
     senhaN.current += 1;
     setMensagens((m) => [...m, { papel: "utilizador", texto: q }]);
     setInput("");
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+    }
     setACarregar(true);
     const T = TXT[lang];
     try {
@@ -211,17 +269,34 @@ export default function Chat() {
       setMensagens((m) => [...m, { papel: "ze", tipo: "erro", sugestoes: [], langUsada: lang }]);
       anuncio.current && (anuncio.current.textContent = T.anuncioErro);
     } finally {
+      ocupadoRef.current = false;
       setACarregar(false);
     }
   }
 
-  // O carimbo ENVIAR bate antes de submeter
+  function perguntar(texto: string) {
+    const q = texto.trim();
+    if (!q || ocupadoRef.current) return;
+    ocupadoRef.current = true;
+    void executarPergunta(q);
+  }
+
+  // O carimbo ENVIAR bate antes de submeter; com reduced-motion submete de imediato (0ms)
   const carimbar = () => {
-    if (!input.trim() || aCarregar) return;
+    const q = input.trim();
+    if (!q || ocupadoRef.current) return;
+    ocupadoRef.current = true;
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      void executarPergunta(q);
+      return;
+    }
+
     setBatendo(true);
-    setTimeout(() => {
+    carimboTimerRef.current = setTimeout(() => {
+      carimboTimerRef.current = null;
       setBatendo(false);
-      perguntar(input);
+      void executarPergunta(q);
     }, 220);
   };
 
@@ -244,6 +319,14 @@ export default function Chat() {
   }, [params]);
 
   let senhaVisivel = 0;
+  let ultimaZeIdx = -1;
+  for (let k = mensagens.length - 1; k >= 0; k--) {
+    if (mensagens[k].papel === "ze") {
+      ultimaZeIdx = k;
+      break;
+    }
+  }
+  const ocupadoUI = batendo || aCarregar;
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-4">
@@ -309,7 +392,11 @@ export default function Chat() {
           }
           const T = TXT[m.langUsada ?? "pt"];
           return (
-            <div key={i} className="animate-fade-in-up flex gap-3">
+            <div
+              key={i}
+              ref={i === ultimaZeIdx ? ultimaRespostaRef : undefined}
+              className="animate-fade-in-up scroll-mt-32 sm:scroll-mt-24 flex gap-3"
+            >
               <ZePersonagem
                 estado={
                   m.tipo === "resposta" ? "carimbar" : m.tipo === "sugestoes" ? "panico" : "normal"
@@ -330,7 +417,8 @@ export default function Chat() {
                     <p className="text-base">{T.erroMsg}</p>
                     <button
                       onClick={() => ultimaPergunta.current && perguntar(ultimaPergunta.current)}
-                      className="btn-outline mt-3 px-4 py-2 text-sm"
+                      disabled={ocupadoUI}
+                      className="btn-outline mt-3 px-4 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {T.tentar}
                     </button>
@@ -349,7 +437,7 @@ export default function Chat() {
                     </p>
                     <button
                       onClick={() => ultimaPergunta.current && perguntar(ultimaPergunta.current)}
-                      disabled={(m.retryAte ?? 0) > Date.now()}
+                      disabled={(m.retryAte ?? 0) > Date.now() || ocupadoUI}
                       className="btn-outline mt-3 px-4 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {T.tentar}
@@ -357,7 +445,7 @@ export default function Chat() {
                   </>
                 ) : m.tipo === "resposta" && m.pergunta ? (
                   <>
-                    <p aria-hidden className="flex flex-wrap items-center gap-2 font-mono text-xs font-bold uppercase tracking-widest text-stone-600">
+                    <p className="flex flex-wrap items-center gap-2 font-mono text-xs font-bold uppercase tracking-widest text-stone-600">
                       {m.tema?.entidade} · {m.tema?.titulo}
                       {m.via === "llm" && (
                         <span className="rounded-md border border-azulejo/50 bg-azulejo-suave px-2 py-0.5 text-xs font-bold text-azulejo">
@@ -415,21 +503,106 @@ export default function Chat() {
                       const linhas = contactosDeFontes(m.pergunta.resposta.fontes);
                       if (linhas.length === 0) return null;
                       return (
-                        <div className="mt-3 space-y-1 rounded-md border-2 border-dashed border-ink/20 bg-stone-50 px-3 py-2.5 text-sm text-stone-700">
+                        <div className="mt-3 space-y-2 rounded-md border-2 border-dashed border-ink/20 bg-stone-50 px-3 py-2.5 text-sm text-stone-700">
                           {linhas.map((c) => (
-                            <p key={c.telefone}>
-                              <span className="font-mono text-sm font-bold uppercase tracking-wider text-ink">
-                                {T.ligar} — {c.entidades.join(" · ")}:
-                              </span>{" "}
-                              {c.telefone}
-                              {c.horario && (
-                                <span className="text-stone-500">
-                                  {" "}
-                                  — {c.horario}
+                            <div key={c.chave} className="space-y-0.5">
+                              <p>
+                                <span className="font-semibold text-ink">
+                                  {c.telefones.length > 0
+                                    ? `${T.ligar} — ${c.entidades.join(" · ")}:`
+                                    : c.entidades.join(" · ")}
                                 </span>
+                                {c.telefones.length > 0 && (
+                                  <>
+                                    {" "}
+                                    {c.telefones.map((t, ti) => (
+                                      <span key={t.href}>
+                                        {ti > 0 && T.ouTel}
+                                        <a
+                                          href={t.href}
+                                          className="font-medium text-azulejo underline decoration-azulejo/30 underline-offset-2 hover:decoration-azulejo"
+                                        >
+                                          {t.visivel}
+                                        </a>
+                                      </span>
+                                    ))}
+                                  </>
+                                )}
+                                {c.horario && (
+                                  <span className="text-stone-600">
+                                    {" "}
+                                    — {c.horario}
+                                  </span>
+                                )}
+                              </p>
+                              {c.emails.length > 0 && (
+                                <p className="text-stone-600">
+                                  <span>{T.emailRotulo}</span>{" "}
+                                  {c.emails.map((em, ei) => (
+                                    <span key={em}>
+                                      {ei > 0 && " · "}
+                                      <a
+                                        href={`mailto:${em}`}
+                                        className="font-medium text-azulejo underline decoration-azulejo/30 underline-offset-2 hover:decoration-azulejo"
+                                      >
+                                        {em}
+                                      </a>
+                                    </span>
+                                  ))}
+                                </p>
                               )}
-                            </p>
+                              {c.notas.map((nota) => (
+                                <p key={nota} className="text-stone-600">
+                                  {segmentarNota(nota).map((seg, si) =>
+                                    seg.tipo === "telefone" ? (
+                                      <a
+                                        key={si}
+                                        href={seg.href}
+                                        className="font-medium text-azulejo underline decoration-azulejo/30 underline-offset-2 hover:decoration-azulejo"
+                                      >
+                                        {seg.visivel}
+                                      </a>
+                                    ) : (
+                                      <span key={si}>{seg.texto}</span>
+                                    )
+                                  )}
+                                </p>
+                              ))}
+                            </div>
                           ))}
+                        </div>
+                      );
+                    })()}
+                    {(() => {
+                      const prazo = m.pergunta.id
+                        ? prazoDaPergunta(m.pergunta.id)
+                        : undefined;
+                      if (!prazo) return null;
+                      const langP = m.langUsada ?? "pt";
+                      return (
+                        <div className="mt-4 rounded-lg border-2 border-carimbo bg-white px-4 py-3.5 shadow-[3px_3px_0_#d5232f]">
+                          <p className="font-mono text-xs font-bold uppercase tracking-widest text-carimbo-tinta">
+                            {T.prazoRotulo} ·{" "}
+                            {prazo.inicio && prazo.inicio !== prazo.fim
+                              ? `${formatarDataPrazo(prazo.inicio, langP)} → ${formatarDataPrazo(prazo.fim, langP)}`
+                              : `${T.prazoAte} ${formatarDataPrazo(prazo.fim, langP)}`}
+                          </p>
+                          <p className="mt-1 text-sm text-stone-700">{prazo.titulo}</p>
+                          <div className="mt-2.5 flex flex-wrap items-center gap-3">
+                            <a
+                              href={`/prazos/${prazo.id}`}
+                              download={`${prazo.id}.ics`}
+                              className="btn-outline px-3 py-1.5 text-xs"
+                            >
+                              {T.prazoCal}
+                            </a>
+                            <Link
+                              href="/prazos"
+                              className="font-mono text-xs text-azulejo underline underline-offset-2"
+                            >
+                              {T.prazoTodos}
+                            </Link>
+                          </div>
                         </div>
                       );
                     })()}
@@ -453,9 +626,10 @@ export default function Chat() {
                         <button
                           key={s.id}
                           onClick={() => perguntar(s.texto)}
-                          className="rounded-md border-2 border-dashed border-ink/30 px-3 py-2 text-left text-sm transition-colors hover:border-ink hover:bg-form-amarelo/20"
+                          disabled={ocupadoUI}
+                          className="rounded-md border-2 border-dashed border-ink/30 px-3 py-2 text-left text-sm transition-colors hover:border-ink hover:bg-form-amarelo/20 disabled:cursor-not-allowed disabled:opacity-50"
                         >
-                          <span aria-hidden className="font-mono text-xs font-bold uppercase tracking-widest text-stone-600">
+                          <span className="font-mono text-xs font-bold uppercase tracking-widest text-stone-600">
                             {s.tema}
                           </span>
                           <br />
@@ -475,7 +649,8 @@ export default function Chat() {
                         <button
                           key={s.id}
                           onClick={() => perguntar(s.texto)}
-                          className="chip-sm"
+                          disabled={ocupadoUI}
+                          className="chip-sm disabled:cursor-not-allowed disabled:opacity-50"
                         >
                           {s.texto}
                         </button>
@@ -489,7 +664,11 @@ export default function Chat() {
         })}
 
         {aCarregar && (
-          <div className="animate-fade-in-up flex gap-3">
+          <div
+            ref={loadingRef}
+            style={{ scrollMarginBottom: padBaixo }}
+            className="animate-fade-in-up scroll-mt-32 sm:scroll-mt-24 flex gap-3"
+          >
             <div className="flex items-center gap-4 rounded-lg rounded-tl-sm border-2 border-ink bg-white px-5 py-4 shadow-[3px_3px_0_#1b1d22]">
               <ZePersonagem estado="pensar" className="w-24 shrink-0" />
               <p
@@ -502,12 +681,11 @@ export default function Chat() {
             </div>
           </div>
         )}
-        <div ref={fim} />
       </div>
 
       {/* FORMULÁRIO Z-01 — a mesma família visual da home */}
       <div ref={barra} className="sticky bottom-0 border-t-2 border-ink bg-paper py-4">
-        <div className="rounded-lg border-2 border-ink bg-white shadow-[4px_4px_0_#1b1d22] focus-within:shadow-[5px_5px_0_#1b1d22]">
+        <div className="rounded-lg border-2 border-ink bg-white shadow-[4px_4px_0_#1b1d22] focus-within:shadow-[5px_5px_0_#1b1d22] has-[textarea:focus-visible]:outline-2 has-[textarea:focus-visible]:outline-offset-2 has-[textarea:focus-visible]:outline-band-verde">
           <div className="flex items-center justify-between border-b-2 border-dashed border-ink/20 px-4 py-1.5 font-mono text-xs font-bold uppercase tracking-widest text-stone-600">
             <span aria-hidden>Formulário Z-01</span>
             <div className="flex items-center gap-1.5 normal-case tracking-normal">
@@ -527,19 +705,20 @@ export default function Chat() {
                   className={`transition-all ${
                     langSel === l
                       ? "carimbo bg-white"
-                      : "rounded border-2 border-stone-300 px-1.5 py-0.5 font-mono text-xs font-bold uppercase tracking-wider text-stone-400 hover:border-stone-500 hover:text-stone-600"
+                      : "rounded border-2 border-ink/40 px-1.5 py-0.5 font-mono text-xs font-bold uppercase tracking-wider text-stone-700 hover:border-ink hover:text-ink"
                   }`}
                 >
                   {l}
                 </button>
               ))}
-              <span aria-hidden className="text-stone-400">
+              <span aria-hidden className="text-stone-600">
                 {langSel === "auto" ? "· auto" : ""}
               </span>
             </div>
           </div>
           <div className="flex items-end gap-2 p-2">
             <textarea
+              ref={textareaRef}
               value={input}
               onChange={(e) => {
                 setInput(e.target.value);
@@ -555,12 +734,12 @@ export default function Chat() {
               rows={1}
               placeholder={movel ? "Pergunta ao Zé…" : "A tua pergunta para o Zé"}
               aria-label="A tua pergunta para o Zé"
-              className="max-h-32 flex-1 resize-none overflow-auto bg-transparent px-3 py-2 text-base outline-none placeholder:text-stone-400"
+              className="max-h-32 flex-1 resize-none overflow-auto bg-transparent px-3 py-2 text-base outline-none placeholder:text-stone-500"
             />
             {/* O botão de envio É um carimbo — bate ao submeter */}
             <button
               onClick={carimbar}
-              disabled={!input.trim() || aCarregar}
+              disabled={!input.trim() || ocupadoUI}
               aria-label="Enviar pergunta"
               className={`carimbo shrink-0 px-3 py-2 text-sm ${
                 batendo ? "stamp-batendo" : ""

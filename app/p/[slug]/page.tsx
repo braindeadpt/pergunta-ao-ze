@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { TEMAS } from "@/lib/data/temas";
 import { TEMAS_EN } from "@/lib/data/temas.en";
 import { prazoDaPergunta } from "@/lib/data/prazos";
-import { contactosDeFontes } from "@/lib/contactos";
+import { contactosDeFontes, segmentarNota } from "@/lib/contactos";
 import { SITE_URL } from "@/lib/site";
 import ZePersonagem from "@/components/ZePersonagem";
 import Partilhar from "@/components/Partilhar";
@@ -59,6 +59,15 @@ const geradoEm = new Intl.DateTimeFormat("pt-PT", {
   month: "long",
   year: "numeric",
 }).format(new Date());
+
+function formatarDataPt(iso: string) {
+  return new Intl.DateTimeFormat("pt-PT", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(`${iso}T00:00:00Z`));
+}
 
 export default async function PaginaPergunta({
   params,
@@ -148,7 +157,7 @@ export default async function PaginaPergunta({
 
       {/* Ficha de resposta — sóbria */}
       <article className="mt-6 rounded-lg border-2 border-ink bg-white px-5 py-5 shadow-[4px_4px_0_#1b1d22]">
-        <p aria-hidden className="font-mono text-xs font-bold uppercase tracking-widest text-stone-600">
+        <p className="font-mono text-xs font-bold uppercase tracking-widest text-stone-600">
           {tema.entidade} · {tema.titulo}
         </p>
         <ul className="mt-3 list-disc space-y-2 pl-5 text-base leading-relaxed">
@@ -185,17 +194,69 @@ export default async function PaginaPergunta({
         </div>
 
         {contactos.length > 0 && (
-          <div className="mt-3 space-y-1 rounded-md border-2 border-dashed border-ink/20 bg-stone-50 px-3 py-2.5 text-sm text-stone-700">
+          <div className="mt-3 space-y-2 rounded-md border-2 border-dashed border-ink/20 bg-stone-50 px-3 py-2.5 text-sm text-stone-700">
             {contactos.map((c) => (
-              <p key={c.telefone}>
-                <span className="font-mono text-sm font-bold uppercase tracking-wider text-ink">
-                  Ligar — {c.entidades.join(" · ")}:
-                </span>{" "}
-                {c.telefone}
-                {c.horario && (
-                  <span className="text-stone-500"> — {c.horario}</span>
+              <div key={c.chave} className="space-y-0.5">
+                <p>
+                  <span className="font-semibold text-ink">
+                    {c.telefones.length > 0
+                      ? `Ligar — ${c.entidades.join(" · ")}:`
+                      : c.entidades.join(" · ")}
+                  </span>
+                  {c.telefones.length > 0 && (
+                    <>
+                      {" "}
+                      {c.telefones.map((t, ti) => (
+                        <span key={t.href}>
+                          {ti > 0 && " ou "}
+                          <a
+                            href={t.href}
+                            className="font-medium text-azulejo underline decoration-azulejo/30 underline-offset-2 hover:decoration-azulejo"
+                          >
+                            {t.visivel}
+                          </a>
+                        </span>
+                      ))}
+                    </>
+                  )}
+                  {c.horario && (
+                    <span className="text-stone-600"> — {c.horario}</span>
+                  )}
+                </p>
+                {c.emails.length > 0 && (
+                  <p className="text-stone-600">
+                    <span>Email:</span>{" "}
+                    {c.emails.map((em, ei) => (
+                      <span key={em}>
+                        {ei > 0 && " · "}
+                        <a
+                          href={`mailto:${em}`}
+                          className="font-medium text-azulejo underline decoration-azulejo/30 underline-offset-2 hover:decoration-azulejo"
+                        >
+                          {em}
+                        </a>
+                      </span>
+                    ))}
+                  </p>
                 )}
-              </p>
+                {c.notas.map((nota) => (
+                  <p key={nota} className="text-stone-600">
+                    {segmentarNota(nota).map((seg, si) =>
+                      seg.tipo === "telefone" ? (
+                        <a
+                          key={si}
+                          href={seg.href}
+                          className="font-medium text-azulejo underline decoration-azulejo/30 underline-offset-2 hover:decoration-azulejo"
+                        >
+                          {seg.visivel}
+                        </a>
+                      ) : (
+                        <span key={si}>{seg.texto}</span>
+                      )
+                    )}
+                  </p>
+                ))}
+              </div>
             ))}
           </div>
         )}
@@ -204,19 +265,27 @@ export default async function PaginaPergunta({
       {prazo && (
         <div className="mt-4 rounded-lg border-2 border-carimbo bg-white px-5 py-4 shadow-[4px_4px_0_#d5232f]">
           <p className="font-mono text-xs font-bold uppercase tracking-widest text-carimbo-tinta">
-            ▸ Prazo{" "}
+            ▸ Prazo oficial ·{" "}
             {prazo.inicio && prazo.inicio !== prazo.fim
-              ? `${prazo.inicio} → ${prazo.fim}`
-              : `até ${prazo.fim}`}
+              ? `${formatarDataPt(prazo.inicio)} → ${formatarDataPt(prazo.fim)}`
+              : `até ${formatarDataPt(prazo.fim)}`}
           </p>
           <p className="mt-1 text-sm text-stone-700">{prazo.titulo}</p>
-          <a
-            href={`/prazos/${prazo.id}`}
-            download={`${prazo.id}.ics`}
-            className="mt-2 inline-block btn-outline px-3 py-1.5 text-xs"
-          >
-            Adicionar ao calendário
-          </a>
+          <div className="mt-2.5 flex flex-wrap items-center gap-3">
+            <a
+              href={`/prazos/${prazo.id}`}
+              download={`${prazo.id}.ics`}
+              className="btn-outline px-3 py-1.5 text-xs"
+            >
+              Adicionar ao calendário (.ics)
+            </a>
+            <Link
+              href="/prazos"
+              className="font-mono text-xs text-azulejo underline underline-offset-2"
+            >
+              Todos os prazos →
+            </Link>
+          </div>
         </div>
       )}
 
