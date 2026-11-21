@@ -271,11 +271,10 @@ test("libertar usa o dia da reserva — não debita o dia seguinte", async () =>
   await c.libertar(fimDia1);
   const dia2 = new Date(inicioDia2).toISOString().slice(0, 10);
   assert.equal(redis.store.get(`ze:llm:${dia2}`)?.v, 1);
-  // A chave zombie do dia 1 fica fechada com TTL desse dia (no passado).
+  // A chave zombie do dia 1 fica expirada — GET devolve null (em Redis
+  // real o PEXPIREAT no passado apaga-a de imediato).
   const dia1 = new Date(fimDia1).toISOString().slice(0, 10);
-  const zombie = redis.store.get(`ze:llm:${dia1}`);
-  assert.equal(zombie?.v, 0);
-  assert.ok(zombie?.expiraEm !== undefined && zombie.expiraEm <= inicioDia2);
+  assert.equal(await redis.get(`ze:llm:${dia1}`), null);
 });
 
 test("limite inválido (NaN): fail-closed nos dois backends", async () => {
