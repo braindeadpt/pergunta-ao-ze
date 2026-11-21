@@ -180,9 +180,13 @@ export class ContadorDiarioRedis implements ContadorDiarioIface {
     const dia = new Date(agora).toISOString().slice(0, 10);
     const key = `ze:llm:${dia}`;
     try {
-      // Nunca fica negativo: uma reserva feita antes da meia-noite UTC e
-      // devolvida depois acertava na chave do dia novo (recém-nascida).
-      if ((await this.redis.decr(key)) < 0) await this.redis.incr(key);
+      // Nunca fica negativo: uma reserva devolvida depois da meia-noite
+      // UTC acerta numa chave já expirada — repõe a 0 e fecha-a com o
+      // TTL desse dia (imediatamente no passado) para não deixar lixo.
+      if ((await this.redis.decr(key)) < 0) {
+        await this.redis.incr(key);
+        await this.redis.pexpireat(key, proximaMeiaNoiteUtc(agora));
+      }
     } catch (e) {
       console.error("[ratelimit] Redis falhou a devolver quota LLM:", e);
     }

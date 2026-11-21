@@ -93,19 +93,27 @@ export async function POST(request: Request) {
   // Teto diário de chamadas LLM: a quota reserva-se ANTES de chamar o
   // modelo — INCR atómico. Ler o contador sem contar deixava passar
   // todos os pedidos em voo com n < teto (corrida verifica-e-age).
-  const quotaLlm = await contadorLlm.verificar(MAX_LLM_CALLS_PER_DAY, true);
+  // O mesmo `agora` vai para verificar() e libertar(): a reserva e a
+  // devolução acertam na mesma chave diária mesmo que a chamada ao
+  // LLM atravesse a meia-noite UTC.
+  const agoraQuota = Date.now();
+  const quotaLlm = await contadorLlm.verificar(
+    MAX_LLM_CALLS_PER_DAY,
+    true,
+    agoraQuota
+  );
   const engine = quotaLlm ? getEngine() : keywordFallback;
   let resultado;
   try {
     resultado = await engine.responder(pergunta.trim(), lang);
   } catch (err) {
-    if (quotaLlm) await contadorLlm.libertar();
+    if (quotaLlm) await contadorLlm.libertar(agoraQuota);
     throw err;
   }
   // Sem chamada real ao LLM (fallback keyword / provider em baixo):
   // devolve a reserva — o teto conta só chamadas ao modelo.
   if (quotaLlm && resultado.via !== "llm") {
-    await contadorLlm.libertar();
+    await contadorLlm.libertar(agoraQuota);
   }
   // Contadores diários de uso (ze:st:*, 90 dias). Nunca lança — stats
   // não podem partir a resposta ao utilizador.

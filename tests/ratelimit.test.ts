@@ -254,8 +254,28 @@ test("libertar devolve a reserva e nunca desce abaixo de 0", async () => {
   assert.equal(await c.verificar(1, true, t0), false);
   await c.libertar(t0); // devolve o slot
   assert.equal(await c.verificar(1, true, t0), true); // há quota outra vez
-  await c.libertar(t0); // devolução a mais: prende em 0
+  await c.libertar(t0); // 1 → 0
+  await c.libertar(t0); // já a 0: prende, nunca fica negativo
   assert.equal(redis.store.get(`ze:llm:${dia}`)?.v, 0);
+});
+
+test("libertar usa o dia da reserva — não debita o dia seguinte", async () => {
+  const fimDia1 = Date.UTC(2026, 9, 1, 23, 59, 59);
+  const inicioDia2 = Date.UTC(2026, 9, 2, 0, 0, 1);
+  const redis = new FakeRedis(() => inicioDia2);
+  const c = new ContadorDiarioRedis(redis);
+  // O dia 2 já tem uma reserva gasta.
+  assert.equal(await c.verificar(2, true, inicioDia2), true);
+  // Reserva feita no dia 1 devolvida no dia 2: vai à chave do dia 1
+  // (já expirada) e deixa o contador do dia 2 intacto.
+  await c.libertar(fimDia1);
+  const dia2 = new Date(inicioDia2).toISOString().slice(0, 10);
+  assert.equal(redis.store.get(`ze:llm:${dia2}`)?.v, 1);
+  // A chave zombie do dia 1 fica fechada com TTL desse dia (no passado).
+  const dia1 = new Date(fimDia1).toISOString().slice(0, 10);
+  const zombie = redis.store.get(`ze:llm:${dia1}`);
+  assert.equal(zombie?.v, 0);
+  assert.ok(zombie?.expiraEm !== undefined && zombie.expiraEm <= inicioDia2);
 });
 
 test("limite inválido (NaN): fail-closed nos dois backends", async () => {
