@@ -32,8 +32,11 @@ export interface RateLimiter {
 }
 
 export interface ContadorDiarioIface {
-  /** Devolve true se ainda há quota; incrementa quando conta=true. */
+  /** Devolve true se ainda há quota; incrementa (reserva) quando conta=true. */
   verificar(limite: number, conta?: boolean, agora?: number): boolean | Promise<boolean>;
+  /** Devolve uma unidade de quota reservada mas não usada (ex.: o LLM
+   *  não chegou a ser chamado). Nunca lança. */
+  libertar(agora?: number): void | Promise<void>;
 }
 
 interface Entrada {
@@ -79,6 +82,7 @@ export class MemoryRateLimiter implements RateLimiter {
 /** Contrato mínimo de Redis — o fake dos testes implementa isto. */
 export interface RedisMin {
   incr(key: string): Promise<number>;
+  decr(key: string): Promise<number>;
   get(key: string): Promise<string | number | null>;
   pexpire(key: string, ms: number): Promise<number>;
   pttl(key: string): Promise<number>;
@@ -156,10 +160,28 @@ export class ContadorDiarioRedis implements ContadorDiarioIface {
       }
       const n = await this.redis.incr(key);
       if (n === 1) await this.redis.pexpireat(key, proximaMeiaNoiteUtc(agora));
-      return n <= limite;
+      if (n > limite) {
+        // Reserva recusada: repõe a contagem para a chave não engordar
+        // acima do teto nem engolir libertar() de reservas válidas.
+        await this.redis.decr(key);
+        return false;
+      }
+      return true;
     } catch (e) {
       console.error("[ratelimit] Redis falhou no contador diário LLM; fail-closed:", e);
       return false;
+    }
+  }
+
+  async libertar(agora = Date.now()): Promise<void> {
+    const dia = new Date(agora).toISOString().slice(0, 10);
+    const key = `ze:llm:${dia}`;
+    try {
+      // Nunca fica negativo: uma reserva feita antes da meia-noite UTC e
+      // devolvida depois acertava na chave do dia novo (recém-nascida).
+      if ((await this.redis.decr(key)) < 0) await this.redis.incr(key);
+    } catch (e) {
+      console.error("[ratelimit] Redis falhou a devolver quota LLM:", e);
     }
   }
 }
@@ -178,6 +200,11 @@ export class ContadorDiario implements ContadorDiarioIface {
     if (this.n >= limite) return false;
     if (conta) this.n += 1;
     return true;
+  }
+
+  libertar(agora = Date.now()): void {
+    const hoje = new Date(agora).toISOString().slice(0, 10);
+    if (hoje === this.dia && this.n > 0) this.n -= 1;
   }
 
   get total() {

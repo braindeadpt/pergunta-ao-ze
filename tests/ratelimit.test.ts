@@ -41,6 +41,10 @@ class FakeRedis implements RedisMin {
     this.maybeFail();
     return ++this.entry(key).v;
   }
+  async decr(key: string) {
+    this.maybeFail();
+    return --this.entry(key).v;
+  }
   async get(key: string) {
     this.maybeFail();
     const e = this.store.get(key);
@@ -225,4 +229,49 @@ test("Contador diário Redis em baixo: fail-closed → KeywordEngine", async () 
   const c = new ContadorDiarioRedis(redis);
   assert.equal(await c.verificar(500, false), false);
   assert.equal(await c.verificar(500, true), false);
+});
+
+test("reserva atómica: N concorrentes no último slot → só 1 passa", async () => {
+  const t0 = Date.UTC(2026, 9, 1, 10, 0, 0);
+  const redis = new FakeRedis(() => t0);
+  const c = new ContadorDiarioRedis(redis);
+  const LIMITE = 5;
+  for (let i = 0; i < LIMITE - 1; i++) await c.verificar(LIMITE, true, t0);
+  const ok = (
+    await Promise.all(
+      Array.from({ length: 20 }, () => c.verificar(LIMITE, true, t0))
+    )
+  ).filter(Boolean).length;
+  assert.equal(ok, 1);
+});
+
+test("libertar devolve a reserva e nunca desce abaixo de 0", async () => {
+  const t0 = Date.UTC(2026, 9, 1, 10, 0, 0);
+  const redis = new FakeRedis(() => t0);
+  const c = new ContadorDiarioRedis(redis);
+  const dia = new Date(t0).toISOString().slice(0, 10);
+  assert.equal(await c.verificar(1, true, t0), true); // esgota
+  assert.equal(await c.verificar(1, true, t0), false);
+  await c.libertar(t0); // devolve o slot
+  assert.equal(await c.verificar(1, true, t0), true); // há quota outra vez
+  await c.libertar(t0); // devolução a mais: prende em 0
+  assert.equal(redis.store.get(`ze:llm:${dia}`)?.v, 0);
+});
+
+test("libertar em baixo não lança (a resposta ao utilizador não parte)", async () => {
+  const redis = new FakeRedis();
+  redis.falhar = true;
+  const c = new ContadorDiarioRedis(redis);
+  await c.libertar(); // só regista o erro
+});
+
+test("ContadorDiario (memória): libertar devolve quota sem ir abaixo de 0", () => {
+  const c = new ContadorDiario();
+  const t0 = Date.UTC(2026, 9, 1, 10, 0, 0);
+  assert.equal(c.verificar(1, true, t0), true);
+  assert.equal(c.verificar(1, true, t0), false);
+  c.libertar(t0);
+  assert.equal(c.verificar(1, true, t0), true);
+  c.libertar(t0);
+  assert.equal(c.total, 0);
 });
