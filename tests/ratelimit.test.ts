@@ -258,6 +258,15 @@ test("libertar devolve a reserva e nunca desce abaixo de 0", async () => {
   assert.equal(redis.store.get(`ze:llm:${dia}`)?.v, 0);
 });
 
+test("limite inválido (NaN): fail-closed nos dois backends", async () => {
+  const c = new ContadorDiarioRedis(new FakeRedis());
+  assert.equal(await c.verificar(NaN, false), false);
+  assert.equal(await c.verificar(NaN, true), false);
+  const mem = new ContadorDiario();
+  assert.equal(mem.verificar(NaN, false), false);
+  assert.equal(mem.verificar(NaN, true), false);
+});
+
 test("libertar em baixo não lança (a resposta ao utilizador não parte)", async () => {
   const redis = new FakeRedis();
   redis.falhar = true;

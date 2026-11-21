@@ -151,6 +151,9 @@ export class ContadorDiarioRedis implements ContadorDiarioIface {
   }
 
   async verificar(limite: number, conta = false, agora = Date.now()): Promise<boolean> {
+    // Limite inválido (NaN de env mal configurada): fail-closed, como
+    // o GET antigo (n < NaN era sempre false).
+    if (Number.isNaN(limite)) return false;
     const dia = new Date(agora).toISOString().slice(0, 10);
     const key = `ze:llm:${dia}`;
     try {
@@ -192,6 +195,7 @@ export class ContadorDiario implements ContadorDiarioIface {
   private n = 0;
 
   verificar(limite: number, conta = false, agora = Date.now()): boolean {
+    if (Number.isNaN(limite)) return false;
     const hoje = new Date(agora).toISOString().slice(0, 10);
     if (hoje !== this.dia) {
       this.dia = hoje;
