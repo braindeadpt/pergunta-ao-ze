@@ -17,6 +17,9 @@ class FakeRedis implements RedisMin {
   async incr() {
     return 0;
   }
+  async decr() {
+    return 0;
+  }
   async get() {
     return null;
   }

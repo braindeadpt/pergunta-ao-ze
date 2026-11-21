@@ -41,6 +41,10 @@ class FakeRedis implements RedisMin {
     this.maybeFail();
     return ++this.entry(key).v;
   }
+  async decr(key: string) {
+    this.maybeFail();
+    return --this.entry(key).v;
+  }
   async get(key: string) {
     this.maybeFail();
     const e = this.store.get(key);
@@ -225,4 +229,77 @@ test("Contador diário Redis em baixo: fail-closed → KeywordEngine", async () 
   const c = new ContadorDiarioRedis(redis);
   assert.equal(await c.verificar(500, false), false);
   assert.equal(await c.verificar(500, true), false);
+});
+
+test("reserva atómica: N concorrentes no último slot → só 1 passa", async () => {
+  const t0 = Date.UTC(2026, 9, 1, 10, 0, 0);
+  const redis = new FakeRedis(() => t0);
+  const c = new ContadorDiarioRedis(redis);
+  const LIMITE = 5;
+  for (let i = 0; i < LIMITE - 1; i++) await c.verificar(LIMITE, true, t0);
+  const ok = (
+    await Promise.all(
+      Array.from({ length: 20 }, () => c.verificar(LIMITE, true, t0))
+    )
+  ).filter(Boolean).length;
+  assert.equal(ok, 1);
+});
+
+test("libertar devolve a reserva e nunca desce abaixo de 0", async () => {
+  const t0 = Date.UTC(2026, 9, 1, 10, 0, 0);
+  const redis = new FakeRedis(() => t0);
+  const c = new ContadorDiarioRedis(redis);
+  const dia = new Date(t0).toISOString().slice(0, 10);
+  assert.equal(await c.verificar(1, true, t0), true); // esgota
+  assert.equal(await c.verificar(1, true, t0), false);
+  await c.libertar(t0); // devolve o slot
+  assert.equal(await c.verificar(1, true, t0), true); // há quota outra vez
+  await c.libertar(t0); // 1 → 0
+  await c.libertar(t0); // já a 0: prende, nunca fica negativo
+  assert.equal(redis.store.get(`ze:llm:${dia}`)?.v, 0);
+});
+
+test("libertar usa o dia da reserva — não debita o dia seguinte", async () => {
+  const fimDia1 = Date.UTC(2026, 9, 1, 23, 59, 59);
+  const inicioDia2 = Date.UTC(2026, 9, 2, 0, 0, 1);
+  const redis = new FakeRedis(() => inicioDia2);
+  const c = new ContadorDiarioRedis(redis);
+  // O dia 2 já tem uma reserva gasta.
+  assert.equal(await c.verificar(2, true, inicioDia2), true);
+  // Reserva feita no dia 1 devolvida no dia 2: vai à chave do dia 1
+  // (já expirada) e deixa o contador do dia 2 intacto.
+  await c.libertar(fimDia1);
+  const dia2 = new Date(inicioDia2).toISOString().slice(0, 10);
+  assert.equal(redis.store.get(`ze:llm:${dia2}`)?.v, 1);
+  // A chave zombie do dia 1 fica expirada — GET devolve null (em Redis
+  // real o PEXPIREAT no passado apaga-a de imediato).
+  const dia1 = new Date(fimDia1).toISOString().slice(0, 10);
+  assert.equal(await redis.get(`ze:llm:${dia1}`), null);
+});
+
+test("limite inválido (NaN): fail-closed nos dois backends", async () => {
+  const c = new ContadorDiarioRedis(new FakeRedis());
+  assert.equal(await c.verificar(NaN, false), false);
+  assert.equal(await c.verificar(NaN, true), false);
+  const mem = new ContadorDiario();
+  assert.equal(mem.verificar(NaN, false), false);
+  assert.equal(mem.verificar(NaN, true), false);
+});
+
+test("libertar em baixo não lança (a resposta ao utilizador não parte)", async () => {
+  const redis = new FakeRedis();
+  redis.falhar = true;
+  const c = new ContadorDiarioRedis(redis);
+  await c.libertar(); // só regista o erro
+});
+
+test("ContadorDiario (memória): libertar devolve quota sem ir abaixo de 0", () => {
+  const c = new ContadorDiario();
+  const t0 = Date.UTC(2026, 9, 1, 10, 0, 0);
+  assert.equal(c.verificar(1, true, t0), true);
+  assert.equal(c.verificar(1, true, t0), false);
+  c.libertar(t0);
+  assert.equal(c.verificar(1, true, t0), true);
+  c.libertar(t0);
+  assert.equal(c.total, 0);
 });

@@ -19,6 +19,13 @@ class FakeRedis implements RedisMin {
     this.store.set(key, e);
     return e.v;
   }
+  async decr(key: string) {
+    if (this.falhar) throw new Error("redis em baixo");
+    const e = this.store.get(key) ?? { v: 0 };
+    e.v -= 1;
+    this.store.set(key, e);
+    return e.v;
+  }
   async get(key: string) {
     if (this.falhar) throw new Error("redis em baixo");
     return this.store.get(key)?.v ?? null;
