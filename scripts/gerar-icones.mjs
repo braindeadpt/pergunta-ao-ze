@@ -42,4 +42,5 @@ await comFundo(512, 320, amarelo, "public/icons/icon-512-maskable.png");
 await comFundo(192, 120, amarelo, "public/icons/icon-192-maskable.png");
 
 // Apple touch icon: sem transparência, fundo papel.
-await comFundo(180, 148, papel, "public/icons/apple-touch-icon.png");
+// app/apple-icon.png é a convenção do Next (URL versionado + <link> automático).
+await comFundo(180, 148, papel, "app/apple-icon.png");

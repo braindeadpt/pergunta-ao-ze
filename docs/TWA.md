@@ -95,6 +95,10 @@ full-screen.
 
 - Mudanças **web** (conteúdo, design): deploy normal na Vercel — a app reflete logo.
 - Mudanças de **manifest/ícones**: editar `app/manifest.ts`/`scripts/gerar-icones.mjs`,
-  fazer deploy, depois `bubblewrap merge` (importa o web manifest para o
-  `twa-manifest.json`), `bubblewrap update` (regenera o projeto Android),
-  bump `versionCode`, rebuild e novo upload.
+  fazer deploy, depois:
+  1. `bubblewrap merge --ignore name short_name --skipVersionUpgrade` — importa o
+     web manifest para o `twa-manifest.json` **sem** sobrescrever os nomes
+     escolhidos no `init` (`Zé` no launcher) e sem subir a versão duas vezes
+  2. `bubblewrap update` — regenera o projeto Android e incrementa o
+     `appVersionCode` automaticamente (não é preciso bump manual)
+  3. `bubblewrap build` → novo upload do `app-release-bundle.aab`
