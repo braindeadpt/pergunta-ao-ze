@@ -50,7 +50,8 @@ self.addEventListener("fetch", (event) => {
     event.respondWith(
       fetch(request)
         .then((res) => {
-          if (res.ok && (res.headers.get("content-type") || "").includes("text/html")) {
+          // HTML e o .ics de prazos (text/calendar) ficam em cache — o resto não.
+          if (res.ok && /^(text\/html|text\/calendar)(?:;|$)/i.test(res.headers.get("content-type") || "")) {
             const clone = res.clone();
             event.waitUntil(
               caches.open(RUNTIME_CACHE).then((c) => c.put(request, clone)),
@@ -68,7 +69,12 @@ self.addEventListener("fetch", (event) => {
   // Navegações cliente (Link do Next) pedem dados RSC, não o documento —
   // aproveitamos para guardar o HTML completo dessa rota em background,
   // senão um reload offline de uma página "visitada" caía no /offline.html.
-  if (url.searchParams.has("_rsc") || request.headers.get("RSC") === "1") {
+  // Prefetches (Next-Router-Prefetch: 1) são ignorados — senão o índice /p
+  // disparava um fetch de documento por cada link só por estar no ecrã.
+  if (
+    (url.searchParams.has("_rsc") || request.headers.get("RSC") === "1") &&
+    request.headers.get("Next-Router-Prefetch") !== "1"
+  ) {
     event.waitUntil(
       fetch(url.pathname)
         .then((res) => {
