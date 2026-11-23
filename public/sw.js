@@ -1,5 +1,5 @@
 // Bump CACHE_NAME em cada release para os clientes atualizarem.
-const CACHE_NAME = "ze-static-v2";
+const CACHE_NAME = "ze-static-v3";
 const RUNTIME_CACHE = "ze-pages-v1";
 
 const STATIC_ASSETS = [
