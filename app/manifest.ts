@@ -47,6 +47,22 @@ export default function manifest(): MetadataRoute.Manifest {
         purpose: "maskable",
       },
     ],
+    screenshots: [
+      {
+        src: "/screenshots/ze-home.png",
+        sizes: "1920x863",
+        type: "image/png",
+        form_factor: "wide",
+        label: "Página inicial — pergunta sobre serviços públicos",
+      },
+      {
+        src: "/screenshots/ze-chat.png",
+        sizes: "1920x863",
+        type: "image/png",
+        form_factor: "wide",
+        label: "Conversa com o Zé — passos e links oficiais",
+      },
+    ],
     shortcuts: [
       {
         name: "Perguntar ao Zé",
