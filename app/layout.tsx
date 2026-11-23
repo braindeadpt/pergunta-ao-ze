@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
 import { SITE_URL } from "@/lib/site";
 
 const inter = Inter({
@@ -58,6 +59,7 @@ export default function RootLayout({
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />
+        <ServiceWorkerRegistration />
         <Analytics />
       </body>
     </html>

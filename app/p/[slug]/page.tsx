@@ -276,7 +276,6 @@ export default async function PaginaPergunta({
           <div className="mt-2.5 flex flex-wrap items-center gap-3">
             <a
               href={`/prazos/${prazo.id}`}
-              download={`${prazo.id}.ics`}
               className="btn-outline px-3 py-1.5 text-xs"
             >
               Adicionar ao calendário (.ics)

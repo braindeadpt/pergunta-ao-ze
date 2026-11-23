@@ -3,9 +3,9 @@
     "relation": ["delegate_permission/common.handle_all_urls"],
     "target": {
       "namespace": "android_app",
-      "package_name": "pt.perguntaaoze.app",
+      "package_name": "pt.perguntaaoze.twa",
       "sha256_cert_fingerprints": [
-        "SUBSTITUIR_POR_SHA256_DO_UPLOAD_KEY_OU_PLAY_APP_SIGNING"
+        "52:93:FD:0D:1C:7D:DB:19:1E:E2:2C:40:FF:5B:0D:15:08:5B:6F:38:92:33:7A:17:16:BF:E7:45:CB:65:B9:D8"
       ]
     }
   }
