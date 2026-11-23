@@ -34,7 +34,10 @@ export const metadata: Metadata = {
   description:
     "O Zé responde a perguntas sobre serviços públicos portugueses e indica as páginas oficiais por onde começar. Projeto independente.",
   metadataBase: new URL(SITE_URL),
-  icons: { apple: "/icons/apple-touch-icon.png" },
+  icons: {
+    icon: { url: "/icon.svg", type: "image/svg+xml", sizes: "any" },
+    apple: "/icons/apple-touch-icon.png",
+  },
   openGraph: {
     type: "website",
     locale: "pt_PT",
