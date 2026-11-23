@@ -44,20 +44,40 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Navegações: rede primeiro; offline serve a página visitada ou /offline.html.
+  // Navegações de documento: rede primeiro; offline serve a página visitada
+  // ou /offline.html. O put fica em waitUntil para o SW não morrer a meio.
   if (request.mode === "navigate") {
     event.respondWith(
       fetch(request)
         .then((res) => {
-          if (res.ok) {
+          if (res.ok && (res.headers.get("content-type") || "").includes("text/html")) {
             const clone = res.clone();
-            caches.open(RUNTIME_CACHE).then((c) => c.put(request, clone));
+            event.waitUntil(
+              caches.open(RUNTIME_CACHE).then((c) => c.put(request, clone)),
+            );
           }
           return res;
         })
         .catch(() =>
           caches.match(request).then((hit) => hit || caches.match("/offline.html")),
         ),
+    );
+    return;
+  }
+
+  // Navegações cliente (Link do Next) pedem dados RSC, não o documento —
+  // aproveitamos para guardar o HTML completo dessa rota em background,
+  // senão um reload offline de uma página "visitada" caía no /offline.html.
+  if (url.searchParams.has("_rsc") || request.headers.get("RSC") === "1") {
+    event.waitUntil(
+      fetch(url.pathname)
+        .then((res) => {
+          if (res.ok && (res.headers.get("content-type") || "").includes("text/html")) {
+            const doc = new Request(url.pathname);
+            return caches.open(RUNTIME_CACHE).then((c) => c.put(doc, res));
+          }
+        })
+        .catch(() => {}),
     );
   }
 });
