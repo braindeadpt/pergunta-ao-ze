@@ -59,7 +59,6 @@ function CartaoPrazo({ p }: { p: Prazo }) {
       <div className="mt-3 flex flex-wrap items-center gap-3">
         <a
           href={`/prazos/${p.id}`}
-          download={`${p.id}.ics`}
           className="btn-outline px-3 py-1.5 text-xs"
         >
           Adicionar ao calendário
