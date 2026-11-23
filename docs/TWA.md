@@ -48,10 +48,10 @@ Respostas ao assistente:
 
 ```sh
 bubblewrap build
-# produz app-release-signed.aab e o fingerprint da keystore
+# produz app-release-bundle.aab (para a Play) e app-release-signed.apk
 ```
 
-O Bubblewrap mostra o `sha256_cert_fingerprints`. Também o podes obter com:
+O fingerprint `sha256_cert_fingerprints` obtém-se da keystore:
 
 ```sh
 keytool -list -v -keystore perguntaaoze.keystore -alias ze | grep SHA256
@@ -78,7 +78,9 @@ full-screen.
 5. **Privacy policy**: `https://perguntaaoze.pt/privacidade`
 6. **Content rating** (questionário IARC): app de informação, sem conteúdo sensível
 7. **Target audience**: 18+ / todos
-8. **Data safety**: declarar que `/api/responder` guarda perguntas anonimizadas (ver `privacidade`)
+8. **Data safety**: declarar que `/api/responder` guarda perguntas anonimizadas
+   **e** que as perguntas podem ser enviadas a um fornecedor externo de IA
+   (motor LLM — ver `privacidade`); ambos os fluxos entram na declaração
 9. **Government declaration**: **não** é app governamental — declarar app privada/independente
    (o Google pergunta explicitamente apps relacionadas com governo)
 10. Upload do `.aab` em **Production** ou **Internal testing** → submeter para revisão
@@ -93,4 +95,6 @@ full-screen.
 
 - Mudanças **web** (conteúdo, design): deploy normal na Vercel — a app reflete logo.
 - Mudanças de **manifest/ícones**: editar `app/manifest.ts`/`scripts/gerar-icones.mjs`,
-  depois `bubblewrap update --manifest ...`, bump `versionCode`, rebuild e novo upload.
+  fazer deploy, depois `bubblewrap merge` (importa o web manifest para o
+  `twa-manifest.json`), `bubblewrap update` (regenera o projeto Android),
+  bump `versionCode`, rebuild e novo upload.
