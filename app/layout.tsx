@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Archivo_Black, Inter, Space_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
@@ -39,6 +39,10 @@ export const metadata: Metadata = {
     locale: "pt_PT",
     siteName: "Pergunta ao Zé",
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#046a38",
 };
 
 export default function RootLayout({
