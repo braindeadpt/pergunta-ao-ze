@@ -44,6 +44,27 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
+  // Rotas de calendário (/prazos/<id> e /prazos/todos.ics): os links usam
+  // <a download>, cujo pedido pode não chegar como "navigate". Trata-se
+  // qualquer GET destas rotas com rede primeiro + fallback à cache,
+  // nunca ao /offline.html (o utilizador quer o ficheiro, não HTML).
+  if (/^\/prazos\/[^/]+$/.test(url.pathname)) {
+    event.respondWith(
+      fetch(request)
+        .then((res) => {
+          if (res.ok && (res.headers.get("content-type") || "").includes("text/calendar")) {
+            const clone = res.clone();
+            event.waitUntil(
+              caches.open(RUNTIME_CACHE).then((c) => c.put(request, clone)),
+            );
+          }
+          return res;
+        })
+        .catch(() => caches.match(request)),
+    );
+    return;
+  }
+
   // Navegações de documento: rede primeiro; offline serve a página visitada
   // ou /offline.html. O put fica em waitUntil para o SW não morrer a meio.
   if (request.mode === "navigate") {
