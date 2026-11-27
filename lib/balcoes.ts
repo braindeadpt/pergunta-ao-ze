@@ -6,8 +6,8 @@ import { TEMAS } from "./data/temas.ts";
  */
 export const BALCOES_DEF: { rotulo: string; letra: string; temas: string[] }[] = [
   { rotulo: "Identificação", letra: "I", temas: ["cartao-de-cidadao", "passaporte", "chave-movel-digital", "certidoes"] },
-  { rotulo: "Dinheiro", letra: "D", temas: ["irs-financas", "seguranca-social", "pensoes-reforma"] },
-  { rotulo: "Trabalho e empresa", letra: "T", temas: ["desemprego-iefp", "empresa-atividade"] },
+  { rotulo: "Dinheiro", letra: "D", temas: ["irs-financas", "seguranca-social", "pensoes-reforma", "recibos-verdes"] },
+  { rotulo: "Trabalho e empresa", letra: "T", temas: ["desemprego-iefp", "empresa-atividade", "direitos-trabalho"] },
   { rotulo: "Saúde e família", letra: "S", temas: ["sns", "familia"] },
   { rotulo: "Estrada e casa", letra: "E", temas: ["carta-conducao-imt", "transportes", "habitacao"] },
   { rotulo: "Fronteiras", letra: "F", temas: ["aima-imigracao", "vistos-entrada", "noutro-pais-ue"] },

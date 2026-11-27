@@ -101,6 +101,8 @@ export const TEMAS_TITULO_EN: Record<string, string> = {
   "vistos-entrada": "Moving to Portugal",
   "reclamacoes": "Complaints",
   "transportes": "Transport & passes",
+  "recibos-verdes": "Green receipts & VAT",
+  "direitos-trabalho": "Work & labour rights",
 };
 
 /** Rótulos EN dos balcões do índice /en/p (mesma ordem de BALCOES_DEF). */

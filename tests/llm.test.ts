@@ -250,3 +250,56 @@ test("llm (F-27): JSON inválido no 1.º modelo continua a tentar o 2.º modelo 
   assert.equal(r.tipo, "resposta");
   assert.equal(r.via, "llm");
 });
+
+test("llm: contexto parcial (score < 3) usa prompt estrito e marca disclaimer", async () => {
+  let systemUsado = "";
+  globalThis.fetch = async (_url: string | URL | Request, init?: RequestInit) => {
+    chamadas++;
+    const body = init?.body ? JSON.parse(String(init.body)) : {};
+    systemUsado = body.messages?.[0]?.content ?? "";
+    return {
+      ok: true,
+      json: async () => ({
+        choices: [
+          {
+            message: {
+              content: JSON.stringify({
+                passos: ["Passo diretamente do contexto fornecido."],
+                nota: null,
+                fontes: [],
+              }),
+            },
+          },
+        ],
+      }),
+    } as Response;
+  };
+  // "tratar de papeis" pontua ~2 (um token fraco) — tier intermédio
+  const r = await engine().responder("tratar de papeis");
+  assert.equal(chamadas, 1);
+  assert.equal(r.tipo, "resposta");
+  assert.equal(r.via, "llm");
+  assert.ok(r.disclaimer);
+  assert.match(r.disclaimer, /contexto parcial/);
+  assert.match(systemUsado, /contexto fornecido é reduzido/);
+});
+
+test("llm: contexto suficiente (score >= 3) não leva disclaimer", async () => {
+  globalThis.fetch = fetchCom({
+    passos: ["Online no ePortugal com Chave Móvel Digital."],
+    nota: null,
+    fontes: ["F1"],
+  });
+  const r = await engine().responder(PERGUNTA);
+  assert.equal(r.tipo, "resposta");
+  assert.equal(r.via, "llm");
+  assert.equal(r.disclaimer, undefined);
+});
+
+test("llm: tier fraco — recusa do modelo devolve sugestões sem disclaimer", async () => {
+  globalThis.fetch = fetchCom({ passos: [], nota: "fora do âmbito", fontes: [] });
+  const r = await engine().responder("tratar de papeis");
+  assert.equal(chamadas, 1);
+  assert.equal(r.tipo, "sugestoes");
+  assert.equal(r.disclaimer, undefined);
+});

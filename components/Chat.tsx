@@ -128,6 +128,7 @@ type Mensagem =
       tema?: Tema;
       sugestoes: Sugestao[];
       via?: "keyword" | "llm";
+      disclaimer?: string;
       retryAte?: number;
       langUsada?: Lang;
       idioma?: Lang;
@@ -280,7 +281,7 @@ export default function Chat() {
       const data = await res.json();
       setMensagens((m) => [
         ...m,
-        { papel: "ze", tipo: data.tipo ?? "sugestoes", pergunta: data.pergunta, tema: data.tema, sugestoes: data.sugestoes ?? [], via: data.via, langUsada: lang, idioma: data.idioma, soEmPt: data.soEmPt },
+        { papel: "ze", tipo: data.tipo ?? "sugestoes", pergunta: data.pergunta, tema: data.tema, sugestoes: data.sugestoes ?? [], via: data.via, disclaimer: data.disclaimer, langUsada: lang, idioma: data.idioma, soEmPt: data.soEmPt },
       ]);
       // Anuncia a chegada da resposta a leitores de ecrã
       anuncio.current && (anuncio.current.textContent = T.anuncioOk);
@@ -548,6 +549,11 @@ export default function Chat() {
                         {m.pergunta.resposta.nota}
                       </p>
                     )}
+                    {m.disclaimer && (
+                      <p className="mt-3 rounded-md border-2 border-dashed border-azulejo/50 bg-azulejo-suave/40 px-3 py-2 text-sm text-esferografica">
+                        {m.disclaimer}
+                      </p>
+                    )}
                     <div className="mt-4 space-y-2 border-t-2 border-dashed border-ink/15 pt-3">
                       <p className="font-mono text-sm font-bold uppercase tracking-widest text-esferografica">
                         {T.fontes}
@@ -706,6 +712,7 @@ export default function Chat() {
                         ...(m.pergunta.resposta.nota
                           ? ["", m.pergunta.resposta.nota]
                           : []),
+                        ...(m.disclaimer ? ["", m.disclaimer] : []),
                         ...(m.pergunta.resposta.fontes.length > 0
                           ? [
                               "",

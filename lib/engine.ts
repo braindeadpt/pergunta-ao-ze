@@ -17,6 +17,8 @@ export interface ResultadoResposta {
   tema?: Tema;
   sugestoes: Sugestao[];
   via?: "keyword" | "llm";
+  /** Resposta LLM gerada com contexto parcial — mostrar ao utilizador. */
+  disclaimer?: string;
   /** Língua efetiva da resposta devolvida */
   idioma?: Lang;
   /** Pedida EN mas a tradução não existe/está por rever — a resposta é PT */
@@ -574,6 +576,33 @@ Regras:
   {"passos": ["..."], "nota": "..." ou null, "fontes": ["F1", "F3"]}
 - "fontes" só pode conter referências das fontes fornecidas.`;
 
+// Tier intermédio (score 1–2): o contexto é fraco, por isso o prompt é
+// mais estrito — só responde se o contexto cobrir a pergunta diretamente.
+const SYSTEM_PROMPT_FRACO = `És o Zé, o assistente do Pergunta ao Zé — um projeto independente que ajuda cidadãos a orientarem-se nos serviços públicos, nas finanças e na burocracia portuguesa. Não és um site do Estado.
+
+Regras:
+- O contexto fornecido é reduzido. Responde APENAS se o contexto cobrir diretamente a pergunta.
+- Se a pergunta for fora do âmbito de serviços públicos, finanças ou burocracia portuguesa, ou se o contexto não bastar, devolve "passos" vazio e explica na "nota" para onde encaminhar o cidadão.
+- Português europeu, frases curtas e diretas, 3 a 5 passos.
+- Não inventes preços, prazos, leis ou requisitos que não estejam no contexto.
+- Nunca peças dados pessoais (NIF, números de documentos, dados de saúde).
+- Responde apenas com JSON válido neste formato:
+  {"passos": ["..."], "nota": "..." ou null, "fontes": ["F1", "F3"]}
+- "fontes" só pode conter referências das fontes fornecidas.`;
+
+// Limiares de contexto para chamar o LLM (score do melhor candidato):
+//   >= LIMIAR_LLM — contexto suficiente, resposta normal
+//   >= LIMIAR_LLM_MINIMO e < LIMIAR_LLM — contexto parcial (um token fraco):
+//     prompt estrito + resposta marcada com disclaimer
+//   <  LIMIAR_LLM_MINIMO — sem base para fundamentar: sugestões diretas
+const LIMIAR_LLM = 3;
+const LIMIAR_LLM_MINIMO = 2;
+
+const DISCLAIMER_FRACO: Record<Lang, string> = {
+  pt: "Resposta gerada por IA com contexto parcial — confirma nos links oficiais antes de agir.",
+  en: "AI-generated answer from partial context — confirm on the official links before acting.",
+};
+
 export class LlmEngine implements AnswerEngine {
   private fallback = new KeywordEngine();
   private cfg: LlmConfig;
@@ -587,9 +616,8 @@ export class LlmEngine implements AnswerEngine {
     lang: Lang = "pt"
   ): Promise<ResultadoResposta> {
     const candidatos = rankear(pergunta, lang);
-    // Só vale a pena chamar o LLM se houver contexto minimamente relevante;
-    // abaixo de 2 o match é um único token fraco — não há nada para fundamentar.
-    if (candidatos.length === 0 || candidatos[0].score < 2) {
+    // Sem match mínimo não há nada para fundamentar — sugestões diretas.
+    if (candidatos.length === 0 || candidatos[0].score < LIMIAR_LLM_MINIMO) {
       return {
         tipo: "sugestoes",
         sugestoes: populares(lang),
@@ -597,6 +625,9 @@ export class LlmEngine implements AnswerEngine {
         idioma: lang,
       };
     }
+    // Tier intermédio: contexto parcial — prompt estrito e a resposta sai
+    // marcada com disclaimer de contexto parcial.
+    const fraco = candidatos[0].score < LIMIAR_LLM;
 
     // F-11: curto-circuito instantâneo para pergunta curada exata (senhas/sugestões)
     const fraseNorm = normalizarFraseExata(pergunta);
@@ -621,12 +652,18 @@ export class LlmEngine implements AnswerEngine {
             return Boolean(en && en.revisao !== true);
           })
         : candidatos
-    ).slice(0, 6);
+    ).slice(0, fraco ? 3 : 6);
     const { contexto, fontes } = montarContexto(candidatosContexto);
 
     for (const model of this.cfg.models) {
       try {
-        const bruto = await this.chamarModelo(model, pergunta, contexto, lang);
+        const bruto = await this.chamarModelo(
+          model,
+          pergunta,
+          contexto,
+          lang,
+          fraco
+        );
         const analise = this.parseResposta(
           bruto,
           contexto,
@@ -635,6 +672,7 @@ export class LlmEngine implements AnswerEngine {
           lang
         );
         if (analise.estado === "ok") {
+          if (fraco) analise.resposta.disclaimer = DISCLAIMER_FRACO[lang];
           return { ...analise.resposta, idioma: lang };
         }
         if (analise.estado === "recusa") {
@@ -659,7 +697,8 @@ export class LlmEngine implements AnswerEngine {
     model: string,
     pergunta: string,
     contexto: string,
-    lang: Lang
+    lang: Lang,
+    fraco = false
   ) {
     const ctrl = new AbortController();
     const t = setTimeout(() => ctrl.abort(), this.cfg.timeoutMs);
@@ -676,7 +715,10 @@ export class LlmEngine implements AnswerEngine {
           temperature: 0.2,
           response_format: { type: "json_object" },
           messages: [
-            { role: "system", content: SYSTEM_PROMPT },
+            {
+              role: "system",
+              content: fraco ? SYSTEM_PROMPT_FRACO : SYSTEM_PROMPT,
+            },
             {
               role: "user",
               content: `Contexto:\n${contexto}\n\nPergunta do cidadão: ${pergunta}${
