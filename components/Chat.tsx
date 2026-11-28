@@ -45,6 +45,14 @@ const TXT = {
         : `Tenta de novo daqui a ${s}s.`,
     semRes1: "Esta pergunta ficou presa na tutela — nem o Zé chega lá. Tenta reformular, ou abre o",
     semRes2: ". Estas talvez ajudem:",
+    gracasSemResposta: [
+      "Fogo, essa apanhou-me de calças na mão. Nem com a Chave Móvel chego lá — tenta o",
+      "Esta é balcão avançado. Até o Zé tem limites — o melhor que te arranjo é o",
+      "Saíste-me. Pergunta digna de minuta de advogado — só te consigo apontar o",
+      "Nem ideia. E inventar é como nascem as más leis — o sítio honesto é o",
+      "Pensei, telefonei ao primo que trabalha nas finanças, nada. Resta o",
+      "Essa está fora do meu balcão — e o Zé não finge o que não sabe. Vai ao",
+    ],
     relacionadas: "Perguntas relacionadas:",
     fontes: "Fontes oficiais",
     ligar: "Ligar",
@@ -75,6 +83,13 @@ const TXT = {
         : `Try again in ${s}s.`,
     semRes1: "This question got stuck in the pipeline — even Zé can't reach it. Try rephrasing, or open",
     semRes2: ". These might help:",
+    gracasSemResposta: [
+      "That one caught Zé with his trousers down. Even the Digital Key won't unlock it — try",
+      "Advanced counter stuff. Even Zé has limits — the best I can do is point you to",
+      "You got me. A question worthy of a lawyer's draft — all I can give you is",
+      "No clue. And making things up is how bad laws get written — the honest place is",
+      "I thought about it, called my cousin at the tax office, nothing. Try",
+    ],
     relacionadas: "Related questions:",
     fontes: "Official sources",
     ligar: "Call",
@@ -130,6 +145,7 @@ type Mensagem =
       via?: "keyword" | "llm";
       disclaimer?: string;
       foraAmbito?: boolean;
+      graca?: string;
       retryAte?: number;
       langUsada?: Lang;
       idioma?: Lang;
@@ -282,7 +298,7 @@ export default function Chat() {
       const data = await res.json();
       setMensagens((m) => [
         ...m,
-        { papel: "ze", tipo: data.tipo ?? "sugestoes", pergunta: data.pergunta, tema: data.tema, sugestoes: data.sugestoes ?? [], via: data.via, disclaimer: data.disclaimer, foraAmbito: data.foraAmbito, langUsada: lang, idioma: data.idioma, soEmPt: data.soEmPt },
+        { papel: "ze", tipo: data.tipo ?? "sugestoes", pergunta: data.pergunta, tema: data.tema, sugestoes: data.sugestoes ?? [], via: data.via, disclaimer: data.disclaimer, foraAmbito: data.foraAmbito, graca: (data.tipo ?? "sugestoes") === "sugestoes" ? T.gracasSemResposta[Math.floor(Math.random() * T.gracasSemResposta.length)] : undefined, langUsada: lang, idioma: data.idioma, soEmPt: data.soEmPt },
       ]);
       // Anuncia a chegada da resposta a leitores de ecrã
       anuncio.current && (anuncio.current.textContent = T.anuncioOk);
@@ -786,7 +802,7 @@ export default function Chat() {
                 ) : (
                   <>
                     <p className="text-base">
-                      {T.semRes1}{" "}
+                      {m.graca ?? T.semRes1}{" "}
                       <a
                         href="https://www.gov.pt"
                         target="_blank"
