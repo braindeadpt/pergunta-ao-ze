@@ -133,6 +133,11 @@ export const ENTIDADES: Record<string, MetaEntidade> = {
     ambito: "Nacional",
     contacto: { telefone: "210 900 032", horario: "24 horas, todos os dias" },
   },
+  "portal.act.gov.pt": {
+    nome: "ACT — Autoridade para as Condições do Trabalho",
+    ambito: "Nacional",
+    contacto: { telefone: "300 069 300", horario: "dias úteis, 9h00–12h30" },
+  },
   "europa.eu": {
     nome: "Your Europe — União Europeia",
     ambito: "Europeu",

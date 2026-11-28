@@ -128,6 +128,8 @@ type Mensagem =
       tema?: Tema;
       sugestoes: Sugestao[];
       via?: "keyword" | "llm";
+      disclaimer?: string;
+      foraAmbito?: boolean;
       retryAte?: number;
       langUsada?: Lang;
       idioma?: Lang;
@@ -280,7 +282,7 @@ export default function Chat() {
       const data = await res.json();
       setMensagens((m) => [
         ...m,
-        { papel: "ze", tipo: data.tipo ?? "sugestoes", pergunta: data.pergunta, tema: data.tema, sugestoes: data.sugestoes ?? [], via: data.via, langUsada: lang, idioma: data.idioma, soEmPt: data.soEmPt },
+        { papel: "ze", tipo: data.tipo ?? "sugestoes", pergunta: data.pergunta, tema: data.tema, sugestoes: data.sugestoes ?? [], via: data.via, disclaimer: data.disclaimer, foraAmbito: data.foraAmbito, langUsada: lang, idioma: data.idioma, soEmPt: data.soEmPt },
       ]);
       // Anuncia a chegada da resposta a leitores de ecrã
       anuncio.current && (anuncio.current.textContent = T.anuncioOk);
@@ -516,7 +518,7 @@ export default function Chat() {
                 ) : m.tipo === "resposta" && m.pergunta ? (
                   <>
                     <p className="flex flex-wrap items-center gap-2 font-mono text-xs font-bold uppercase tracking-widest text-stone-600">
-                      {m.tema?.entidade} · {m.tema?.titulo}
+                      {m.tema && `${m.tema.entidade} · ${m.tema.titulo}`}
                       {m.via === "llm" && (
                         <span className="rounded-md border border-azulejo/50 bg-azulejo-suave px-2 py-0.5 text-xs font-bold text-azulejo">
                           {T.ia}
@@ -548,6 +550,18 @@ export default function Chat() {
                         {m.pergunta.resposta.nota}
                       </p>
                     )}
+                    {m.disclaimer && (
+                      <p
+                        className={`mt-3 rounded-md border-2 border-dashed px-3 py-2 text-sm ${
+                          m.foraAmbito
+                            ? "border-amber-400/60 bg-amber-50 text-amber-900"
+                            : "border-azulejo/50 bg-azulejo-suave/40 text-esferografica"
+                        }`}
+                      >
+                        {m.disclaimer}
+                      </p>
+                    )}
+                    {m.pergunta.resposta.fontes.length > 0 && (
                     <div className="mt-4 space-y-2 border-t-2 border-dashed border-ink/15 pt-3">
                       <p className="font-mono text-sm font-bold uppercase tracking-widest text-esferografica">
                         {T.fontes}
@@ -569,6 +583,7 @@ export default function Chat() {
                         </a>
                       ))}
                     </div>
+                    )}
                     {(() => {
                       const linhas = contactosDeFontes(m.pergunta.resposta.fontes);
                       if (linhas.length === 0) return null;
@@ -706,6 +721,7 @@ export default function Chat() {
                         ...(m.pergunta.resposta.nota
                           ? ["", m.pergunta.resposta.nota]
                           : []),
+                        ...(m.disclaimer ? ["", m.disclaimer] : []),
                         ...(m.pergunta.resposta.fontes.length > 0
                           ? [
                               "",
@@ -718,7 +734,11 @@ export default function Chat() {
                         ...(idPergunta ? ["", urlCanonico] : []),
                       ].join("\n");
                       const hrefWhatsapp = `https://wa.me/?text=${encodeURIComponent(
-                        `${tituloPartilha}\n${urlCanonico}`
+                        idPergunta
+                          ? `${tituloPartilha}\n${
+                              m.disclaimer ? `${m.disclaimer}\n` : ""
+                            }${urlCanonico}`
+                          : textoCopiar
                       )}`;
                       const foiCopiado = copiadoIdx === i;
 

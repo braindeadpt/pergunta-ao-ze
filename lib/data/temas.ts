@@ -21,6 +21,8 @@ import tEducacao from "./temas/educacao.ts";
 import tVistosEntrada from "./temas/vistos-entrada.ts";
 import tReclamacoes from "./temas/reclamacoes.ts";
 import tTransportes from "./temas/transportes.ts";
+import tRecibosVerdes from "./temas/recibos-verdes.ts";
+import tDireitosTrabalho from "./temas/direitos-trabalho.ts";
 
 export const TEMAS: Tema[] = [
   tCartaoDeCidadao,
@@ -45,6 +47,8 @@ export const TEMAS: Tema[] = [
   tVistosEntrada,
   tReclamacoes,
   tTransportes,
+  tRecibosVerdes,
+  tDireitosTrabalho,
 ];
 
 export function findPergunta(id: string) {

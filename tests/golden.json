@@ -55,7 +55,7 @@
   { "pergunta": "quero abrir uma empresa", "idEsperado": "empresa-abrir" },
   { "pergunta": "criar empresa na hora", "idEsperado": "empresa-abrir" },
   { "pergunta": "como abro atividade independente", "idEsperado": "empresa-independente" },
-  { "pergunta": "preciso de passar recibos verdes", "idEsperado": "empresa-independente" },
+  { "pergunta": "preciso de passar recibos verdes", "idEsperado": "rv-emitir" },
 
   { "pergunta": "como peco autorizacao de residencia", "idEsperado": "aima-residencia" },
   { "pergunta": "sou estrangeiro e quero titulo de residencia em portugal", "idEsperado": "aima-residencia" },
@@ -156,5 +156,26 @@
   { "pergunta": "a que horas fecha o continente", "idEsperado": null },
   { "pergunta": "conversor de euros para dolares", "idEsperado": null },
   { "pergunta": "quanto ganha um eletricista", "idEsperado": null },
-  { "pergunta": "importar e legalizar carro na alfandega", "idEsperado": null }
+  { "pergunta": "importar e legalizar carro na alfandega", "idEsperado": null },
+
+  { "pergunta": "como passo um recibo verde no portal das financas", "idEsperado": "rv-emitir" },
+  { "pergunta": "sou trabalhador independente como emito fatura ao cliente", "idEsperado": "rv-emitir" },
+  { "pergunta": "tenho de cobrar iva nos recibos verdes", "idEsperado": "rv-iva" },
+  { "pergunta": "estou isento de iva artigo 53", "idEsperado": "rv-iva" },
+  { "pergunta": "o que e a retencao na fonte", "idEsperado": "rv-retencao" },
+  { "pergunta": "declaracao trimestral de rendimentos seguranca social", "idEsperado": "rv-trimestral" },
+  { "pergunta": "tenho de entregar a declaracao anual a seguranca social", "idEsperado": "rv-anual" },
+  { "pergunta": "preciso de niss para passar recibos verdes", "idEsperado": "ss-niss" },
+  { "pergunta": "como emitir recibos verdes se ja tenho niss", "idEsperado": "rv-emitir" },
+  { "pergunta": "ja tenho niss como abro atividade nas financas", "idEsperado": "empresa-independente" },
+  { "pergunta": "ja tenho nif como peco o niss para passar recibos verdes", "idEsperado": "ss-niss" },
+  { "pergunta": "ainda nao tenho niss como peco o niss", "idEsperado": "ss-niss" },
+  { "pergunta": "ja tenho o meu niss como emito recibos verdes", "idEsperado": "rv-emitir" },
+  { "pergunta": "como abrir atividade nas financas com o meu niss", "idEsperado": "empresa-independente" },
+  { "pergunta": "quantos dias de ferias tenho direito por ano", "idEsperado": "dt-ferias" },
+  { "pergunta": "quando se paga o subsidio de natal", "idEsperado": "dt-subsidios" },
+  { "pergunta": "fui despedido o que devo fazer", "idEsperado": "dt-despedido" },
+  { "pergunta": "como apresento queixa na act", "idEsperado": "dt-act" },
+  { "pergunta": "quero fazer queixa do meu patrao na act", "idEsperado": "dt-act" },
+  { "pergunta": "o que deve ter um contrato de trabalho escrito", "idEsperado": "dt-contrato" }
 ]
