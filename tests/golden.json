@@ -166,6 +166,8 @@
   { "pergunta": "declaracao trimestral de rendimentos seguranca social", "idEsperado": "rv-trimestral" },
   { "pergunta": "tenho de entregar a declaracao anual a seguranca social", "idEsperado": "rv-anual" },
   { "pergunta": "preciso de niss para passar recibos verdes", "idEsperado": "ss-niss" },
+  { "pergunta": "como emitir recibos verdes se ja tenho niss", "idEsperado": "rv-emitir" },
+  { "pergunta": "ja tenho niss como abro atividade nas financas", "idEsperado": "empresa-independente" },
   { "pergunta": "quantos dias de ferias tenho direito por ano", "idEsperado": "dt-ferias" },
   { "pergunta": "quando se paga o subsidio de natal", "idEsperado": "dt-subsidios" },
   { "pergunta": "fui despedido o que devo fazer", "idEsperado": "dt-despedido" },

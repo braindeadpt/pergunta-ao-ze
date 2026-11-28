@@ -186,6 +186,11 @@ const QUALIFICADORES_FORTES = new Set([
   "legalizar", "exchange", "foreign", "niss",
 ]);
 
+// Frase normalizada que afirma já ter NISS ("já tenho niss", "tenho o niss",
+// "o meu niss") — nesse caso o token é contexto, não pedido.
+const NISS_POSSE =
+  /\bja tenho\b|\btenho (o |meu )?niss\b|\bmeu niss\b|\bniss atribuido\b/;
+
 const SETORES_REGULADOR = [
   "regulador", "regulator", "anacom", "erse", "banco", "operadora",
   "telecom", "telecomunicacoes", "energia", "arbitragem", "provedor",
@@ -376,6 +381,9 @@ function pontuar(
     let qualificadoresEmFalta = false;
     for (const q of tokensBase) {
       if (!QUALIFICADORES_FORTES.has(q)) continue;
+      // "niss" afirmado como já obtido é contexto, não pedido — não
+      // penaliza ("já tenho NISS, como emitir recibos?").
+      if (q === "niss" && NISS_POSSE.test(fraseNorm)) continue;
       const chaveVocab = `__vocab_${lang}_${pergunta.id}`;
       if (!cache.has(chaveVocab)) {
         const en = lang === "en" ? TEMAS_EN[pergunta.id] : undefined;
@@ -655,6 +663,22 @@ function pareceTopicoGeral(pergunta: string): boolean {
   );
 }
 
+// No tier geral não há contexto para verificar detalhes exatos — o prompt
+// proíbe-os e este filtro rejeita a resposta se aparecerem: URLs/domínios,
+// % ou €, datas, telefones e números de artigo de lei.
+const PROIBIDO_GERAL = new RegExp(
+  [
+    "https?://|www\\.",
+    "[a-z0-9][a-z0-9.-]*\\.(pt|gov|com|net|org|eu|io|info)\\b",
+    "\\d+([.,]\\d+)?\\s*(%|€|euros?|por cento)",
+    "\\bart(igo)?\\.?º?\\.?\\s*\\d|\\bn\\.?º\\s*\\d",
+    "\\b\\d{3}[ .]\\d{3}[ .]\\d{3}\\b|\\b\\d{9}\\b",
+    "\\b(19|20)\\d{2}\\b",
+    "\\b\\d{1,2}\\s+de\\s+\\w+\\s+de\\s+\\d{4}\\b|\\b\\d{1,2}/\\d{1,2}/\\d{2,4}\\b",
+  ].join("|"),
+  "i"
+);
+
 export class LlmEngine implements AnswerEngine {
   private fallback = new KeywordEngine();
   private cfg: LlmConfig;
@@ -675,6 +699,14 @@ export class LlmEngine implements AnswerEngine {
       if (pareceTopicoGeral(pergunta)) {
         const geral = await this.responderGeral(pergunta, lang);
         if (geral) return geral;
+        // Houve chamada real ao provider — marca via=llm para a rota não
+        // devolver a reserva do teto diário.
+        return {
+          tipo: "sugestoes",
+          sugestoes: populares(lang),
+          via: "llm",
+          idioma: lang,
+        };
       }
       return {
         tipo: "sugestoes",
@@ -812,14 +844,15 @@ export class LlmEngine implements AnswerEngine {
     // Recusa fundamentada do próprio modelo (fora de tópico)
     if (passos.length === 0) return null;
 
-    // Sem contexto não há como verificar URLs — se o modelo emitir um,
-    // a resposta não é fiável e cai nas sugestões.
+    // Sem contexto não há como verificar detalhes exatos — se o modelo
+    // emitir URL/domínio, valores, datas, telefones ou n.os de artigo, a
+    // resposta não é fiável e cai nas sugestões.
     const nota =
       typeof parsed.nota === "string" && parsed.nota.trim().length > 0
         ? parsed.nota
         : undefined;
     const saida = [...passos, nota ?? ""].join("\n");
-    if (/https?:\/\/|www\./i.test(saida)) return null;
+    if (PROIBIDO_GERAL.test(saida)) return null;
 
     const sintetica: Pergunta = {
       id: "",

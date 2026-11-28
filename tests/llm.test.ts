@@ -347,7 +347,7 @@ test("llm: tier geral — recusa do contexto curado tenta resposta geral", async
         : {
             passos: [
               "O Governo é o órgão de condução da política geral do país.",
-              "Confirma a composição atual em portugal.gov.pt.",
+              "Confirma a composição atual no portal do Governo.",
             ],
             nota: null,
             fontes: [],
@@ -377,4 +377,35 @@ test("llm: tier geral — resposta com URL é descartada e cai em sugestões", a
   const r = await engine().responder("o que e a inflacao");
   assert.equal(chamadas, 1);
   assert.equal(r.tipo, "sugestoes");
+});
+
+test("llm: tier geral — domínio sem prefixo é descartado", async () => {
+  globalThis.fetch = fetchCom({
+    passos: ["Confirma a taxa em exemplo.pt."],
+    nota: null,
+    fontes: [],
+  });
+  const r = await engine().responder("o que e a inflacao");
+  assert.equal(chamadas, 1);
+  assert.equal(r.tipo, "sugestoes");
+});
+
+test("llm: tier geral — valores exatos (% e ano) são descartados", async () => {
+  globalThis.fetch = fetchCom({
+    passos: ["A taxa atual é de 5%, em vigor desde 2026."],
+    nota: null,
+    fontes: [],
+  });
+  const r = await engine().responder("o que e a inflacao");
+  assert.equal(chamadas, 1);
+  assert.equal(r.tipo, "sugestoes");
+});
+
+test("llm: tier geral falhado devolve sugestões marcadas via=llm", async () => {
+  globalThis.fetch = fetchCom({ passos: [], nota: "fora de tópico" });
+  const r = await engine().responder("o que e a inflacao");
+  assert.equal(chamadas, 1);
+  assert.equal(r.tipo, "sugestoes");
+  // chamada real ao provider — a rota não deve devolver a reserva diária
+  assert.equal(r.via, "llm");
 });

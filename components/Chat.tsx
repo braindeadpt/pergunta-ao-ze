@@ -734,9 +734,11 @@ export default function Chat() {
                         ...(idPergunta ? ["", urlCanonico] : []),
                       ].join("\n");
                       const hrefWhatsapp = `https://wa.me/?text=${encodeURIComponent(
-                        `${tituloPartilha}\n${
-                          m.disclaimer ? `${m.disclaimer}\n` : ""
-                        }${urlCanonico}`
+                        idPergunta
+                          ? `${tituloPartilha}\n${
+                              m.disclaimer ? `${m.disclaimer}\n` : ""
+                            }${urlCanonico}`
+                          : textoCopiar
                       )}`;
                       const foiCopiado = copiadoIdx === i;
 

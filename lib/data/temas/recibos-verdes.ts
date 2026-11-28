@@ -45,10 +45,10 @@ const tema: Tema = {
       ],
       resposta: {
         passos: [
-          "Depende do enquadramento: abaixo do limiar de faturação do artigo 53.º do Código do IVA ficas isento — o recibo sai sem IVA, com a menção legal correspondente.",
-          "Se ultrapassares o limiar num ano, a obrigação de cobrar IVA começa a 1 de janeiro do ano seguinte. Se excederes o limiar em mais de 25% durante o ano, é devida desde esse momento — entregas a declaração de alterações nas Finanças.",
+          "Depende do enquadramento: se estiveres isento pelo artigo 53.º do Código do IVA (abaixo do limiar de faturação e sem renúncia), o recibo sai sem IVA, com a menção legal correspondente.",
+          "Se renunciaste à isenção e optaste pelo regime normal, cobras IVA mesmo abaixo do limiar e entregas declarações periódicas.",
+          "Se ultrapassares o limiar num ano, a obrigação de cobrar IVA começa a 1 de janeiro do ano seguinte — entrega a declaração de alterações nos 15 dias úteis após o fim do ano. Se excederes o limiar em mais de 25% durante o ano, cobras desde esse momento e entregas a declaração nos 15 dias seguintes.",
           "O limiar de isenção é atualizado por lei — confirma o valor em vigor no Portal das Finanças ou com a AT antes de emitir.",
-          "Clientes noutros países (UE ou fora dela) podem ter regras diferentes de IVA — confirma o caso concreto antes de emitir.",
         ],
         fontes: [
           {
