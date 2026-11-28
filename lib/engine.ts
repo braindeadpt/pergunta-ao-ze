@@ -181,7 +181,7 @@ const PAISES_UE_DESTINO = new Set([
 const QUALIFICADORES_FORTES = new Set([
   "trocar", "estrangeiro", "internacional", "divorcio", "obito",
   "falecimento", "heranca", "inspecao", "alfandega", "importar",
-  "legalizar", "exchange", "foreign",
+  "legalizar", "exchange", "foreign", "niss",
 ]);
 
 const SETORES_REGULADOR = [

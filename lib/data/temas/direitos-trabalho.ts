@@ -132,10 +132,10 @@ const tema: Tema = {
       ],
       resposta: {
         passos: [
-          "Regra geral o contrato é escrito — a exceção mais comum é o contrato por tempo indeterminado sem forma especial.",
-          "Deve indicar a atividade/função, a retribuição, o período normal de trabalho, o local e a data de início.",
+          "Regra geral o contrato de trabalho não precisa de forma escrita — a lei só a exige em casos como o contrato a termo, a tempo parcial, de teletrabalho e de trabalho temporário.",
+          "Quando é escrito, deve indicar a atividade/função, a retribuição, o período normal de trabalho, o local e a data de início.",
           "Se for a termo certo ou incerto, tem de dizer o motivo do termo — sem motivo válido o termo é nulo.",
-          "Se não tens cópia, pede-a à entidade empregadora; os recibos de vencimento e a declaração na Segurança Social Direta também comprovam a relação de trabalho.",
+          "Mesmo sem contrato escrito, a relação prova-se pelos recibos de vencimento e pelo registo na Segurança Social Direta.",
         ],
         fontes: [
           {

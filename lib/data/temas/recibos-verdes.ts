@@ -46,7 +46,7 @@ const tema: Tema = {
       resposta: {
         passos: [
           "Depende do enquadramento: abaixo do limiar de faturação do artigo 53.º do Código do IVA ficas isento — o recibo sai sem IVA, com a menção legal correspondente.",
-          "Acima do limiar, ou se renunciares à isenção, passas a cobrar IVA ao cliente e a entregar declarações periódicas de IVA.",
+          "Se ultrapassares o limiar num ano, a obrigação de cobrar IVA começa a 1 de janeiro do ano seguinte. Se excederes o limiar em mais de 25% durante o ano, é devida desde esse momento — entregas a declaração de alterações nas Finanças.",
           "O limiar de isenção é atualizado por lei — confirma o valor em vigor no Portal das Finanças ou com a AT antes de emitir.",
           "Clientes noutros países (UE ou fora dela) podem ter regras diferentes de IVA — confirma o caso concreto antes de emitir.",
         ],
@@ -126,28 +126,28 @@ const tema: Tema = {
     },
     {
       id: "rv-anual",
-      texto: "Tenho de entregar declaração anual de atividade às Finanças?",
+      texto: "Tenho de entregar a declaração anual à Segurança Social?",
       palavras: [
-        "declaracao", "anual", "atividade", "faturacao", "financas",
-        "janeiro", "valores", "independente", "irs", "enquadramento",
+        "declaracao", "anual", "rendimentos", "seguranca", "social",
+        "janeiro", "confirmar", "independente", "direta", "contribuicoes",
       ],
       resposta: {
         passos: [
-          "Sim — em janeiro entregas no Portal das Finanças a declaração anual com os valores faturados no ano anterior.",
-          "É distinta do IRS: serve para confirmar o enquadramento de IVA e de atividade.",
-          "Sem a declaração podes ficar com dados em falta ou perder o enquadramento de isenção que tinhas.",
-          "Confirma o prazo exato do ano em curso no Portal das Finanças.",
+          "Sim — em janeiro confirmas ou declaras na Segurança Social Direta os rendimentos do ano civil anterior.",
+          "Serve para ajustar as tuas contribuições — não é o IRS nem uma declaração às Finanças.",
+          "Ficas dispensado se fores pensionista e tiveres entregue pelo menos uma declaração trimestral no ano anterior.",
+          "Se não entregares, a Segurança Social calcula as contribuições por valores presumidos.",
         ],
         fontes: [
           {
-            titulo: "Declarações de atividade — apoio do Portal das Finanças",
-            url: "https://info.portaldasfinancas.gov.pt/pt/apoio_ao_contribuinte/Cidadaos/Atividade_profissional/Declaracoes_de_atividade/Paginas/default.aspx",
-            dominio: "portaldasfinancas.gov.pt",
+            titulo: "Trabalhador independente — declarar ou confirmar a declaração anual (gov.pt)",
+            url: "https://www.gov.pt/servicos/trabalhador-independente-declaracao-do-valor-de-atividade",
+            dominio: "gov.pt",
           },
           {
-            titulo: "Guia do trabalhador independente — gov.pt",
-            url: "https://www.gov.pt/guias/trabalhador-independente",
-            dominio: "gov.pt",
+            titulo: "Declaração trimestral — Segurança Social",
+            url: "https://www.seg-social.pt/declaracao-trimestral",
+            dominio: "seg-social.pt",
           },
         ],
         verificadoEm: "2026-11-27",
