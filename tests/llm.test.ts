@@ -217,7 +217,7 @@ test("llm (F-03 + F-12): resposta EN gerada por LLM aplica normalizarRespostaEn 
   }
 });
 
-test("llm (F-27): passos: [] válido no 1.º modelo devolve sugestões sem chamar 2.º modelo", async () => {
+test("llm (F-27): passos: [] válido no 1.º modelo tenta tier geral só no primário", async () => {
   globalThis.fetch = fetchCom({
     passos: [],
     nota: "O contexto fornecido não cobre esta situação específica.",
@@ -226,8 +226,9 @@ test("llm (F-27): passos: [] válido no 1.º modelo devolve sugestões sem chama
   const r = await engine(["modelo-primario", "modelo-fallback"]).responder(
     PERGUNTA
   );
-  assert.equal(chamadas, 1);
-  assert.deepEqual(modelosChamados, ["modelo-primario"]);
+  // 1 chamada de contexto + 1 do tier geral — o fallback nunca é gasto
+  assert.equal(chamadas, 2);
+  assert.deepEqual(modelosChamados, ["modelo-primario", "modelo-primario"]);
   assert.equal(r.tipo, "sugestoes");
   assert.ok(r.sugestoes.length > 0);
 });
@@ -302,4 +303,78 @@ test("llm: tier fraco — recusa do modelo devolve sugestões sem disclaimer", a
   assert.equal(chamadas, 1);
   assert.equal(r.tipo, "sugestoes");
   assert.equal(r.disclaimer, undefined);
+});
+
+test("llm: tier geral — pergunta de domínio sem match sai com foraAmbito", async () => {
+  globalThis.fetch = fetchCom({
+    passos: [
+      "O Presidente da República é eleito por voto direto.",
+      "Tem de ser cidadão português de origem, maior de 35 anos.",
+      "Confirma os requisitos na Constituição e na CNE.",
+    ],
+    nota: null,
+    fontes: [],
+  });
+  // score 0 mas "presidente"/"republica" são domínio
+  const r = await engine().responder(
+    "quem pode ser presidente da republica"
+  );
+  assert.equal(chamadas, 1);
+  assert.equal(r.tipo, "resposta");
+  assert.equal(r.via, "llm");
+  assert.equal(r.foraAmbito, true);
+  assert.match(r.disclaimer ?? "", /fora do âmbito verificado/);
+  assert.equal(r.pergunta?.resposta.fontes.length, 0);
+  assert.equal(r.pergunta?.id, "");
+});
+
+test("llm: tier geral — pergunta fora de domínio não chama a LLM", async () => {
+  globalThis.fetch = fetchCom({ passos: ["nunca devia ser chamado"] });
+  const r = await engine().responder("receita de arroz doce");
+  assert.equal(chamadas, 0);
+  assert.equal(r.tipo, "sugestoes");
+});
+
+test("llm: tier geral — recusa do contexto curado tenta resposta geral", async () => {
+  let systemUsados: string[] = [];
+  globalThis.fetch = async (_url: string | URL | Request, init?: RequestInit) => {
+    chamadas++;
+    const body = init?.body ? JSON.parse(String(init.body)) : {};
+    systemUsados.push(body.messages?.[0]?.content ?? "");
+    const payload =
+      chamadas === 1
+        ? { passos: [], nota: "contexto não cobre", fontes: [] }
+        : {
+            passos: [
+              "O Governo é o órgão de condução da política geral do país.",
+              "Confirma a composição atual em portugal.gov.pt.",
+            ],
+            nota: null,
+            fontes: [],
+          };
+    return {
+      ok: true,
+      json: async () => ({
+        choices: [{ message: { content: JSON.stringify(payload) } }],
+      }),
+    } as Response;
+  };
+  // pontua 3.0 em ep-o-que-e via tokens auxiliares → recusa → tier geral
+  const r = await engine().responder("o que achas do governo atual");
+  assert.equal(chamadas, 2);
+  assert.equal(r.tipo, "resposta");
+  assert.equal(r.foraAmbito, true);
+  assert.match(systemUsados[0], /APENAS com base no contexto/);
+  assert.match(systemUsados[1], /não tem resposta verificada/);
+});
+
+test("llm: tier geral — resposta com URL é descartada e cai em sugestões", async () => {
+  globalThis.fetch = fetchCom({
+    passos: ["Vai a https://sitio-inventado.pt para confirmar."],
+    nota: null,
+    fontes: [],
+  });
+  const r = await engine().responder("o que e a inflacao");
+  assert.equal(chamadas, 1);
+  assert.equal(r.tipo, "sugestoes");
 });

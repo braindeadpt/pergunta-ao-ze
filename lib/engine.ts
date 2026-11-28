@@ -19,6 +19,8 @@ export interface ResultadoResposta {
   via?: "keyword" | "llm";
   /** Resposta LLM gerada com contexto parcial — mostrar ao utilizador. */
   disclaimer?: string;
+  /** Resposta genérica de IA sem contexto curado — fora do âmbito verificado. */
+  foraAmbito?: boolean;
   /** Língua efetiva da resposta devolvida */
   idioma?: Lang;
   /** Pedida EN mas a tradução não existe/está por rever — a resposta é PT */
@@ -603,6 +605,56 @@ const DISCLAIMER_FRACO: Record<Lang, string> = {
   en: "AI-generated answer from partial context — confirm on the official links before acting.",
 };
 
+// Tier geral (score < LIMIAR_LLM_MINIMO): sem contexto curado, mas a pergunta
+// é do domínio cívico/financeiro português — resposta genérica e orientadora,
+// claramente marcada como não verificada.
+const SYSTEM_PROMPT_GERAL = `És o Zé, o assistente do Pergunta ao Zé — um projeto independente que ajuda cidadãos a orientarem-se nos serviços públicos, nas finanças e na burocracia portuguesa. Não és um site do Estado.
+
+Esta pergunta não tem resposta verificada na base curada. Responde APENAS se for sobre serviços públicos, finanças, economia, legislação, política ou vida cívica em Portugal.
+
+Regras:
+- Responde de forma genérica e orientadora: o que é, como funciona em geral e a que entidade ou portal oficial recorrer para confirmar.
+- NUNCA cites valores concretos (€ ou %), prazos ou datas exatas, números de artigos de lei nem telefones — podem estar desatualizados. Diz antes para confirmar na fonte oficial.
+- Não incluas URLs nem nomes de fontes — indica só a entidade (ex.: Portal das Finanças, Segurança Social Direta, ACT).
+- Em política sê factual e neutro — sem opiniões, previsões ou tomada de partido.
+- Se a pergunta for claramente fora deste âmbito (saúde pessoal, receitas, tecnologia, desporto, conselhos pessoais...), devolve "passos" vazio e explica na "nota" para onde encaminhar o cidadão.
+- Português europeu, frases curtas e diretas, 3 a 5 passos.
+- Nunca peças dados pessoais (NIF, números de documentos, dados de saúde).
+- Responde apenas com JSON válido neste formato:
+  {"passos": ["..."], "nota": "..." ou null, "fontes": []}`;
+
+const DISCLAIMER_GERAL: Record<Lang, string> = {
+  pt: "Resposta genérica de IA, fora do âmbito verificado do Zé — pode conter erros. Confirma sempre na fonte oficial antes de agir.",
+  en: "Generic AI answer, outside Zé's verified scope — may contain errors. Always confirm on the official source before acting.",
+};
+
+// Vocabulário de domínio — sem pelo menos um destes tokens a pergunta vai
+// direto para sugestões (poupa a quota da LLM a spam/fora de tópico).
+const TOPICO_GERAL = [
+  "imposto", "taxa", "iva", "irs", "irc", "financas", "orcamento",
+  "economia", "inflacao", "juro", "divida", "deficit", "banco", "seguro",
+  "credito", "emprestimo", "salario", "ordenado", "vencimento", "subsidio",
+  "pensao", "reforma", "desemprego", "trabalho", "patrao", "empregador",
+  "contrato", "despedimento", "ferias", "lei", "legal", "ilegal", "crime",
+  "tribunal", "juiz", "advogado", "multa", "processo", "direito", "dever",
+  "governo", "ministro", "presidente", "parlamento", "deputado", "partido",
+  "eleicao", "voto", "votar", "camara", "municipio", "freguesia", "junta",
+  "estado", "portugal", "portugues", "cidadao", "nacionalidade",
+  "residencia", "visto", "imigrante", "imigracao", "arrendamento",
+  "renda", "senhorio", "habitacao", "escola", "universidade", "saude",
+  "hospital", "policia", "consumo", "empresa", "negocio", "sociedade",
+  "fatura", "recibo", "contribuinte", "nif", "niss", "seguranca",
+  "social", "apoio", "bolsa", "tax", "law", "government", "economy",
+  "politic", "election", "salary", "pension", "fine", "court",
+  "contract", "rent", "landlord", "portuguese", "unemployment",
+];
+
+function pareceTopicoGeral(pergunta: string): boolean {
+  return normalizar(pergunta).some((t) =>
+    TOPICO_GERAL.some((p) => mesmaRaiz(t, p))
+  );
+}
+
 export class LlmEngine implements AnswerEngine {
   private fallback = new KeywordEngine();
   private cfg: LlmConfig;
@@ -616,8 +668,14 @@ export class LlmEngine implements AnswerEngine {
     lang: Lang = "pt"
   ): Promise<ResultadoResposta> {
     const candidatos = rankear(pergunta, lang);
-    // Sem match mínimo não há nada para fundamentar — sugestões diretas.
+    // Sem match mínimo não há contexto curado. Se a pergunta for do domínio
+    // cívico/financeiro português, tenta o tier geral (resposta orientadora
+    // marcada como não verificada) antes de cair nas sugestões.
     if (candidatos.length === 0 || candidatos[0].score < LIMIAR_LLM_MINIMO) {
+      if (pareceTopicoGeral(pergunta)) {
+        const geral = await this.responderGeral(pergunta, lang);
+        if (geral) return geral;
+      }
       return {
         tipo: "sugestoes",
         sugestoes: populares(lang),
@@ -662,7 +720,7 @@ export class LlmEngine implements AnswerEngine {
           pergunta,
           contexto,
           lang,
-          fraco
+          fraco ? SYSTEM_PROMPT_FRACO : SYSTEM_PROMPT
         );
         const analise = this.parseResposta(
           bruto,
@@ -676,6 +734,17 @@ export class LlmEngine implements AnswerEngine {
           return { ...analise.resposta, idioma: lang };
         }
         if (analise.estado === "recusa") {
+          // O melhor candidato não cobre a pergunta (típico quando o score
+          // vem de tokens auxiliares, ex.: "o que é o orçamento de estado"
+          // a bater num "*-o-que-e" qualquer). Se for do domínio, tenta o
+          // tier geral antes de devolver sugestões.
+          if (pareceTopicoGeral(pergunta)) {
+            // Só o modelo primário — uma recusa não deve queimar o fallback.
+            const geral = await this.responderGeral(pergunta, lang, [
+              this.cfg.models[0],
+            ]);
+            if (geral) return geral;
+          }
           const sugs = sugestoesDe(candidatos, lang, 4);
           return {
             tipo: "sugestoes",
@@ -693,12 +762,89 @@ export class LlmEngine implements AnswerEngine {
     return { ...fallback, via: "keyword" };
   }
 
+  // Tier geral: sem contexto curado — o modelo responde de forma genérica e
+  // orientadora sobre o domínio cívico/financeiro português, com proibição
+  // de citar valores, prazos, artigos ou URLs. Devolve null se o modelo
+  // recusar (fora de tópico) ou falhar — o chamador cai nas sugestões.
+  private async responderGeral(
+    pergunta: string,
+    lang: Lang,
+    modelos?: string[]
+  ): Promise<ResultadoResposta | null> {
+    for (const model of modelos ?? this.cfg.models) {
+      try {
+        const bruto = await this.chamarModelo(
+          model,
+          pergunta,
+          "",
+          lang,
+          SYSTEM_PROMPT_GERAL
+        );
+        const analise = this.parseRespostaGeral(bruto, pergunta, lang);
+        if (analise) return analise;
+      } catch (err) {
+        console.error(`[LlmEngine] tier geral — modelo ${model} falhou:`, err);
+      }
+    }
+    return null;
+  }
+
+  private parseRespostaGeral(
+    bruto: string,
+    pergunta: string,
+    lang: Lang
+  ): ResultadoResposta | null {
+    const inicio = bruto.indexOf("{");
+    const fim = bruto.lastIndexOf("}");
+    if (inicio < 0 || fim <= inicio) return null;
+
+    let parsed: { passos?: unknown; nota?: unknown };
+    try {
+      parsed = JSON.parse(bruto.slice(inicio, fim + 1));
+    } catch {
+      return null;
+    }
+
+    if (!Array.isArray(parsed.passos)) return null;
+    const passos = parsed.passos.filter(
+      (p): p is string => typeof p === "string" && p.trim().length > 0
+    );
+    // Recusa fundamentada do próprio modelo (fora de tópico)
+    if (passos.length === 0) return null;
+
+    // Sem contexto não há como verificar URLs — se o modelo emitir um,
+    // a resposta não é fiável e cai nas sugestões.
+    const nota =
+      typeof parsed.nota === "string" && parsed.nota.trim().length > 0
+        ? parsed.nota
+        : undefined;
+    const saida = [...passos, nota ?? ""].join("\n");
+    if (/https?:\/\/|www\./i.test(saida)) return null;
+
+    const sintetica: Pergunta = {
+      id: "",
+      texto: pergunta,
+      palavras: [],
+      resposta: { passos, nota, fontes: [] },
+    };
+
+    return {
+      tipo: "resposta",
+      pergunta: sintetica,
+      sugestoes: populares(lang),
+      via: "llm",
+      disclaimer: DISCLAIMER_GERAL[lang],
+      foraAmbito: true,
+      idioma: lang,
+    };
+  }
+
   private async chamarModelo(
     model: string,
     pergunta: string,
     contexto: string,
     lang: Lang,
-    fraco = false
+    systemPrompt: string
   ) {
     const ctrl = new AbortController();
     const t = setTimeout(() => ctrl.abort(), this.cfg.timeoutMs);
@@ -717,7 +863,7 @@ export class LlmEngine implements AnswerEngine {
           messages: [
             {
               role: "system",
-              content: fraco ? SYSTEM_PROMPT_FRACO : SYSTEM_PROMPT,
+              content: systemPrompt,
             },
             {
               role: "user",
