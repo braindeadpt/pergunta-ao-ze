@@ -187,9 +187,11 @@ const QUALIFICADORES_FORTES = new Set([
 ]);
 
 // Frase normalizada que afirma já ter NISS ("já tenho niss", "tenho o niss",
-// "o meu niss") — nesse caso o token é contexto, não pedido.
+// "obtive o niss", "niss atribuído") — nesse caso o token é contexto, não
+// pedido. Exige o NISS como objeto da posse e sem negação antes do verbo:
+// "já tenho NIF, como peço o NISS" e "ainda não tenho NISS" ficam de fora.
 const NISS_POSSE =
-  /\bja tenho\b|\btenho (o |meu )?niss\b|\bmeu niss\b|\bniss atribuido\b/;
+  /(?<!nao )(?:ja )?tenho (?:o |meu )?niss\b|\b(?:obtive|recebi) (?:o )?niss\b|\bniss (?:ja )?(?:foi |esta )?atribuido\b/;
 
 const SETORES_REGULADOR = [
   "regulador", "regulator", "anacom", "erse", "banco", "operadora",
