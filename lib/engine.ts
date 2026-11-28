@@ -191,7 +191,7 @@ const QUALIFICADORES_FORTES = new Set([
 // pedido. Exige o NISS como objeto da posse e sem negação antes do verbo:
 // "já tenho NIF, como peço o NISS" e "ainda não tenho NISS" ficam de fora.
 const NISS_POSSE =
-  /(?<!nao )(?:ja )?tenho (?:o |meu )?niss\b|\b(?:obtive|recebi) (?:o )?niss\b|\bniss (?:ja )?(?:foi |esta )?atribuido\b/;
+  /(?<!nao )(?:ja )?tenho (?:(?:o|meu|teu|seu) )*niss\b|\b(?:obtive|recebi) (?:o )?niss\b|\bniss (?:ja )?(?:foi |esta )?atribuido\b|\bcom (?:(?:o|meu|teu|seu) )+niss\b/;
 
 const SETORES_REGULADOR = [
   "regulador", "regulator", "anacom", "erse", "banco", "operadora",

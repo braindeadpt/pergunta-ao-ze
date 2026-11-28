@@ -170,6 +170,8 @@
   { "pergunta": "ja tenho niss como abro atividade nas financas", "idEsperado": "empresa-independente" },
   { "pergunta": "ja tenho nif como peco o niss para passar recibos verdes", "idEsperado": "ss-niss" },
   { "pergunta": "ainda nao tenho niss como peco o niss", "idEsperado": "ss-niss" },
+  { "pergunta": "ja tenho o meu niss como emito recibos verdes", "idEsperado": "rv-emitir" },
+  { "pergunta": "como abrir atividade nas financas com o meu niss", "idEsperado": "empresa-independente" },
   { "pergunta": "quantos dias de ferias tenho direito por ano", "idEsperado": "dt-ferias" },
   { "pergunta": "quando se paga o subsidio de natal", "idEsperado": "dt-subsidios" },
   { "pergunta": "fui despedido o que devo fazer", "idEsperado": "dt-despedido" },
